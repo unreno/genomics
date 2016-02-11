@@ -70,11 +70,18 @@ install: install-all $(TARGETS:%=install-%) install-scripts
 
 install-all:
 	@printf "\nINSTALLING ALL\n\n"
-	$(MKDIR) $(BASE_BIN_DIR)
+	$(MKDIR) $(BASE_BIN_DIR)/unrenogenomics
+
+
+uninstall-scripts:
+	@printf "\nUNINSTALLING SCRIPTS\n\n"
+	cd $(BASE_BIN_DIR); \
+		find . -lname unrenogenomics/\* -exec rm {} \;
+	rm -rf $(BASE_BIN_DIR)/unrenogenomics
 
 #	Remove old stuff.  Need -f or get an error.
-install-scripts:
-	$(MKDIR) $(BASE_BIN_DIR)
+install-scripts: uninstall-scripts
+	$(MKDIR) $(BASE_BIN_DIR)/unrenogenomics
 	@printf "\nINSTALLING SCRIPTS\n\n"
 #	#	No longer using rins, so why keep installing
 #	rm -f $(BASE_BIN_DIR)/blastn_cleanup.pl
@@ -104,7 +111,14 @@ install-scripts:
 	#cp scripts/*awk $(BASE_BIN_DIR)
 	#cp scripts/*pl $(BASE_BIN_DIR)
 	#cp scripts/*rb $(BASE_BIN_DIR)
-	#cp scripts/*sh $(BASE_BIN_DIR)
+	#cp scripts/*sh $(BASE_BIN_DIR)/unrenogenomics
+
+	cd $(BASE_BIN_DIR); \
+	for file in `find unrenogenomics -type f` ; do \
+		echo $$file; \
+		ln -s $$file; \
+	done
+
 
 #	#	remove old, no longer used scripts (there are others, just not sure which)
 #	rm -f $(BASE_BIN_DIR)/rins.rb
