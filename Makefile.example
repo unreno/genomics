@@ -5,7 +5,7 @@ BASE_BIN_DIR = ${BASE_DIR}/bin
 #	All scripts will be installed in this subdir
 #	and linked from the parent. This will allow 
 #	for the uninstallation of everything!
-APPS_SUBDIR  = "unreno_genomics"
+APPS_SUBDIR  = unreno_genomics
 
 #	There is a difference between 34 and 35.  I don't know exactly what it is
 #	but 35 finds nothing and 34 finds a bunch.  Perhaps a change in parameters?
@@ -88,35 +88,13 @@ uninstall-scripts:
 install-scripts: uninstall-scripts
 	$(MKDIR) $(BASE_BIN_DIR)/$(APPS_SUBDIR)
 	@printf "\nINSTALLING SCRIPTS\n\n"
-#	#	No longer using rins, so why keep installing
-#	rm -f $(BASE_BIN_DIR)/blastn_cleanup.pl
-#	rm -f $(BASE_BIN_DIR)/blatoutcandidate.pl
-#	rm -f $(BASE_BIN_DIR)/candidate_non_human.pl
-#	rm -f $(BASE_BIN_DIR)/chopreads.pl
-#	rm -f $(BASE_BIN_DIR)/compress.pl
-#	rm -f $(BASE_BIN_DIR)/fastq2fasta.pl
-#	rm -f $(BASE_BIN_DIR)/modify_trinity_output.pl
-#	rm -f $(BASE_BIN_DIR)/pull_reads_fasta.pl
-#	rm -f $(BASE_BIN_DIR)/rins.pl
-#	rm -f $(BASE_BIN_DIR)/sam2names.pl
-#	rm -f $(BASE_BIN_DIR)/write_result.pl
-#	#	remove old, deprecated scripts
-#	rm -f $(BASE_BIN_DIR)/ec_fasta_split_and_blastn.sh
-#	rm -f $(BASE_BIN_DIR)/blastn_check.sh
-#	rm -f $(BASE_BIN_DIR)/blastn_check.gawk
-#	rm -f $(BASE_BIN_DIR)/fasta_read_split.awk
-#	rm -f $(BASE_BIN_DIR)/fasta_size_split.awk
-#	rm -f $(BASE_BIN_DIR)/remove_N_reads_from_fasta.awk
-#	rm -f $(BASE_BIN_DIR)/rins_ccls_lib.rb
-#	rm -f $(BASE_BIN_DIR)/srun_blastn_to_nt.sh
-#	#	No longer using rins, so why keep installing
-#	#	cp rins_core/*pl $(BASE_BIN_DIR)
 
 	#	when these actually exist ...
-	#cp scripts/*awk $(BASE_BIN_DIR)
-	#cp scripts/*pl $(BASE_BIN_DIR)
-	#cp scripts/*rb $(BASE_BIN_DIR)
-	#cp scripts/*sh $(BASE_BIN_DIR)/$(APPS_SUBDIR)
+	#cp scripts/*.gawk $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
+	#cp scripts/*.awk $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
+	#cp scripts/*.pl $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
+	#cp scripts/*.rb $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
+	#cp scripts/*.sh $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
 
 	cd $(BASE_BIN_DIR); \
 	for file in `find $(APPS_SUBDIR) -type f` ; do \
@@ -124,20 +102,6 @@ install-scripts: uninstall-scripts
 		ln -s $$file; \
 	done
 
-
-#	#	remove old, no longer used scripts (there are others, just not sure which)
-#	rm -f $(BASE_BIN_DIR)/rins.rb
-#	rm -f $(BASE_BIN_DIR)/blastn_cleanup.rb
-#	rm -f $(BASE_BIN_DIR)/blatoutcandidate.rb
-#	rm -f $(BASE_BIN_DIR)/candidate_non_human.rb
-#	rm -f $(BASE_BIN_DIR)/file_format_detector.rb
-#	rm -f $(BASE_BIN_DIR)/pull_reads_fasta.rb
-#	rm -f $(BASE_BIN_DIR)/sam2names.rb
-#	rm -f $(BASE_BIN_DIR)/write_result.rb
-#	rm -f $(BASE_BIN_DIR)/add_descriptions_to_results.rb
-#	rm -f $(BASE_BIN_DIR)/just_first_contig_match_results.rb
-#	rm -f $(BASE_BIN_DIR)/dark.rb
-#	rm -f $(BASE_BIN_DIR)/dark_OLD.rb
 
 #	cp rins_ccls/*awk $(BASE_BIN_DIR)
 #	*awk would include *.awk and *.gawk
