@@ -3,6 +3,8 @@
 #	Output when selecting will be tsv.
 #	Making the command last would make it easier to parse if it contained any tabs.
 
+#	Making it text would be better as well.  Commands could be long.
+
 mysql --user root << EOF
 DROP DATABASE IF EXISTS queue;
 CREATE DATABASE queue;
