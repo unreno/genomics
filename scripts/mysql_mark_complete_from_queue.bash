@@ -9,6 +9,6 @@ done
 
 var="${var}"$'\n'"UNLOCK TABLES;"
 
-echo "$var"
+#echo "$var"
 
 echo "$var" | mysql --user root queue
