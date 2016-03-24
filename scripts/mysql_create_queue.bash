@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#	Output when selecting will be tsv.
+#	Making the command last would make it easier to parse if it contained any tabs.
+
 mysql --user root << EOF
 DROP DATABASE IF EXISTS queue;
 CREATE DATABASE queue;
@@ -7,10 +10,10 @@ CONNECT queue;
 
 CREATE TABLE queue (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-	command VARCHAR(255) NOT NULL,
 	added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	started_at TIMESTAMP,
-	completed_at TIMESTAMP
+	completed_at TIMESTAMP,
+	command VARCHAR(255) NOT NULL
 );
 EOF
 
