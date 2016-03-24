@@ -15,7 +15,6 @@ CREATE TABLE queue (
 	added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	started_at TIMESTAMP,
 	completed_at TIMESTAMP,
-	command VARCHAR(255) NOT NULL
+	command TEXT NOT NULL
 );
 EOF
-
