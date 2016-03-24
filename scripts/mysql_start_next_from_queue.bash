@@ -22,4 +22,3 @@ WHERE id = @last;
 
 UNLOCK TABLES;
 EOF
-
