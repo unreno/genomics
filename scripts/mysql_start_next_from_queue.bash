@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mysql --user root queue << EOF
+mysql --user root --skip-column-names queue << EOF
 LOCK TABLES queue WRITE;
 
 SELECT id INTO @last FROM queue
@@ -12,7 +12,7 @@ UPDATE queue
 SET started_at = CURRENT_TIMESTAMP
 WHERE id = @last;
 
-SELECT * FROM queue
+SELECT command FROM queue
 WHERE id = @last;
 
 UNLOCK TABLES;
