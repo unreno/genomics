@@ -17,7 +17,7 @@
 #	r=`./mysql_start_next_from_queue.bash`
 
 #	Boom!
-while r=`./mysql_start_next_from_queue.bash` && [ -n "$r" ] ; do
+while r=`mysql_start_next_from_queue.bash` && [ -n "$r" ] ; do
 #	if [ "x$r" != "x" ] ; then	#	r is not blank
 	
 		id=`echo "$r" | grep "^     id: "`
@@ -31,6 +31,8 @@ while r=`./mysql_start_next_from_queue.bash` && [ -n "$r" ] ; do
 		#	run the command
 	
 		#	mark as complete record with id = $id
+
+		mysql_mark_complete_from_queue.bash $id
 	
 #	else	
 #		echo "Queue appears to be empty."
