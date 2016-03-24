@@ -29,6 +29,7 @@ while r=`mysql_start_next_from_queue.bash` && [ -n "$r" ] ; do
 		echo "--${command}--"
 	
 		#	run the command
+		$command
 	
 		#	mark as complete record with id = $id
 
