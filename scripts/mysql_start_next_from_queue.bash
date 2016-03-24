@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-
-
 mysql --user root queue << EOF
 LOCK TABLES queue WRITE;
 
