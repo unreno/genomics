@@ -13,10 +13,12 @@
 
 #while [ r=`./mysql_start_next_from_queue.bash` -a "x$r" != "x" ] ; do
 #	I'm not a fan of "while true" loops but I seem to using them a lot lately.
-while true ; do
+#while true ; do
+#	r=`./mysql_start_next_from_queue.bash`
 
-	r=`./mysql_start_next_from_queue.bash`
-	if [ "x$r" != "x" ] ; then	#	r is not blank
+#	Boom!
+while r=`./mysql_start_next_from_queue.bash` && [ -n "$r" ] ; do
+#	if [ "x$r" != "x" ] ; then	#	r is not blank
 	
 		id=`echo "$r" | grep "^     id: "`
 		id=${id:9}
@@ -30,8 +32,11 @@ while true ; do
 	
 		#	mark as complete record with id = $id
 	
-	else	
-		echo "Queue appears to be empty."
-		break	#	from the while true loop
-	fi
+#	else	
+#		echo "Queue appears to be empty."
+#		break	#	from the while true loop
+#	fi
 done
+
+echo "Queue appears to be empty now."
+
