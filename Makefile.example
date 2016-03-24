@@ -95,6 +95,7 @@ install-scripts: uninstall-scripts
 	#cp scripts/*.pl $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
 	#cp scripts/*.rb $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
 	#cp scripts/*.sh $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
+	cp scripts/*.bash $(BASE_BIN_DIR)/$(APPS_SUBDIR)/
 
 	cd $(BASE_BIN_DIR); \
 	for file in `find $(APPS_SUBDIR) -type f` ; do \
