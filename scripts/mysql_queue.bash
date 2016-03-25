@@ -16,7 +16,7 @@ fi
 
 database_name="queue"
 table_name="queue"
-log_file_name="`basename $0`.log"
+log_file_name="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
 
 
 #max_retries=5
@@ -96,7 +96,8 @@ start_next(){
 			ORDER BY added_at ASC
 			LIMIT 1;
 		UPDATE $table_name
-			SET started_at = CURRENT_TIMESTAMP
+			SET started_at = CURRENT_TIMESTAMP,
+				processid = $$
 			WHERE id = @last;
 		SELECT id,command FROM $table_name
 			WHERE id = @last;
@@ -165,6 +166,7 @@ start(){
 #	added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 #	started_at TIMESTAMP,
 #	completed_at TIMESTAMP,
+#	processid INT,
 #	command TEXT NOT NULL
 #);
 #EOF
