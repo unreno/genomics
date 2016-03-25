@@ -5,8 +5,9 @@ if [ $# -eq 0 ]; then
 	echo "maintain FIFO-like mysql database"
 	echo
 	echo "Usage:"
-	echo "`basename $0` push COMMAND -> adds COMMAND to bottom of queue (one at a time)"
+	echo "`basename $0` push 'COMMAND' -> adds COMMAND to bottom of queue (one at a time)"
 	echo "(currently deving pushing multiple properly quoted commands. no promises.)"
+	echo "COMMAND must be quoted! Single or double."
 	echo "`basename $0` size -> display number of records (aka count or length)"
 	echo "`basename $0` list -> display all records"
 	echo "`basename $0` start -> initiates a loop popping and running unrun elements in the queue"
@@ -187,3 +188,8 @@ case "$1" in
 	list )
 		list;;
 esac
+
+
+
+#	for i in {1..50}; do echo mysql_queue.bash push \'sleep `date +%N | cut -c 5-6`\'; done | sh
+
