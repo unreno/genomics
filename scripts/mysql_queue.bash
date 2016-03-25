@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [ $# -eq 0 ]; then
 	echo
@@ -17,36 +17,41 @@ fi
 
 database_name="queue"
 table_name="queue"
-log_file_name="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
+logfile="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
+#IFS=''	#	was for possibly preserving indentation in HEREDOCS. Causes problems.
+
+log(){
+	echo "$*" >> $logfile
+}
 
 
 #max_retries=5
 
-peek(){
-	echo "Peeking ... `date`" >> $log_file_name
-#	r=`sqlite3 -cmd '.timeout 5000' -line $database_file_name "select * from queue order by id asc limit 1"`
-#	command=`echo "$r" | grep "^\s*command = " | sed 's/^command = //'`
-#	echo $command
-}
+#peek(){
+#	echo "Peeking ... `date`" >> $logfile
+##	r=`sqlite3 -cmd '.timeout 5000' -line $database_file_name "select * from queue order by id asc limit 1"`
+##	command=`echo "$r" | grep "^\s*command = " | sed 's/^command = //'`
+##	echo $command
+#}
 
 #
 #	Sadly, rapid pop calls can result in the multiple returns of the same record.
 #
 #pop(){
-#	echo "Popping ... `date`" >> $log_file_name
+#	echo "Popping ... `date`" >> $logfile
 #	r=`sqlite3 -cmd '.timeout 5000' -line $database_file_name "select * from queue order by id asc limit 1"`
 #	id=`echo "$r" | grep " id = " | awk -F= '{print $NF}'`
 #	if [ "x$id" != "x"  ] ; then
 #		command=`echo "$r" | grep "^\s*command = " | sed 's/^command = //'`
 #		echo $command
-#		echo $command >> $log_file_name
-#		echo "Deleting ..." >> $log_file_name
+#		echo $command >> $logfile
+#		echo "Deleting ..." >> $logfile
 #		sqlite3 -cmd '.timeout 5000' $database_file_name "delete from queue where id = $id"
 #		delete_retries=0
 #		while [ $delete_retries -lt $max_retries -a \
 #			`sqlite3 -cmd '.timeout 5000' $database_file_name "select * from queue where id = $id" | wc -l` -gt 0 ]
 #		do
-#			echo "Delete failed. Retrying ... $delete_retries" >> $log_file_name
+#			echo "Delete failed. Retrying ... $delete_retries" >> $logfile
 #			sqlite3 -cmd '.timeout 5000' $database_file_name "delete from queue where id = $id"
 #			delete_retries=`expr $delete_retries + 1`
 #		done
@@ -56,7 +61,7 @@ peek(){
 push(){
 	#	The $* in a function MUST BE PASSED.  IT IS NOT THE $* from the command line.
 	#	Unless, of course, that's what you pass it.
-	echo "Pushing ... `date`" >> $log_file_name
+	log "Pushing ... `date`"
 	var="LOCK TABLES $table_name WRITE;"
 	#	for i in "$@" ; do
 	#		var="${var}"$'\n'"INSERT INTO $table_name (command) VALUES ( '$i' );"
@@ -67,13 +72,14 @@ push(){
 		shift
 	done
 	var="${var}"$'\n'"UNLOCK TABLES;"
-	echo "$var"
+	log "$var"
 	echo "$var" | mysql --user root $database_name
-	echo "Pushed $*" >> $log_file_name
+	log "Pushed $*"
+	echo "Pushed $*"
 }
 
 count(){
-	echo "Counting ... `date`" >> $log_file_name
+	log "Counting ... `date`"
 	#	The "| tail -n +2" is to remove the ***** row.
 	mysql --user root --vertical $database_name <<- EOF | tail -n +2
 		SELECT COUNT(*) INTO @all FROM $table_name;
@@ -85,7 +91,7 @@ count(){
 }
 
 list(){
-	echo "Listing ... `date`" >> $log_file_name
+	log "Listing ... `date`"
 	mysql --user root -e "SELECT * FROM $table_name" $database_name
 }
 
@@ -108,13 +114,14 @@ start_next(){
 	#	DON'T FORGET THE DOUBLE QUOTES!
 	#	Without the double quotes, the id and command will be on the 
 	#	same line in the variable and then won't work as expected.
-	echo "$var"
+	log
+	log "$var"
 	n=`echo "$var" | mysql --user root --vertical $database_name | tail -n +2`
 	echo "$n"
 }
 
 start(){
-	echo "Starting ... `date`" >> $log_file_name
+	log "Starting ... `date`"
 
 	#     id: 10
 	#command: echo "testing2"
@@ -131,15 +138,18 @@ start(){
 			id=`echo "$r" | grep "^     id: " | cut -c 10-` && \
 			command=`echo "$r" | grep "^command: " | cut -c 10-` && \
 			[ "x$id" != "x" -a "x$command" != "x" ] ; do
-		echo "$r"
+#		echo "$r"
 #		id=`echo "$r" | grep "^     id: " | cut -c 10-`
 #		id=${id:9}
-		echo "--${id}--"
+#		echo "--${id}--"
 	
 #		command=`echo "$r" | grep "^command: " | cut -c 10-`
 #		command=${command:9}
-		echo "--${command}--"
+#		echo "--${command}--"
 	
+		log "Running ... id $id"
+		log "Running ... $command"
+
 		#	run the command
 		$command
 	
@@ -149,7 +159,7 @@ start(){
 			UPDATE $table_name SET completed_at = CURRENT_TIMESTAMP WHERE id = '$id';
 			UNLOCK TABLES;
 		EOF
-		echo "$var"
+		log "$var"
 		echo "$var" | mysql --user root $database_name
 	done
 
@@ -173,8 +183,8 @@ start(){
 #EOF
 
 case "$1" in
-	peek )
-		shift; peek;;
+#	peek )
+#		shift; peek;;
 #	pop )
 #		shift; pop;;
 	start )
