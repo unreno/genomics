@@ -1,0 +1,746 @@
+
+With OwnerId and UserId removed, not that it matters.
+
+
+aws rds describe-db-security-groups
+
+{
+    "DBSecurityGroups": [
+        {
+            "IPRanges": [], 
+            "OwnerId": 
+            "DBSecurityGroupDescription": "default", 
+            "EC2SecurityGroups": [], 
+            "DBSecurityGroupName": "default"
+        }
+    ]
+}
+
+aws rds delete-db-security-group --db-security-group-name default
+
+A client error (InvalidParameterValue) occurred when calling the DeleteDBSecurityGroup operation: You cannot delete the default DB security group
+
+
+
+
+aws rds describe-db-instances
+
+
+{
+    "DBInstances": [
+        {
+            "PubliclyAccessible": true, 
+            "MasterUsername": "myawsuser", 
+            "MonitoringInterval": 0, 
+            "LicenseModel": "general-public-license", 
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active", 
+                    "VpcSecurityGroupId": "sg-6f7e0717"
+                }
+            ], 
+            "InstanceCreateTime": "2016-03-28T18:06:10.302Z", 
+            "CopyTagsToSnapshot": false, 
+            "OptionGroupMemberships": [
+                {
+                    "Status": "in-sync", 
+                    "OptionGroupName": "default:mariadb-10-0"
+                }
+            ], 
+            "PendingModifiedValues": {}, 
+            "Engine": "mariadb", 
+            "MultiAZ": false, 
+            "LatestRestorableTime": "2016-03-28T21:40:00Z", 
+            "DBSecurityGroups": [], 
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.mariadb10.0", 
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ], 
+            "AutoMinorVersionUpgrade": true, 
+            "PreferredBackupWindow": "03:14-03:44", 
+            "DBSubnetGroup": {
+                "Subnets": [
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-186dee40", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        }
+                    }, 
+                    {
+                        "SubnetStatus": "Active", 
+                        "SubnetIdentifier": "subnet-abcea5dd", 
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        }
+                    }
+                ], 
+                "DBSubnetGroupName": "queuedbsubnetgroupname", 
+                "VpcId": "vpc-a6434cc2", 
+                "DBSubnetGroupDescription": "queuedbsubnetgroupdescription", 
+                "SubnetGroupStatus": "Complete"
+            }, 
+            "ReadReplicaDBInstanceIdentifiers": [], 
+            "AllocatedStorage": 5, 
+            "BackupRetentionPeriod": 1, 
+            "DBName": "queuednname", 
+            "PreferredMaintenanceWindow": "fri:06:50-fri:07:20", 
+            "Endpoint": {
+                "Port": 3306, 
+                "Address": "queuedbinstanceid.c8xrmj8azb5r.us-east-1.rds.amazonaws.com"
+            }, 
+            "DBInstanceStatus": "available", 
+            "EngineVersion": "10.0.17", 
+            "AvailabilityZone": "us-east-1a", 
+            "DomainMemberships": [], 
+            "StorageType": "standard", 
+            "DbiResourceId": "db-5BZYRDENNAEY66UWAMOECGSOCM", 
+            "CACertificateIdentifier": "rds-ca-2015", 
+            "StorageEncrypted": false, 
+            "DBInstanceClass": "db.t2.micro", 
+            "DbInstancePort": 0, 
+            "DBInstanceIdentifier": "queuedbinstanceid"
+        }
+    ]
+}
+
+aws rds delete-db-instance --db-instance-identifier queuedbinstanceid --skip-final-snapshot
+
+
+
+
+
+
+
+
+aws rds describe-db-subnet-groups
+
+{
+    "DBSubnetGroups": [
+        {
+            "Subnets": [
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-b77245ee", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1b"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-211b3e0a", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1e"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-57925b6a", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1d"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-5855482f", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1a"
+                    }
+                }
+            ], 
+            "DBSubnetGroupName": "default-vpc-0f2fff6b", 
+            "VpcId": "vpc-0f2fff6b", 
+            "DBSubnetGroupDescription": "Created from the RDS Management Console", 
+            "SubnetGroupStatus": "Complete"
+        }, 
+        {
+            "Subnets": [
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-32b8700f", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1d"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-f88cbba1", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1b"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-34a1bc43", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1a"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-92e6c2b9", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1e"
+                    }
+                }
+            ], 
+            "DBSubnetGroupName": "default-vpc-d879aabc", 
+            "VpcId": "vpc-d879aabc", 
+            "DBSubnetGroupDescription": "Created from the RDS Management Console", 
+            "SubnetGroupStatus": "Complete"
+        }, 
+        {
+            "Subnets": [
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-186dee40", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1b"
+                    }
+                }, 
+                {
+                    "SubnetStatus": "Active", 
+                    "SubnetIdentifier": "subnet-abcea5dd", 
+                    "SubnetAvailabilityZone": {
+                        "Name": "us-east-1a"
+                    }
+                }
+            ], 
+            "DBSubnetGroupName": "queuedbsubnetgroupname", 
+            "VpcId": "vpc-a6434cc2", 
+            "DBSubnetGroupDescription": "queuedbsubnetgroupdescription", 
+            "SubnetGroupStatus": "Complete"
+        }
+    ]
+}
+
+
+aws rds delete-db-subnet-group --db-subnet-group-name default-vpc-0f2fff6b
+aws rds delete-db-subnet-group --db-subnet-group-name default-vpc-d879aabc
+aws rds delete-db-subnet-group --db-subnet-group-name queuedbsubnetgroupname
+
+A client error (InvalidDBSubnetGroupStateFault) occurred when calling the DeleteDBSubnetGroup operation: Cannot delete the subnet group 'queuedbsubnetgroupname' because at least one database instance: queuedbinstanceid is still using it.
+
+aws rds delete-db-subnet-group --db-subnet-group-name queuedbsubnetgroupname
+
+
+
+
+
+
+
+
+aws ec2 describe-subnets
+
+{
+    "Subnets": [
+        {
+            "VpcId": "vpc-a6434cc2", 
+            "CidrBlock": "10.0.16.0/20", 
+            "MapPublicIpOnLaunch": false, 
+            "DefaultForAz": false, 
+            "State": "available", 
+            "AvailabilityZone": "us-east-1b", 
+            "SubnetId": "subnet-186dee40", 
+            "AvailableIpAddressCount": 4091
+        }, 
+        {
+            "VpcId": "vpc-a6434cc2", 
+            "CidrBlock": "10.0.0.0/20", 
+            "MapPublicIpOnLaunch": false, 
+            "DefaultForAz": false, 
+            "State": "available", 
+            "AvailabilityZone": "us-east-1a", 
+            "SubnetId": "subnet-abcea5dd", 
+            "AvailableIpAddressCount": 4090
+        }, 
+        {
+            "VpcId": "vpc-dfc47bbb", 
+            "CidrBlock": "172.31.0.0/16", 
+            "MapPublicIpOnLaunch": false, 
+            "DefaultForAz": false, 
+            "State": "available", 
+            "AvailabilityZone": "us-east-1b", 
+            "SubnetId": "subnet-947a73cd", 
+            "AvailableIpAddressCount": 65531
+        }
+    ]
+}
+
+aws ec2 delete-subnet --subnet-id subnet-186dee40
+aws ec2 delete-subnet --subnet-id subnet-abcea5dd
+aws ec2 delete-subnet --subnet-id subnet-947a73cd
+
+
+
+
+
+
+aws ec2 describe-security-groups
+
+
+{
+    "SecurityGroups": [
+        {
+            "IpPermissionsEgress": [], 
+            "Description": "default group", 
+            "IpPermissions": [
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 0, 
+                    "IpRanges": [], 
+                    "ToPort": 65535, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 0, 
+                    "IpRanges": [], 
+                    "ToPort": 65535, 
+                    "IpProtocol": "udp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": -1, 
+                    "IpRanges": [], 
+                    "ToPort": -1, 
+                    "IpProtocol": "icmp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 22, 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "ToPort": 22, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": []
+                }
+            ], 
+            "GroupName": "default", 
+            "OwnerId": 
+            "GroupId": "sg-467ca02f"
+        }, 
+        {
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1", 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "UserIdGroupPairs": [], 
+                    "PrefixListIds": []
+                }
+            ], 
+            "Description": "default VPC security group", 
+            "IpPermissions": [
+                {
+                    "IpProtocol": "-1", 
+                    "IpRanges": [], 
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": 
+                            "GroupId": "sg-6f7e0717"
+                        }
+                    ], 
+                    "PrefixListIds": []
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 3306, 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "ToPort": 3306, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": []
+                }
+            ], 
+            "GroupName": "default", 
+            "VpcId": "vpc-a6434cc2", 
+            "OwnerId": 
+            "GroupId": "sg-6f7e0717"
+        }, 
+        {
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1", 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "UserIdGroupPairs": [], 
+                    "PrefixListIds": []
+                }
+            ], 
+            "Description": "default VPC security group", 
+            "IpPermissions": [
+                {
+                    "IpProtocol": "-1", 
+                    "IpRanges": [], 
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": 
+                            "GroupId": "sg-9c9413fa"
+                        }
+                    ], 
+                    "PrefixListIds": []
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 22, 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "ToPort": 22, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": []
+                }
+            ], 
+            "GroupName": "default", 
+            "VpcId": "vpc-dfc47bbb", 
+            "OwnerId": 
+            "GroupId": "sg-9c9413fa"
+        }, 
+        {
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1", 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "UserIdGroupPairs": [], 
+                    "PrefixListIds": []
+                }
+            ], 
+            "Description": "launch-wizard-1 created 2015-11-06T12:55:38.230-08:00", 
+            "IpPermissions": [
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 22, 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "ToPort": 22, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": []
+                }
+            ], 
+            "GroupName": "launch-wizard-1", 
+            "VpcId": "vpc-dfc47bbb", 
+            "OwnerId": 
+            "GroupId": "sg-f2ac2b94"
+        }
+    ]
+}
+
+aws ec2 delete-security-group --group-id sg-467ca02f
+
+A client error (InvalidGroup.Reserved) occurred when calling the DeleteSecurityGroup operation: The 'default' security group is reserved, and cannot be deleted by a user. If creating a security group, specify a different name.
+
+Most are "defaults", but this one isn't.
+aws ec2 delete-security-group --group-id sg-f2ac2b94
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+aws ec2 describe-internet-gateways
+
+{
+    "InternetGateways": [
+        {
+            "Tags": [], 
+            "InternetGatewayId": "igw-72890d16", 
+            "Attachments": [
+                {
+                    "State": "available", 
+                    "VpcId": "vpc-a6434cc2"
+                }
+            ]
+        }, 
+        {
+            "Tags": [], 
+            "InternetGatewayId": "igw-1c584979", 
+            "Attachments": [
+                {
+                    "State": "available", 
+                    "VpcId": "vpc-dfc47bbb"
+                }
+            ]
+        }
+    ]
+}
+
+
+aws ec2 describe-route-tables
+
+
+{
+    "RouteTables": [
+        {
+            "Associations": [
+                {
+                    "RouteTableAssociationId": "rtbassoc-6c909f0b", 
+                    "Main": true, 
+                    "RouteTableId": "rtb-96f05df1"
+                }
+            ], 
+            "RouteTableId": "rtb-96f05df1", 
+            "VpcId": "vpc-a6434cc2", 
+            "PropagatingVgws": [], 
+            "Tags": [], 
+            "Routes": [
+                {
+                    "GatewayId": "local", 
+                    "DestinationCidrBlock": "10.0.0.0/16", 
+                    "State": "active", 
+                    "Origin": "CreateRouteTable"
+                }, 
+                {
+                    "GatewayId": "igw-72890d16", 
+                    "DestinationCidrBlock": "0.0.0.0/0", 
+                    "State": "active", 
+                    "Origin": "CreateRoute"
+                }
+            ]
+        }, 
+        {
+            "Associations": [
+                {
+                    "RouteTableAssociationId": "rtbassoc-3b94935f", 
+                    "Main": true, 
+                    "RouteTableId": "rtb-85cfa0e1"
+                }
+            ], 
+            "RouteTableId": "rtb-85cfa0e1", 
+            "VpcId": "vpc-dfc47bbb", 
+            "PropagatingVgws": [], 
+            "Tags": [], 
+            "Routes": [
+                {
+                    "GatewayId": "local", 
+                    "DestinationCidrBlock": "172.31.0.0/16", 
+                    "State": "active", 
+                    "Origin": "CreateRouteTable"
+                }, 
+                {
+                    "GatewayId": "igw-1c584979", 
+                    "DestinationCidrBlock": "0.0.0.0/0", 
+                    "State": "active", 
+                    "Origin": "CreateRoute"
+                }
+            ]
+        }
+    ]
+}
+
+
+
+
+
+
+
+
+
+
+aws ec2 describe-vpcs
+
+
+{
+    "Vpcs": [
+        {
+            "VpcId": "vpc-a6434cc2", 
+            "InstanceTenancy": "default", 
+            "State": "available", 
+            "DhcpOptionsId": "dopt-513bc334", 
+            "CidrBlock": "10.0.0.0/16", 
+            "IsDefault": false
+        }, 
+        {
+            "VpcId": "vpc-dfc47bbb", 
+            "InstanceTenancy": "default", 
+            "State": "available", 
+            "DhcpOptionsId": "dopt-513bc334", 
+            "CidrBlock": "172.31.0.0/16", 
+            "IsDefault": false
+        }
+    ]
+}
+
+
+
+Must do this in the proper order
+aws ec2 detach-internet-gateway --internet-gateway-id igw-72890d16 --vpc-id vpc-a6434cc2
+aws ec2 delete-vpc --vpc-id vpc-a6434cc2
+aws ec2 delete-internet-gateway --internet-gateway-id igw-72890d16
+
+aws ec2 detach-internet-gateway --internet-gateway-id igw-1c584979 --vpc-id vpc-dfc47bbb
+aws ec2 delete-vpc --vpc-id vpc-dfc47bbb
+aws ec2 delete-internet-gateway --internet-gateway-id igw-1c584979
+
+
+
+
+
+
+aws ec2 describe-route-tables
+{
+    "RouteTables": []
+}
+
+aws ec2 describe-vpcs
+{
+    "Vpcs": []
+}
+
+aws ec2 describe-internet-gateways
+{
+    "InternetGateways": []
+}
+
+aws ec2 describe-subnets
+{
+    "Subnets": []
+}
+
+aws rds describe-db-instances 
+{
+    "DBInstances": []
+}
+
+aws rds describe-db-subnet-groups
+{
+    "DBSubnetGroups": []
+}
+
+aws rds describe-db-security-groups
+{
+    "DBSecurityGroups": [
+        {
+            "IPRanges": [], 
+            "OwnerId": 
+            "DBSecurityGroupDescription": "default", 
+            "EC2SecurityGroups": [], 
+            "DBSecurityGroupName": "default"
+        }
+    ]
+}
+
+aws ec2 describe-security-groups
+{
+    "SecurityGroups": [
+        {
+            "IpPermissionsEgress": [], 
+            "Description": "default group", 
+            "IpPermissions": [
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 0, 
+                    "IpRanges": [], 
+                    "ToPort": 65535, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 0, 
+                    "IpRanges": [], 
+                    "ToPort": 65535, 
+                    "IpProtocol": "udp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": -1, 
+                    "IpRanges": [], 
+                    "ToPort": -1, 
+                    "IpProtocol": "icmp", 
+                    "UserIdGroupPairs": [
+                        {
+                            "GroupName": "default", 
+                            "UserId": 
+                            "GroupId": "sg-467ca02f"
+                        }
+                    ]
+                }, 
+                {
+                    "PrefixListIds": [], 
+                    "FromPort": 22, 
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ], 
+                    "ToPort": 22, 
+                    "IpProtocol": "tcp", 
+                    "UserIdGroupPairs": []
+                }
+            ], 
+            "GroupName": "default", 
+            "OwnerId": 
+            "GroupId": "sg-467ca02f"
+        }
+    ]
+}
+
+Can't destroy the default security group and default db security group.
+
