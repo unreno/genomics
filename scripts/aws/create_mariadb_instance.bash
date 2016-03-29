@@ -31,6 +31,42 @@ done
 #       Basically, this is TRUE AND DO ...
 [ -z $password ] && usage
 
+
+
+#	Check if database with this id exists already.
+#	Basically
+#if [ `aws rds describe-db-instances | jq '.DBInstances | select(.DBInstanceIdentifier == "QueueDbInstanceId") | length'` -gt 0 ] ; then
+#	echo -e "You've already got a Queue DB setup. You probably don't want to do this.\n"
+#	exit
+#fi
+#
+#	If there aren't any, jq crashes
+#	
+
+
+#	If not found, the following will be printed on the STDERR. I don't need it, so to dev null.
+#	A client error (DBInstanceNotFound) occurred when calling the DescribeDBInstances operation: DBInstance QueueDbInstanceId not found.
+r=`aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId 2> /dev/null`
+status=$? 	#	255 when it doesn't exist
+
+if [ $status -ne 0 ] ; then
+	echo "$status ne 0"
+	echo "Doesn't exist, I think"
+	exit
+fi
+
+exit
+#	Basically, don't overwrite the cnf file if a db exists.
+
+cat <<-EOF > awsqueue.cnf
+[mysql]
+user=$username
+password=$password
+port=3306
+host=
+EOF
+chmod 600 awsqueue.cnf
+
 aws rds create-db-instance \
 	--publicly-accessible
 	--engine mariadb \
@@ -176,5 +212,13 @@ aws rds create-db-instance \
 #	Perhaps create an alias if you're really into it
 #	alias mysql_awsqueue="mysql --defaults-group-suffix=awsqueue"
 
+#	Or a separate defaults file could be created altogether. --defaults-file=HOST.cnf
+#	(I like this option. Its isolated and can be created and destroyed with the database)
+
+#	One could also use the encrypted version created by mysql_config_editor
+#	if you are using >5.6, I think. (~/.mylogin.cnf)
+#	Don't be fooled though. The file is encrypted, but the source code has the key.
+#	I could easily modify and recompile the source and have the password.
+#	IT IS NOT SECURE. Only fractionally moreso than ~/.my.cnf
 
 
