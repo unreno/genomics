@@ -84,8 +84,8 @@ aws ec2 authorize-security-group-ingress \
 	--protocol tcp --port 3306 --cidr 0.0.0.0/0 \
 	--group-id $sgid
 
-subnetgroupname='dbsubnetgroupname'
-subnetgroup=`aws rds create-db-subnet-group --db-subnet-group-name $subnetgroupname --db-subnet-group-description dbsubnetgroupdescription --subnet-ids $subnetid1 $subnetid2`
+subnetgroupname='DbSubnetGroupName'
+subnetgroup=`aws rds create-db-subnet-group --db-subnet-group-name $subnetgroupname --db-subnet-group-description DbSubnetGroupDescription --subnet-ids $subnetid1 $subnetid2`
 echo $subnetgroup
 
 #{
@@ -106,9 +106,9 @@ echo $subnetgroup
 #                }
 #            }
 #        ], 
-#        "DBSubnetGroupName": "queuedbsubnetgroupname", 
+#        "DBSubnetGroupName": "DbSubnetGroupName", 
 #        "VpcId": "vpc-a6434cc2", 
-#        "DBSubnetGroupDescription": "queuedbsubnetgroupdescription", 
+#        "DBSubnetGroupDescription": "DbSubnetGroupDescription", 
 #        "SubnetGroupStatus": "Complete"
 #    }
 #}
