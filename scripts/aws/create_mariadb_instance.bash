@@ -46,29 +46,28 @@ done
 
 #	If not found, the following will be printed on the STDERR. I don't need it, so to dev null.
 #	A client error (DBInstanceNotFound) occurred when calling the DescribeDBInstances operation: DBInstance QueueDbInstanceId not found.
-r=`aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId 2> /dev/null`
-status=$? 	#	255 when it doesn't exist
-
-if [ $status -ne 0 ] ; then
-	echo "$status ne 0"
-	echo "Doesn't exist, I think"
-	exit
+qdbi=`aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId 1> /dev/null 2>&1`
+#	qdbi should be blank, so storing it is unnecessary.
+status=$? 	#	0 when it exists, 255 when it doesn't
+if [ $status -eq 0 ] ; then
+	echo "QueueDbInstanceId already exists. Stopping."
+	exit $status
 fi
 
-exit
 #	Basically, don't overwrite the cnf file if a db exists.
 
 cat <<-EOF > awsqueue.cnf
 [mysql]
 user=$username
 password=$password
+database=QueueDbName
 port=3306
 host=
 EOF
 chmod 600 awsqueue.cnf
 
 aws rds create-db-instance \
-	--publicly-accessible
+	--publicly-accessible \
 	--engine mariadb \
 	--allocated-storage 5 \
 	--db-instance-class db.t2.micro \
@@ -178,6 +177,7 @@ aws rds create-db-instance \
 
 
 
+aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId --query "DBInstances[].Endpoint"
 
 
 
@@ -220,5 +220,17 @@ aws rds create-db-instance \
 #	Don't be fooled though. The file is encrypted, but the source code has the key.
 #	I could easily modify and recompile the source and have the password.
 #	IT IS NOT SECURE. Only fractionally moreso than ~/.my.cnf
+
+
+echo "Running the following in a few minutes to get the hostname."
+
+echo 'aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId --query "DBInstances[].Endpoint'
+
+echo "Then add it to the awsqueue.cnf file."
+
+echo "Then connect simply via ..."
+
+echo "mysql --defaults-file=awsqueue.cnf"
+
 
 
