@@ -152,3 +152,29 @@ aws rds create-db-instance \
 #	If need to delete ...
 #	aws rds delete-db-instance --db-instance-identifier queuedbinstanceid --skip-final-snapshot
 #	Deleting can take several minutes
+
+
+
+
+
+#	To simplify usage, ~/.my.cnf could be created to include the database specs.
+#	Probably a good idea to "chmod 600 ~/.my.cnf"
+#	Then simple call "mysql --defaults-group-suffix=awsqueue"
+#[mysqlawsqueue]
+#	host
+#	port
+#	user
+#	password
+#	database
+#
+#	This cnf file overwrites settings so last setting sticks.
+#	eg
+#		database=overwritten_db
+#		database=used_db
+#
+
+#	Perhaps create an alias if you're really into it
+#	alias mysql_awsqueue="mysql --defaults-group-suffix=awsqueue"
+
+
+
