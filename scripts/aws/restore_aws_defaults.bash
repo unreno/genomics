@@ -16,6 +16,11 @@ aws ec2 describe-internet-gateways
 aws ec2 describe-route-tables
 aws ec2 describe-vpcs
 
+if [ `aws ec2 describe-vpcs | jq '.Vpcs | length'` -gt 0 ] ; then
+	echo -e "You've already got a VPC setup. You probably don't want to do this.\n"
+	exit
+fi
+
 
 echo "Create a VPC, with security group and route table"
 vpc=`aws ec2 create-vpc --cidr-block 172.31.0.0/16`
