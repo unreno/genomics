@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-if [ $# -eq 0 ]; then
+#cat ~/.localqueue.cnf
+#[mysql]
+#user=root
+#password=
+#database=queue
+defaults_file="~/.localqueue.cnf"
+#database_name="queue"
+table_name="queue"
+
+function usage(){
 	echo
 	echo "maintain FIFO-like mysql database"
 	echo
@@ -12,11 +21,37 @@ if [ $# -eq 0 ]; then
 	echo "`basename $0` list -> display all records"
 	echo "`basename $0` start -> initiates a loop popping and running unrun elements in the queue"
 	echo
+	echo "Defaults:"
+	echo "--defaults_file . $defaults_file"
+	echo "--table_name .... $table_name"
+	echo
+	echo "Example:"
+	echo "`basename $0` --defaults_file ~/.awsqueue.cnf push 'sleep 10'"
+	echo
+	echo "Tips:"
+	echo "Create an alias ..."
+	echo "... alias awsq='`basename $0` --defaults_file ~/.awsqueue.cnf'"
+	echo "awsq push 'sleep 10'"
+	echo "awsq list"
+	echo
 	exit
-fi
+}
 
-database_name="queue"
-table_name="queue"
+while [ $# -ne 0 ] ; do
+	case $1 in
+		-d|--d*)
+			shift; defaults_file=$1; shift ;;
+		-t|--t*)
+			shift; table_name=$1; shift ;;
+		-*)
+			echo ; echo "Unexpected args from: ${*}"; usage ;;
+		*)
+			break;;
+	esac
+done
+
+[ $# -eq 0 ] && usage
+
 logfile="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
 #IFS=''	#	was for possibly preserving indentation in HEREDOCS. Causes problems.
 
@@ -73,7 +108,8 @@ push(){
 	done
 	var="${var}"$'\n'"UNLOCK TABLES;"
 	log "$var"
-	echo "$var" | mysql --user root $database_name
+#	echo "$var" | mysql --user root $database_name
+	echo "$var" | mysql --defaults-file=$defaults_file
 	log "Pushed $*"
 	echo "Pushed $*"
 }
@@ -81,7 +117,8 @@ push(){
 count(){
 	log "Counting ... `date`"
 	#	The "| tail -n +2" is to remove the ***** row.
-	mysql --user root --vertical $database_name <<- EOF | tail -n +2
+#	mysql --user root --vertical $database_name <<- EOF | tail -n +2
+	mysql --defaults-file=$defaults_file --vertical <<- EOF | tail -n +2
 		SELECT COUNT(*) INTO @all FROM $table_name;
 		SELECT COUNT(*) INTO @waiting FROM $table_name WHERE started_at = 0;
 		SELECT COUNT(*) INTO @running FROM $table_name WHERE started_at <> 0 AND completed_at = 0;
@@ -92,7 +129,8 @@ count(){
 
 list(){
 	log "Listing ... `date`"
-	mysql --user root -e "SELECT * FROM $table_name" $database_name
+#	mysql --user root -e "SELECT * FROM $table_name" $database_name
+	mysql --defaults-file=$defaults_file -e "SELECT * FROM $table_name"
 }
 
 start_next(){
@@ -116,7 +154,8 @@ start_next(){
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
-	n=`echo "$var" | mysql --user root --vertical $database_name | tail -n +2`
+#	n=`echo "$var" | mysql --user root --vertical $database_name | tail -n +2`
+	n=`echo "$var" | mysql --defaults-file=$defaults_file --vertical | tail -n +2`
 	echo "$n"
 }
 
@@ -160,7 +199,8 @@ start(){
 			UNLOCK TABLES;
 		EOF
 		log "$var"
-		echo "$var" | mysql --user root $database_name
+#		echo "$var" | mysql --user root $database_name
+		echo "$var" | mysql --defaults-file=$defaults_file
 	done
 
 	echo "Queue appears to be empty now."
