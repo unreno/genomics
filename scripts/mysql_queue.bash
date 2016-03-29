@@ -20,6 +20,7 @@ function usage(){
 	echo "`basename $0` size -> display number of records (aka count or length)"
 	echo "`basename $0` list -> display all records"
 	echo "`basename $0` start -> initiates a loop popping and running unrun elements in the queue"
+	echo "`basename $0` create -> creates table (does not create database or destroy existing table"
 	echo
 	echo "Defaults:"
 	echo "--defaults_file . $defaults_file"
@@ -29,7 +30,7 @@ function usage(){
 	echo "`basename $0` --defaults_file ~/.awsqueue.cnf push 'sleep 10'"
 	echo
 	echo "Tips:"
-	echo "Create an alias ..."
+	echo "Create an alias ... (FYI: aliases don't get pulled into scripts!)"
 	echo "... alias awsq='`basename $0` --defaults_file ~/.awsqueue.cnf'"
 	echo "awsq push 'sleep 10'"
 	echo "awsq list"
@@ -207,20 +208,30 @@ start(){
 
 }
 
-#mysql --user root << EOF
+create(){
 #DROP DATABASE IF EXISTS $database_name;
 #CREATE DATABASE $database_name;
 #CONNECT $database_name;
 #
-#CREATE TABLE $table_name (
-#	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-#	added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-#	started_at TIMESTAMP,
-#	completed_at TIMESTAMP,
-#	processid INT,
-#	command TEXT NOT NULL
-#);
-#EOF
+	read -d '' var <<- EOF
+		CREATE TABLE $table_name (
+			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+			added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			started_at TIMESTAMP,
+			completed_at TIMESTAMP,
+			processid INT,
+			command TEXT NOT NULL
+		);
+	EOF
+	#	using echo to "return" a value
+	#	DON'T FORGET THE DOUBLE QUOTES!
+	#	Without the double quotes, the id and command will be on the 
+	#	same line in the variable and then won't work as expected.
+	log
+	log "$var"
+	n=`echo "$var" | mysql --defaults-file=$defaults_file`
+	echo "$n"
+}
 
 case "$1" in
 #	peek )
@@ -237,6 +248,8 @@ case "$1" in
 		count;;
 	list )
 		list;;
+	create )
+		create;;
 esac
 
 
