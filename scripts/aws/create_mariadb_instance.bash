@@ -1,47 +1,46 @@
 #!/usr/bin/env bash
 
+username='MyAWSUser'
 
-#	aws rds describe-db-subnet-groups
+function usage(){
+	echo
+	echo "Start a MariaDB instance on AWS"
+	echo
+	echo "Usage:"
+	echo
+	echo "`basename $0` --password PASSWORD [--username $username]"
+	echo
+	exit
+}
 
-#	May have to ...
+password=''
 
-#aws rds create-db-subnet-group --db-subnet-group-name queuedbsubnetgroupname --db-subnet-group-description queuedbsubnetgroupdescription --subnet-ids subnet-abcea5dd subnet-186dee40
-#{
-#    "DBSubnetGroup": {
-#        "Subnets": [
-#            {
-#                "SubnetStatus": "Active", 
-#                "SubnetIdentifier": "subnet-186dee40", 
-#                "SubnetAvailabilityZone": {
-#                    "Name": "us-east-1b"
-#                }
-#            }, 
-#            {
-#                "SubnetStatus": "Active", 
-#                "SubnetIdentifier": "subnet-abcea5dd", 
-#                "SubnetAvailabilityZone": {
-#                    "Name": "us-east-1a"
-#                }
-#            }
-#        ], 
-#        "DBSubnetGroupName": "queuedbsubnetgroupname", 
-#        "VpcId": "vpc-a6434cc2", 
-#        "DBSubnetGroupDescription": "queuedbsubnetgroupdescription", 
-#        "SubnetGroupStatus": "Complete"
-#    }
-#}
+while [ $# -ne 0 ] ; do
+	case $1 in
+		-u|--u*)
+			shift; username=$1; shift ;;
+		-p|--p*)
+			shift; password=$1; shift ;;
+		-*)
+			echo ; echo "Unexpected args from: ${*}"; usage ;;
+		*)
+			break;;
+	esac
+done
 
+#       Basically, this is TRUE AND DO ...
+[ -z $password ] && usage
 
-#aws rds create-db-instance \
-#	--publicly-accessible
-#	--engine mariadb \
-#	--allocated-storage 5 \
-#	--db-instance-class db.t2.micro \
-#	--db-instance-identifier queuedbinstanceid \
-#	--master-username myawsuser \
-#	--master-user-password myawspassword \
-#	--db-name queuedbname \
-#	--db-subnet-group-name queuedbsubnetgroupname
+aws rds create-db-instance \
+	--publicly-accessible
+	--engine mariadb \
+	--allocated-storage 5 \
+	--db-instance-class db.t2.micro \
+	--db-instance-identifier QueueDbInstanceId \
+	--master-username $username \
+	--master-user-password $password \
+	--db-name QueueDbName \
+	--db-subnet-group-name DbSubnetGroupName
 
 #{
 #    "DBInstance": {
