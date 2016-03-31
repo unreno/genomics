@@ -5,12 +5,21 @@
 #user=root
 #password=
 #database=queue
+
+#cat ~/.awsqueue.cnf
+#[mysql]
+#user=*******
+#password=*******
+#database=QueueDbName
+#port=3306
+#host=******.******.rds.amazonaws.com
+
 defaults_file="~/.localqueue.cnf"
 table_name="queue"
 
 function usage(){
 	echo
-	echo "maintain FIFO-like mysql database"
+	echo "Maintain FIFO-like mysql/mariadb database"
 	echo
 	echo "Usage:"
 	echo "`basename $0` push 'COMMAND' -> adds COMMAND to bottom of queue (one at a time)"
