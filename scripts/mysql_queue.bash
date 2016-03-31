@@ -30,7 +30,7 @@ function usage(){
 	echo
 	echo "Tips:"
 	echo "Create an alias ... (FYI: aliases don't get pulled into scripts!)"
-	echo "... alias awsq='`basename $0` --defaults_file ~/.awsqueue.cnf'"
+	echo "alias awsq='`basename $0` --defaults_file ~/.awsqueue.cnf'"
 	echo "awsq push 'sleep 10'"
 	echo "awsq list"
 	echo
@@ -174,7 +174,10 @@ start(){
 	while r=$(start_next) && \
 			id=`echo "$r" | grep "^     id: " | cut -c 10-` && \
 			command=`echo "$r" | grep "^command: " | cut -c 10-` && \
-			[ "x$id" != "x" -a "x$command" != "x" ] ; do
+			[ -n "$id" -a -n "$command" ] ; do
+#	When using -n or -z, be sure to either wrap variable in quotes
+#	or use double brackets [[ ]]. See snippet at bottom.
+#			[ "x$id" != "x" -a "x$command" != "x" ] ; do
 #		echo "$r"
 #		id=`echo "$r" | grep "^     id: " | cut -c 10-`
 #		id=${id:9}
@@ -224,7 +227,7 @@ create(){
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
-	n=`echo "$var" | $mysql
+	n=`echo "$var" | $mysql`
 	echo "$n"
 }
 
@@ -235,7 +238,7 @@ case "$1" in
 #		shift; pop;;
 	start )
 		#	Syntax highlighting suggests that start is a keyword?
-		shift; start;;	
+		start;;
 	push | queue )
 		#	Using $@ and wrapping in double quotes passes quotes correctly!
 		shift; push "$@";;	
@@ -250,4 +253,22 @@ esac
 
 
 #	for i in {1..50}; do echo mysql_queue.bash push \'sleep `date +%N | cut -c 5-6`\'; done | sh
+
+exit;
+
+unset $x
+[ -n $x ] && echo "$x:and" || echo "$x:or"
+[[ -n $x ]] && echo "$x:and" || echo "$x:or"
+[ -n "$x" ] && echo "$x:and" || echo "$x:or"
+
+x=""
+[ -n $x ] && echo "$x:and" || echo "$x:or"
+[[ -n $x ]] && echo "$x:and" || echo "$x:or"
+[ -n "$x" ] && echo "$x:and" || echo "$x:or"
+
+x="set"
+[ -n $x ] && echo "$x:and" || echo "$x:or"
+[[ -n $x ]] && echo "$x:and" || echo "$x:or"
+[ -n "$x" ] && echo "$x:and" || echo "$x:or"
+
 
