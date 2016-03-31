@@ -256,7 +256,7 @@ esac
 
 exit;
 
-unset $x
+unset x
 [ -n $x ] && echo "$x:and" || echo "$x:or"
 [[ -n $x ]] && echo "$x:and" || echo "$x:or"
 [ -n "$x" ] && echo "$x:and" || echo "$x:or"
