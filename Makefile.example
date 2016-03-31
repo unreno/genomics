@@ -78,6 +78,8 @@ install-all:
 	$(MKDIR) $(BASE_BIN_DIR)/$(APPS_SUBDIR)
 
 
+uninstall: uninstall-scripts
+
 uninstall-scripts:
 	@printf "\nUNINSTALLING SCRIPTS\n\n"
 	cd $(BASE_BIN_DIR); \

@@ -6,7 +6,6 @@
 #password=
 #database=queue
 defaults_file="~/.localqueue.cnf"
-#database_name="queue"
 table_name="queue"
 
 function usage(){
@@ -52,6 +51,8 @@ while [ $# -ne 0 ] ; do
 done
 
 [ $# -eq 0 ] && usage
+
+mysql="mysql --defaults-file=$defaults_file"
 
 logfile="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
 #IFS=''	#	was for possibly preserving indentation in HEREDOCS. Causes problems.
@@ -109,8 +110,7 @@ push(){
 	done
 	var="${var}"$'\n'"UNLOCK TABLES;"
 	log "$var"
-#	echo "$var" | mysql --user root $database_name
-	echo "$var" | mysql --defaults-file=$defaults_file
+	echo "$var" | $mysql
 	log "Pushed $*"
 	echo "Pushed $*"
 }
@@ -118,8 +118,7 @@ push(){
 count(){
 	log "Counting ... `date`"
 	#	The "| tail -n +2" is to remove the ***** row.
-#	mysql --user root --vertical $database_name <<- EOF | tail -n +2
-	mysql --defaults-file=$defaults_file --vertical <<- EOF | tail -n +2
+	$mysql --vertical <<- EOF | tail -n +2
 		SELECT COUNT(*) INTO @all FROM $table_name;
 		SELECT COUNT(*) INTO @waiting FROM $table_name WHERE started_at = 0;
 		SELECT COUNT(*) INTO @running FROM $table_name WHERE started_at <> 0 AND completed_at = 0;
@@ -130,8 +129,7 @@ count(){
 
 list(){
 	log "Listing ... `date`"
-#	mysql --user root -e "SELECT * FROM $table_name" $database_name
-	mysql --defaults-file=$defaults_file -e "SELECT * FROM $table_name"
+	$mysql -e "SELECT * FROM $table_name"
 }
 
 start_next(){
@@ -155,8 +153,7 @@ start_next(){
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
-#	n=`echo "$var" | mysql --user root --vertical $database_name | tail -n +2`
-	n=`echo "$var" | mysql --defaults-file=$defaults_file --vertical | tail -n +2`
+	n=`echo "$var" | $mysql --vertical | tail -n +2`
 	echo "$n"
 }
 
@@ -200,8 +197,7 @@ start(){
 			UNLOCK TABLES;
 		EOF
 		log "$var"
-#		echo "$var" | mysql --user root $database_name
-		echo "$var" | mysql --defaults-file=$defaults_file
+		echo "$var" | $mysql
 	done
 
 	echo "Queue appears to be empty now."
@@ -209,10 +205,9 @@ start(){
 }
 
 create(){
-#DROP DATABASE IF EXISTS $database_name;
-#CREATE DATABASE $database_name;
-#CONNECT $database_name;
-#
+	#DROP DATABASE IF EXISTS $database_name;
+	#CREATE DATABASE $database_name;
+	#CONNECT $database_name;
 	read -d '' var <<- EOF
 		CREATE TABLE $table_name (
 			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
@@ -224,12 +219,12 @@ create(){
 		);
 	EOF
 	#	using echo to "return" a value
-	#	DON'T FORGET THE DOUBLE QUOTES!
+	#	DON'T FORGET THE DOUBLE QUOTES to preserve newlines!
 	#	Without the double quotes, the id and command will be on the 
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
-	n=`echo "$var" | mysql --defaults-file=$defaults_file`
+	n=`echo "$var" | $mysql
 	echo "$n"
 }
 
