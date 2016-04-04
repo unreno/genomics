@@ -62,6 +62,7 @@ done
 [ $# -eq 0 ] && usage
 
 mysql="mysql --defaults-file=$defaults_file"
+hostname=`hostname`
 
 logfile="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
 #IFS=''	#	was for possibly preserving indentation in HEREDOCS. Causes problems.
@@ -146,10 +147,11 @@ start_next(){
 		LOCK TABLES $table_name WRITE;
 		SELECT id INTO @last FROM $table_name
 			WHERE started_at = 0
-			ORDER BY added_at ASC
+			ORDER BY queued_at ASC
 			LIMIT 1;
 		UPDATE $table_name
 			SET started_at = CURRENT_TIMESTAMP,
+				hostname = '$hostname',
 				processid = $$
 			WHERE id = @last;
 		SELECT id,command FROM $table_name
@@ -223,9 +225,10 @@ create(){
 	read -d '' var <<- EOF
 		CREATE TABLE $table_name (
 			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-			added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			queued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			started_at TIMESTAMP,
 			completed_at TIMESTAMP,
+			hostname VARCHAR(255),
 			processid INT,
 			command TEXT NOT NULL
 		);
