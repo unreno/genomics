@@ -35,6 +35,7 @@ done
 
 
 #	Get a subnet. Which one?
+#	Subnet can only have X number of ip addresses. (X is over 4000, fyi)
 
 
 
