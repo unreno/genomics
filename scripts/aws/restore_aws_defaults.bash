@@ -16,6 +16,10 @@ aws ec2 describe-internet-gateways
 aws ec2 describe-route-tables
 aws ec2 describe-vpcs
 
+#	If you delete your default VPC and then need to restore it, you can contact AWS Support to create a new default VPC in that region for you. You cannot mark an existing VPC as a default VPC. If you delete a default subnet and then need to restore it, create a new subnet in your default VPC, and then contact AWS Support to mark the subnet as a default subnet. You must provide the following details: your AWS account ID, the region, and the subnet ID. To ensure that your new default subnet behaves as expected, modify the subnet attribute to assign public IP addresses to instances that are launched in that subnet. For more information, see Modifying Your Subnet's Public IP Addressing Behavior. You can only have one default subnet per Availability Zone. You cannot create a default subnet in a nondefault VPC. 
+#	Oops.
+
+
 if [ `aws ec2 describe-vpcs | jq '.Vpcs | length'` -gt 0 ] ; then
 	echo -e "You've already got a VPC setup. You probably don't want to do this.\n"
 	exit
