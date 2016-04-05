@@ -16,7 +16,7 @@ function usage(){
 	exit
 }
 
-image_id="ami-60b6c60a"	#"ami-4fa3580b"	#	ami-ef2fd7ab"
+image_id="ami-60b6c60a"
 instance_type="t2.micro"
 #instance_type="t2.medium"
 volume_size=10
@@ -40,20 +40,18 @@ while [ $# -ne 0 ] ; do
 done
 
 #       Basically, this is TRUE AND DO ...
-#[ -z $password ] && usage
 [ $# -ne 0 ] && usage
 
 
 #	Get a subnet. Which one?
 #	Subnet can only have X number of ip addresses. (X is over 4000, fyi)
 
-#	select by vpcid
+#	select by vpcid. Which vpcid?
 #	sort by AvailableIpAddressCount?
 
 #	This should return that with the MOST available.
-subnet_id=`aws ec2 describe-subnets | jq '.Subnets | sort_by(.AvailableIpAddressCount) | reverse[0].SubnetId' | tr -d '"'`
-
-
+subnets=`aws ec2 describe-subnets`
+echo $subnets
 #aws ec2 describe-subnets
 #{
 #    "Subnets": [
@@ -80,6 +78,9 @@ subnet_id=`aws ec2 describe-subnets | jq '.Subnets | sort_by(.AvailableIpAddress
 #    ]
 #}
 
+
+subnet_id=`echo $subnets | jq '.Subnets | sort_by(.AvailableIpAddressCount) | reverse[0].SubnetId' | tr -d '"'`
+echo $subnet_id
 
 
 
@@ -157,51 +158,54 @@ subnet_id=`aws ec2 describe-subnets | jq '.Subnets | sort_by(.AvailableIpAddress
 #    ]
 #}
 
-
-
-
-
-command="aws ec2 run-instances \
-	--count 1 \
-	--image-id $image_id \
-	--instance-type $instance_type \
-	--key-name HOMEKEY \
-	--subnet-id $subnet_id \
-	--associate-public-ip-address \
-	--instance-initiated-shutdown-behavior terminate \
+command="aws ec2 run-instances
+	--dry-run
+	--count 1
+	--image-id $image_id
+	--instance-type $instance_type
+	--key-name HOMEKEY
+	--subnet-id $subnet_id
+	--associate-public-ip-address
+	--instance-initiated-shutdown-behavior terminate
 	--iam-instance-profile Name='ec2_processor'"
+#	--user-data file://aws_start_1000genomes_processing.sh
+# --block-device-mappings '[{"DeviceName":"/dev/xvda", "Ebs":{"VolumeSize":100,"VolumeType":"gp2"}}]'
+#	--block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":'${volume_size}',"VolumeType":"gp2"}}]'
+# --query 'Instances[].InstanceId'
+
+#	'ec2_processor' was "ec2_processor". Double quotes versus single quotes matter???? Nope.
 
 #	Double quotes preserve newlines (if they weren't escaped)
 echo "$command"
+instance=`$command`
+echo "$instance"
 
-#	'ec2_processor' was "ec2_processor". Double quotes versus single quotes matter????
-
-
-
-##	--user-data file://aws_start_1000genomes_processing.sh \
-#
-##    --block-device-mappings '[{"DeviceName":"/dev/xvda", "Ebs":{"VolumeSize":100,"VolumeType":"gp2"}}]' \
-##    --query 'Instances[].InstanceId' \
-
-#
-#	--block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":'${volume_size}',"VolumeType":"gp2"}}]' \
-#
+instance_id=`echo "$instance" | jq '.Instances[].InstanceId' | tr -d '"'`
+echo $instance_id
 
 
 
-#aws ec2 describe-instances \
-#    --query 'Reservations[0].Instances[0].PublicIpAddress' \
-#    --instance-ids INSTANCE_ID
+
+#$ aws ec2 describe-instances
+#{
+#    "Reservations": []
+#}
 
 
-
-#	ssh -i WORKKEY.pem ec2-user@#.#.#.#
+command="aws ec2 describe-instances
+	--query 'Reservations[0].Instances[0].PublicIpAddress'
+	--instance-ids $instance_id"
+echo
+echo $command
+echo
+echo "ssh -i WORKKEY.pem ec2-user@#.#.#.#"
+echo
 
 
 
 
 #	Seems that it may be next to impossible to select the latest
-#	Amazon Linux AMI
+#	Amazon Linux AMI programmatically
 
 #	rather than [] suffix, use map(select()) so output is an array.
 
