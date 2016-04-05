@@ -18,7 +18,8 @@ function usage(){
 	echo
 	echo "Maintain FIFO-like mysql/mariadb database"
 	echo
-	echo "Usage:"
+	echo "Usage: (NO EQUALS SIGNS)"
+	echo
 	echo "`basename $0` push 'COMMAND' -> adds COMMAND to bottom of queue (one at a time)"
 	echo "(currently deving pushing multiple properly quoted commands. no promises.)"
 	echo "COMMAND must be quoted! Single or double."
@@ -47,11 +48,14 @@ defaults_file="~/.localqueue.cnf"
 table_name="queue"
 
 while [ $# -ne 0 ] ; do
+	#	Options MUST start with - or --.
 	case $1 in
-		-d|--d*)
+		-d*|--d*)
 			shift; defaults_file=$1; shift ;;
-		-t|--t*)
+		-t*|--t*)
 			shift; table_name=$1; shift ;;
+		--)	#	just -- is a common and explicit "stop parsing options" command
+			shift; break ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)

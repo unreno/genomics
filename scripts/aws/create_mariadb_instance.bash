@@ -4,7 +4,7 @@ function usage(){
 	echo
 	echo "Start a MariaDB instance on AWS"
 	echo
-	echo "Usage:"
+	echo "Usage: (NO EQUALS SIGNS)"
 	echo
 	echo "`basename $0` --password PASSWORD [--username USERNAME]"
 	echo
@@ -20,11 +20,16 @@ username='MyAWSUser'
 password=''
 
 while [ $# -ne 0 ] ; do
+	#	Options MUST start with - or --.
 	case $1 in
-		-u|--u*)
+		-u*|--u*)
 			shift; username=$1; shift ;;
-		-p|--p*)
+		-p*|--p*)
 			shift; password=$1; shift ;;
+		-h*|--h*)
+			usage ;;
+		--)	#	just -- is a common and explicit "stop parsing options" command
+			shift; break ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)

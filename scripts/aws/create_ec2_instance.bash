@@ -4,7 +4,7 @@ function usage(){
 	echo
 	echo "Start an EC2 instance on AWS"
 	echo
-	echo "Usage:"
+	echo "Usage: (NO EQUALS SIGNS)"
 	echo
 	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE]"
 	echo
@@ -21,20 +21,21 @@ instance_type="t2.micro"
 #instance_type="t2.medium"
 volume_size=10
 
-#password=''
-
 while [ $# -ne 0 ] ; do
+	#	Options MUST start with - or --.
 	case $1 in
-		-in|--in*)
+		-in*|-in*)
 			shift; instance_type=$1; shift ;;
-		-im|--im*)
+		-im*|-im*)
 			shift; image_id=$1; shift ;;
 		-h*|--h*)
 			usage ;;
+		--)	#	just -- is a common and explicit "stop parsing options" command
+			shift; break ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
-			break;;
+			break ;;
 	esac
 done
 
