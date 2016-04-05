@@ -11,22 +11,18 @@
 #    called like ...
 #    find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; /Users/jakewendt/herv/hg38_alignment/test_limits.sh' \;
 
-base=`basename $PWD`
-
-{
-    echo "Starting at ..."
-    date
-
-    echo "Not really doing anything."
-    
-#    for i in $(seq 1 20); do echo "blah" > `basename $0`.out.$i; done
-
-#    no problems running this on my mac.
-#    Need to try on an ec2 instance and see what happens.
-
-    echo
-    echo "Finished at ..."
-    date
-
-} 1>>$base.`basename $0`.out 2>&1
-
+mkdir testing
+cd testing
+for i in `seq 1000` ; do
+	{
+		echo "Starting $i at ..."
+		date
+		mkdir $i
+		cd $i
+		echo testing > logfile
+		cd ..
+		lsof | wc -l | awk '{print "lsof "$0}'
+		echo "Finished $i at ..."
+		date
+	} 1>>$i.`basename $0`.out 2>&1
+done
