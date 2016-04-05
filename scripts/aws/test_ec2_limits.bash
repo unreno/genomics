@@ -5,6 +5,7 @@
 #	Something odd happened when I actually did this.  It crossed some file limit and crashed.  Twice.  Both times it had processed about 1000 samples.  Somehow when the above was run with align_herv_k113_chimerics_to_index (instead of pwd), it kept file handles opened(?) and when it ran out, it crashed.  Need to investigate.  Somehow.  Just tried on my laptop with similar script, without any processing and no problems.  I really don’t understand "limits"
 
 
+#	Perhaps "lsof" can help?
 
 
 #    called like ...
