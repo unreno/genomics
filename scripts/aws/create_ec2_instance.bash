@@ -12,6 +12,13 @@ function usage(){
 	echo
 	echo " image_id ....... $image_id"
 	echo " instance_type .. $instance_type"
+	echo "        vCPU   ECU  Memory(GiB) Linux/UNIX Usage"
+	echo "General Purpose - Current Generation (US East - 20160405)"
+	echo "t2.nano   1  Variable  0.5  $0.0065 per Hour"
+	echo "t2.micro  1  Variable  1    $0.013 per Hour"
+	echo "t2.small  1  Variable  2    $0.026 per Hour"
+	echo "t2.medium 2  Variable  4    $0.052 per Hour"
+	echo "t2.large  2  Variable  8    $0.104 per Hour"
 	echo
 	exit
 }
