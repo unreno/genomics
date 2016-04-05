@@ -37,7 +37,7 @@ while [ $# -ne 0 ] ; do
 			shift; image_id=$1; shift ;;
 		-h*|--h*)
 			usage ;;
-		--)	#	just -- is a common and explicit "stop parsing options" command
+		--)	#	just -- is a common and explicit "stop parsing options" option
 			shift; break ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;

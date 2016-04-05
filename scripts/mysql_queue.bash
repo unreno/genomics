@@ -54,7 +54,7 @@ while [ $# -ne 0 ] ; do
 			shift; defaults_file=$1; shift ;;
 		-t*|--t*)
 			shift; table_name=$1; shift ;;
-		--)	#	just -- is a common and explicit "stop parsing options" command
+		--)	#	just -- is a common and explicit "stop parsing options" option
 			shift; break ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
