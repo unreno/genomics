@@ -1,27 +1,36 @@
 #!/usr/bin/env bash
 
-#username='MyAWSUser'
-
 function usage(){
 	echo
 	echo "Start an EC2 instance on AWS"
 	echo
 	echo "Usage:"
 	echo
-#	echo "`basename $0` --password PASSWORD [--username $username]"
-	echo "`basename $0`"
+	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE]"
+	echo
+	echo "Defaults"
+	echo
+	echo " image_id ....... $image_id"
+	echo " instance_type .. $instance_type"
 	echo
 	exit
 }
+
+image_id="ami-60b6c60a"	#"ami-4fa3580b"	#	ami-ef2fd7ab"
+instance_type="t2.micro"
+#instance_type="t2.medium"
+volume_size=10
 
 #password=''
 
 while [ $# -ne 0 ] ; do
 	case $1 in
-#		-u|--u*)
-#			shift; username=$1; shift ;;
-#		-p|--p*)
-#			shift; password=$1; shift ;;
+		-in|--in*)
+			shift; instance_type=$1; shift ;;
+		-im|--im*)
+			shift; image_id=$1; shift ;;
+		-h*|--h*)
+			usage ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
@@ -36,6 +45,13 @@ done
 
 #	Get a subnet. Which one?
 #	Subnet can only have X number of ip addresses. (X is over 4000, fyi)
+
+#	select by vpcid
+#	sort by AvailableIpAddressCount?
+
+#	This should return that with the MOST available.
+subnet_id=`aws ec2 describe-subnets | jq '.Subnets | sort_by(.AvailableIpAddressCount) | reverse[0].SubnetId' | tr -d '"'`
+
 
 #aws ec2 describe-subnets
 #{
@@ -102,7 +118,7 @@ done
 #    ]
 #}
 
-
+#	20160405 - Newest version of above
 #$ aws ec2 describe-images --image-ids ami-08111162
 #
 #{
@@ -144,17 +160,32 @@ done
 
 
 
-#aws ec2 run-instances \
-#    --image-id ami-60b6c60a \
-#    --instance-type t2.micro \
-#    --key-name HOMEKEY \
-#    --instance-initiated-shutdown-behavior terminate \
-#    --associate-public-ip-address \
-#    --subnet-id subnet-947a73cd \
-#    --iam-instance-profile Name="ec2_processor"
+command="aws ec2 run-instances \
+	--count 1 \
+	--image-id $image_id \
+	--instance-type $instance_type \
+	--key-name HOMEKEY \
+	--subnet-id $subnet_id \
+	--associate-public-ip-address \
+	--instance-initiated-shutdown-behavior terminate \
+	--iam-instance-profile Name='ec2_processor'"
+
+#	Double quotes preserve newlines (if they weren't escaped)
+echo "$command"
+
+#	'ec2_processor' was "ec2_processor". Double quotes versus single quotes matter????
+
+
+
+##	--user-data file://aws_start_1000genomes_processing.sh \
 #
 ##    --block-device-mappings '[{"DeviceName":"/dev/xvda", "Ebs":{"VolumeSize":100,"VolumeType":"gp2"}}]' \
 ##    --query 'Instances[].InstanceId' \
+
+#
+#	--block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":'${volume_size}',"VolumeType":"gp2"}}]' \
+#
+
 
 
 #aws ec2 describe-instances \
