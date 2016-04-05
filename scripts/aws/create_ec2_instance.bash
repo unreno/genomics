@@ -37,6 +37,33 @@ done
 #	Get a subnet. Which one?
 #	Subnet can only have X number of ip addresses. (X is over 4000, fyi)
 
+#aws ec2 describe-subnets
+#{
+#    "Subnets": [
+#        {
+#            "VpcId": "vpc-0f333c6b", 
+#            "CidrBlock": "172.31.0.0/20", 
+#            "MapPublicIpOnLaunch": false, 
+#            "DefaultForAz": false, 
+#            "State": "available", 
+#            "AvailabilityZone": "us-east-1a", 
+#            "SubnetId": "subnet-356f0543", 
+#            "AvailableIpAddressCount": 4091
+#        }, 
+#        {
+#            "VpcId": "vpc-0f333c6b", 
+#            "CidrBlock": "172.31.16.0/20", 
+#            "MapPublicIpOnLaunch": false, 
+#            "DefaultForAz": false, 
+#            "State": "available", 
+#            "AvailabilityZone": "us-east-1b", 
+#            "SubnetId": "subnet-0bca4853", 
+#            "AvailableIpAddressCount": 4091
+#        }
+#    ]
+#}
+
+
 
 
 #$ aws ec2 describe-images --image-ids ami-60b6c60a
@@ -141,6 +168,8 @@ done
 
 
 
+#	Seems that it may be next to impossible to select the latest
+#	Amazon Linux AMI
 
 #	rather than [] suffix, use map(select()) so output is an array.
 
@@ -157,4 +186,11 @@ done
 #852
 
 
-
+#	Rather than jq, can also use python to pick from json
+#		line=`echo $message | python -c \
+#			'import sys, json; print json.load(sys.stdin)["Messages"][0]["Body"]'`
+#		echo $line
+#
+#		handle=`echo $message | python -c \
+#			'import sys, json; print json.load(sys.stdin)["Messages"][0]["ReceiptHandle"]'`
+#		echo $handle
