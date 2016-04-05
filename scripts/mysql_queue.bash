@@ -14,9 +14,6 @@
 #port=3306
 #host=******.******.rds.amazonaws.com
 
-defaults_file="~/.localqueue.cnf"
-table_name="queue"
-
 function usage(){
 	echo
 	echo "Maintain FIFO-like mysql/mariadb database"
@@ -45,6 +42,9 @@ function usage(){
 	echo
 	exit
 }
+
+defaults_file="~/.localqueue.cnf"
+table_name="queue"
 
 while [ $# -ne 0 ] ; do
 	case $1 in
