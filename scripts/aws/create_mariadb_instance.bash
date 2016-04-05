@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-username='MyAWSUser'
-
 function usage(){
 	echo
 	echo "Start a MariaDB instance on AWS"
@@ -13,6 +11,7 @@ function usage(){
 	exit
 }
 
+username='MyAWSUser'
 password=''
 
 while [ $# -ne 0 ] ; do
