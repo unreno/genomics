@@ -6,7 +6,12 @@ function usage(){
 	echo
 	echo "Usage:"
 	echo
-	echo "`basename $0` --password PASSWORD [--username $username]"
+	echo "`basename $0` --password PASSWORD [--username USERNAME]"
+	echo
+	echo "Defaults:"
+	echo
+	echo " username .. $username"
+	echo " password .. "
 	echo
 	exit
 }
