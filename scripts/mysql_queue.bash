@@ -268,7 +268,7 @@ esac
 
 exit;
 
-#	DO NOT DO [ -n $x ]! I is always true.
+#	DO NOT DO [ -n $x ]! It is always true.
 
 unset x
 [ -n $x ] && echo "$x:and" || echo "$x:or"
