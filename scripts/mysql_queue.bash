@@ -289,4 +289,4 @@ x="set"
 [[ -n $x ]] && echo "$x:and" || echo "$x:or"
 [ -n "$x" ] && echo "$x:and" || echo "$x:or"
 
-
+#	Why all the HEREDOCs? Why not just var="blah blah newline blah blah"? It does work.
