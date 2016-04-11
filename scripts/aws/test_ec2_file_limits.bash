@@ -19,10 +19,11 @@ for i in `seq 1000` ; do
 		date
 		mkdir $i
 		cd $i
-		echo testing > logfile
+			echo testing > logfile
+			lsof | wc -l | awk '{print "lsof count "$0}'
+			lsof > logfile
+			echo "Finished $i at ..."
+			date
 		cd ..
-		lsof | wc -l | awk '{print "lsof "$0}'
-		echo "Finished $i at ..."
-		date
 	} 1>>$i.`basename $0`.out 2>&1
 done
