@@ -1,0 +1,39 @@
+
+
+Initial go, aligned all 1000 genomes to herv k ends.
+
+Extracted pre and post ltrs and aligned to hg19.
+
+
+Attempted to correct initial herv alignment mistake and aligned all chimerics to full herv k and disposed of those that aligned. 
+
+Realigned results to hg19 and also hg38.
+
+
+Looks like we need to make another correction. The default hg19 and hg38 fasta files include alternate chromosome sections. Any chimerics that aligned to these alternates or the "normal" version results in a mapping score of 0.
+
+Gonna have to remove these alternates and create new hg19 and hg38 indexes and realign.
+
+
+
+
+
+
+
+
+--- 2/15/2016
+
+When we align the chimeric reads to hg19 or hg38, I extract the position and direction at the end of the read that was next to the LTR.  These are "insertion points".  I did this for MAPQ scores of 0, 10 and 20.  I compare these insertion points from the post ltr set and the pre ltr set.  If a pre ltr insertion point is within 10bp, although it is usually 6bp, of a post ltr insertion point going in the same direction we call that position an "overlapper".  I compile all of these overlapper positions from all of these samples into a reference.  Each of these has a direction associated with it as bowtie will reverse complement the alignment if necessary.  These points end in either :F or :R.
+
+You provided a bam file for each hg19 and hg38 where you aligned the herv ltr.  I extracted these positions and the associated direction and created another reference list.  I gave each of these positions a suffix of either :BF, :BR, :EF or :ER depending on which ltr end and direction that it aligned to.  I have combined this reference list, which equates to existing herv insertions, with the previous overlapper list, which corresponds to new herv insertions, for each of the maps scores Q00(formerly ALL), Q10 and Q20.
+
+I then compared all of the insertion points for each subject and each of the 3 mapq scores to this combined reference list within 10bp and created csv files.  I could certainly be more rigid and lower or remove this 10bp proximity if needed or desired.
+
+The key is that if a found insertion point is at or within this 10bp to a reference position with one of the two letter suffixes, it exists in hg19/hg38.  If it has a single letter suffix, it is a newly found insertion we've found as an overlapper.  I could certainly not include our overlapper positions and just compare the insertion points to these existing reference points if needed.
+
+Basically, I lined up chimeric reads and you lined up LTR ends to hg19/hg38 and now we're just comparing the two position sets.
+
+This is why the "reference" csv should be used and not the "sample" csv as the "sample" does not include the reference information, although I could probably fix that.
+
+I've read through this a couple times and that seems clear to me.  Is it?  Or am I still missing something?
+

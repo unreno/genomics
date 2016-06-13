@@ -1,0 +1,6 @@
+
+
+Extracted all chimeric reads from hg19 alignment bam file.
+
+(Yes, that includes ALL the reads, even those that did not align to hg19.)
+
