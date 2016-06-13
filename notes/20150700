@@ -10,3 +10,8 @@ NA21144-ERR251692.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.pre_
 (mistake in using only the ends of HERVK. Should've used full HERVK.)
 
 
+
+At some point, we merged all the data from all the samples for each subject.
+
+
+
