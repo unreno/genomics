@@ -15,3 +15,27 @@ At some point, we merged all the data from all the samples for each subject.
 
 
 
+
+
+
+-- At some point we created reference lists of insertion points
+
+
+
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference.Q20 *Q20*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.Q20.overlappers_reference' \; &
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference.Q10 *Q10*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.Q10.overlappers_reference' \; &
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference.ALL *ALL*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.ALL.overlappers_reference' \; &
+
+
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference_w_hg19.Q20 *Q20*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.Q20.overlappers_reference_w_hg19' \; &
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference_w_hg19.Q10 *Q10*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.Q10.overlappers_reference_w_hg19' \; &
+
+nohup find . -type d \( -name HG\* -o -name NA\* \) -depth 1 -execdir sh -c 'echo {}; cd {}; positions_within_10bp_of_reference.sh ../overlapper_reference_w_hg19.ALL *ALL*ts | sort | uniq -c > {}.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.both_ltr.bowtie2.hg19.ALL.overlappers_reference_w_hg19' \; &
+
+
+

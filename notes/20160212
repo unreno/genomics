@@ -1,0 +1,9 @@
+
+
+20160212 - Creating reference of existing insertion points plus found overlapper points
+
+awk '{x="START";s=0;if($1=="HERV_K113_ltr_ending"){ s=150;x="END" }; print $2":"s+$3":"x}' herv_k113_ltr_ends_150.fasta.bam_pos.hg19.txt > herv_k113_existing_insertion_points.hg19.txt
+
+cat herv_k113_existing_insertion_points.hg19.txt overlapper_reference.ALL > herv_k113_existing_insertion_points_and_overlapper_reference.hg19.txt
+
+
