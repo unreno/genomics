@@ -40,11 +40,12 @@ done
 #       Basically, this is TRUE AND DO ...
 [ -z $password ] && usage
 
+db_instance_identifier='QueueDbInstanceId'
 
 
 #	Check if database with this id exists already.
 #	Basically
-#if [ `aws rds describe-db-instances | jq '.DBInstances | select(.DBInstanceIdentifier == "QueueDbInstanceId") | length'` -gt 0 ] ; then
+#if [ `aws rds describe-db-instances | jq '.DBInstances | select(.DBInstanceIdentifier == "${db_instance_identifier}") | length'` -gt 0 ] ; then
 #	echo -e "You've already got a Queue DB setup. You probably don't want to do this.\n"
 #	exit
 #fi
@@ -55,11 +56,11 @@ done
 
 #	If not found, the following will be printed on the STDERR. I don't need it, so to dev null.
 #	A client error (DBInstanceNotFound) occurred when calling the DescribeDBInstances operation: DBInstance QueueDbInstanceId not found.
-qdbi=`aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId 1> /dev/null 2>&1`
+qdbi=`aws rds describe-db-instances --db-instance-identifier ${db_instance_identifier} 1> /dev/null 2>&1`
 #	qdbi should be blank, so storing it is unnecessary.
 status=$? 	#	0 when it exists, 255 when it doesn't
 if [ $status -eq 0 ] ; then
-	echo "QueueDbInstanceId already exists. Stopping."
+	echo "${db_instance_identifier} already exists. Stopping."
 	exit $status
 fi
 
@@ -75,16 +76,46 @@ host=
 EOF
 chmod 600 awsqueue.cnf
 
+
+vpcid=`aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" | jq '.Vpcs[].VpcId' | tr -d '"'`
+
+echo "VPC ID: ${vpcid}"
+
+sg=`aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$vpcid,Name=description,Values=default VPC security group"`
+#echo "Security Group: ${sg}"
+sgid=`echo $sg | jq '.SecurityGroups[].GroupId' | tr -d '"'`
+echo "Security Group Id: ${sgid}"
+
+#echo "Explicitly enable ssh access (port 22)"
+#aws ec2 authorize-security-group-ingress \
+#	--protocol tcp --port 22 --cidr 0.0.0.0/0 \
+#	--group-id $sgid
+
+echo "Explicitly enable mysql/mariadb access (port 3306)"
+aws ec2 authorize-security-group-ingress \
+	--protocol tcp --port 3306 --cidr 0.0.0.0/0 \
+	--group-id $sgid
+
+db_subnet_group_name='DbSubnetGroupName'
+
+
+subnet_ids=`aws ec2 describe-subnets | jq '.Subnets[].SubnetId' | paste -s -d' ' | tr -d '"'`
+echo "Subnet Ids: ${subnet_ids}"
+
+subnetgroup=`aws rds create-db-subnet-group --db-subnet-group-name ${db_subnet_group_name} --db-subnet-group-description DbSubnetGroupDescription --subnet-ids ${subnet_ids}`
+echo $subnetgroup
+
+
 aws rds create-db-instance \
 	--publicly-accessible \
 	--engine mariadb \
 	--allocated-storage 5 \
 	--db-instance-class db.t2.micro \
-	--db-instance-identifier QueueDbInstanceId \
+	--db-instance-identifier ${db_instance_identifier} \
 	--master-username $username \
 	--master-user-password $password \
 	--db-name QueueDbName \
-	--db-subnet-group-name DbSubnetGroupName
+	--db-subnet-group-name ${db_subnet_group_name}
 
 #{
 #    "DBInstance": {
@@ -186,7 +217,9 @@ aws rds create-db-instance \
 
 
 
-aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId --query "DBInstances[].Endpoint"
+aws rds describe-db-instances \
+	--db-instance-identifier ${db_instance_identifier} \
+	--query "DBInstances[].Endpoint"
 
 
 
@@ -233,13 +266,18 @@ aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId --query
 
 echo "Running the following in a few minutes to get the hostname."
 
-echo 'aws rds describe-db-instances --db-instance-identifier QueueDbInstanceId --query "DBInstances[].Endpoint'
+echo "aws rds describe-db-instances --db-instance-identifier ${db_instance_identifier} --query \"DBInstances[].Endpoint\""
 
-echo "Then add it to the awsqueue.cnf file."
+echo "Then add the address to the host line in the awsqueue.cnf file."
 
 echo "Then connect simply via ..."
 
 echo "mysql --defaults-file=awsqueue.cnf"
+
+echo "Perhaps, as I do, copy this awsqueue.cnf to ~/.awsqueue.cnf"
+echo "Then, create an alias \"alias awsdb='mysql --defaults-file=~/.awsqueue.cnf'\""
+echo "Then access is as simple as \"awsdb\""
+
 
 
 
