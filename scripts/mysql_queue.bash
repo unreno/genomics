@@ -206,8 +206,8 @@ start(){
 		log "Running ... $command"
 
 		#	run the command
-		$command
-	
+		eval $command
+
 		#	mark as complete record with id = $id
 		read -d '' var <<- EOF
 			LOCK TABLES $table_name WRITE;

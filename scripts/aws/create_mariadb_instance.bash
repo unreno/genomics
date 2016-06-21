@@ -13,6 +13,17 @@ function usage(){
 	echo " username .. $username"
 	echo " password .. "
 	echo
+	echo "aws/create_mariadb_instance.bash --username IAmHuman --password ******"
+	echo "cp awsqueue.cnf ~/.awsqueue.cnf"
+	echo "chmod 400 ~/.awsqueue.cnf"
+	echo "alias awsdb='mysql --defaults-file=~/.awsqueue.cnf'"
+	echo "alias awsq='mysql_queue.bash --defaults_file ~/.awsqueue.cnf'"
+	echo "awsq create"
+	echo "awsq push 'sleep 1 && echo \"I was sleeping!\"'"
+	echo "awsq list"
+	echo "awsq start"
+	echo "awsq list"
+	echo
 	exit
 }
 
@@ -277,7 +288,5 @@ echo "mysql --defaults-file=awsqueue.cnf"
 echo "Perhaps, as I do, copy this awsqueue.cnf to ~/.awsqueue.cnf"
 echo "Then, create an alias \"alias awsdb='mysql --defaults-file=~/.awsqueue.cnf'\""
 echo "Then access is as simple as \"awsdb\""
-
-
 
 
