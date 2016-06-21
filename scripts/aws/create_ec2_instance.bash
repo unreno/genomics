@@ -6,12 +6,14 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE]"
+	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH]"
 	echo
 	echo "Defaults"
 	echo
 	echo " image_id ....... $image_id"
 	echo " instance_type .. $instance_type"
+	echo " key ............ $key (the key and file base name NEED to be the same)"
+	echo
 	echo "        vCPU   ECU  Memory(GiB) Linux/UNIX Usage"
 	echo "General Purpose - Current Generation (US East - 20160405)"
 	echo "t2.nano   1  Variable  0.5  $0.0065 per Hour"
@@ -25,6 +27,7 @@ function usage(){
 
 image_id="ami-60b6c60a"
 instance_type="t2.micro"
+key="~/.aws/KEYNAME.pem"
 #instance_type="t2.medium"
 volume_size=10
 
@@ -35,6 +38,8 @@ while [ $# -ne 0 ] ; do
 			shift; instance_type=$1; shift ;;
 		-im*|-im*)
 			shift; image_id=$1; shift ;;
+		-k*|-k*)
+			shift; key=$1; shift ;;
 		-h*|--h*)
 			usage ;;
 		--)	#	just -- is a common and explicit "stop parsing options" option
@@ -48,6 +53,11 @@ done
 
 #       Basically, this is TRUE AND DO ...
 [ $# -ne 0 ] && usage
+
+
+key_name=${key%.*} # drop the shortest suffix match to ".*" (the .pem extension)
+key_name=${key_name##*/}	#	drop the longest prefix match to "*/" (the path)
+
 
 
 #	Get a subnet. Which one?
@@ -170,7 +180,7 @@ command="aws ec2 run-instances
 	--count 1
 	--image-id $image_id
 	--instance-type $instance_type
-	--key-name HOMEKEY
+	--key-name ${key_name}
 	--subnet-id $subnet_id
 	--associate-public-ip-address
 	--instance-initiated-shutdown-behavior terminate
@@ -205,7 +215,7 @@ command="aws ec2 describe-instances
 echo
 echo $command
 echo
-echo "ssh -i WORKKEY.pem ec2-user@#.#.#.#"
+echo "ssh -i ${key} ec2-user@#.#.#.#"
 echo
 
 
