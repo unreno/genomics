@@ -72,7 +72,8 @@ logfile="`basename $0`.`date "+%Y%m%d%H%M%S"`.$$.log"
 #IFS=''	#	was for possibly preserving indentation in HEREDOCS. Causes problems.
 
 log(){
-	echo "$*" >> $logfile
+#	echo "$*" >> $logfile
+	echo "$*"
 }
 
 
@@ -175,6 +176,9 @@ start_next(){
 start(){
 	log "Starting ... `date`"
 
+	pid_file=$HOME/`basename $0`.removal_cancel_further_running
+	echo $$ > $pid_file
+
 	#     id: 10
 	#command: echo "testing2"
 
@@ -186,7 +190,9 @@ start(){
 
 	#	The text only starts at 10 because that is the length
 	#	of "command: ". If the field name changes, so must "10".
-	while r=$(start_next) && \
+#	while r=$(start_next) && \
+	while [ -f $pid_file ] && \
+			r=$(start_next) && \
 			id=`echo "$r" | grep "^     id: " | cut -c 10-` && \
 			command=`echo "$r" | grep "^command: " | cut -c 10-` && \
 			[ -n "$id" -a -n "$command" ] ; do
@@ -218,7 +224,8 @@ start(){
 		echo "$var" | $mysql
 	done
 
-	echo "Queue appears to be empty now."
+	[ -f $pid_file ] || echo "PID file is gone. Further processing cancelled."
+	[ -f $pid_file ] && echo "Queue appears to be empty now." && \rm -f $pid_file
 
 }
 
