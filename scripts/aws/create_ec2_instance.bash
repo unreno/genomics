@@ -6,9 +6,11 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH]"
+	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH] --NOT-DRY-RUN"
 	echo
-	echo "Defaults"
+	echo "--NOT-DRY-RUN is a boolean flag to ACTUALLY start instance (without, does not)"
+	echo
+	echo "Defaults:"
 	echo
 	echo " image_id ....... $image_id"
 	echo " instance_type .. $instance_type"
@@ -16,24 +18,27 @@ function usage(){
 	echo
 	echo "        vCPU   ECU  Memory(GiB) Linux/UNIX Usage"
 	echo "General Purpose - Current Generation (US East - 20160405)"
-	echo "t2.nano   1  Variable  0.5  $0.0065 per Hour"
-	echo "t2.micro  1  Variable  1    $0.013 per Hour"
-	echo "t2.small  1  Variable  2    $0.026 per Hour"
-	echo "t2.medium 2  Variable  4    $0.052 per Hour"
-	echo "t2.large  2  Variable  8    $0.104 per Hour"
+	echo "t2.nano   1  Variable  0.5  \$0.0065 per Hour"
+	echo "t2.micro  1  Variable  1    \$0.013 per Hour"
+	echo "t2.small  1  Variable  2    \$0.026 per Hour"
+	echo "t2.medium 2  Variable  4    \$0.052 per Hour"
+	echo "t2.large  2  Variable  8    \$0.104 per Hour"
 	echo
 	exit
 }
 
-image_id="ami-60b6c60a"
+image_id="ami-f303fb93"
 instance_type="t2.micro"
 key="~/.aws/KEYNAME.pem"
 #instance_type="t2.medium"
 volume_size=10
+dry_run="--dry-run"
 
 while [ $# -ne 0 ] ; do
 	#	Options MUST start with - or --.
 	case $1 in
+		--NOT-DRY-RUN)
+			dry_run=""; shift ;;
 		-in*|-in*)
 			shift; instance_type=$1; shift ;;
 		-im*|-im*)
