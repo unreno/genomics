@@ -1,0 +1,69 @@
+
+aws s3 cp 1kg_all_chroms_pruned_mds.mds s3://herv/snp-20160620/
+aws s3 cp pheno_files s3://herv/snp-20160620/pheno_files --recursive
+aws s3 cp eur s3://herv/snp-20160620/pruned_vcfs/eur/ --recursive --exclude "*" --include "ALL.chr*.tar.gz"
+
+
+aws s3 ls s3://herv/snp-20160620/ --recursive
+2016-06-22 14:20:59     395790 snp-20160620/1kg_all_chroms_pruned_mds.mds
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_1223549_R_POST
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_1249869_F_PRE
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_1389475_F_PRE
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_1468872_R_PRE
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_218716_F_PRE
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_436651_F_PRE
+2016-06-22 14:21:29      10386 snp-20160620/pheno_files/afr/chr17_ctg5_hap1_504028_F_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_1223549_R_POST
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_1249869_F_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_1389475_F_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_1468872_R_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_218716_F_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_436651_F_PRE
+2016-06-22 14:21:29       5706 snp-20160620/pheno_files/amr/chr17_ctg5_hap1_504028_F_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_1223549_R_POST
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_1249869_F_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_1389475_F_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_1468872_R_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_218716_F_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_436651_F_PRE
+2016-06-22 14:21:29       8658 snp-20160620/pheno_files/eas/chr17_ctg5_hap1_504028_F_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_1223549_R_POST
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_1249869_F_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_1389475_F_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_1468872_R_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_218716_F_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_436651_F_PRE
+2016-06-22 14:21:30       8802 snp-20160620/pheno_files/eur/chr17_ctg5_hap1_504028_F_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_1223549_R_POST
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_1249869_F_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_1389475_F_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_1468872_R_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_218716_F_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_436651_F_PRE
+2016-06-22 14:21:30       7146 snp-20160620/pheno_files/sas/chr17_ctg5_hap1_504028_F_PRE
+2016-06-22 14:22:39   39927048 snp-20160620/pruned_vcfs/eur/ALL.chr1.tar.gz
+2016-06-22 14:22:39   25484125 snp-20160620/pruned_vcfs/eur/ALL.chr10.tar.gz
+2016-06-22 14:22:41   13965029 snp-20160620/pruned_vcfs/eur/ALL.chr11.tar.gz
+2016-06-22 14:22:42   24303317 snp-20160620/pruned_vcfs/eur/ALL.chr12.tar.gz
+2016-06-22 14:22:42   18107444 snp-20160620/pruned_vcfs/eur/ALL.chr13.tar.gz
+2016-06-22 14:22:43   16675185 snp-20160620/pruned_vcfs/eur/ALL.chr14.tar.gz
+2016-06-22 14:22:43   15597982 snp-20160620/pruned_vcfs/eur/ALL.chr15.tar.gz
+2016-06-22 14:22:44   17503394 snp-20160620/pruned_vcfs/eur/ALL.chr16.tar.gz
+2016-06-22 14:22:45   15234047 snp-20160620/pruned_vcfs/eur/ALL.chr17.tar.gz
+2016-06-22 14:22:45   14462294 snp-20160620/pruned_vcfs/eur/ALL.chr18.tar.gz
+2016-06-22 14:22:46   12632677 snp-20160620/pruned_vcfs/eur/ALL.chr19.tar.gz
+2016-06-22 14:22:46   42615617 snp-20160620/pruned_vcfs/eur/ALL.chr2.tar.gz
+2016-06-22 14:22:48   11447245 snp-20160620/pruned_vcfs/eur/ALL.chr20.tar.gz
+2016-06-22 14:22:49    7404946 snp-20160620/pruned_vcfs/eur/ALL.chr21.tar.gz
+2016-06-22 14:22:49    7650958 snp-20160620/pruned_vcfs/eur/ALL.chr22.tar.gz
+2016-06-22 14:22:48   35490713 snp-20160620/pruned_vcfs/eur/ALL.chr3.tar.gz
+2016-06-22 14:22:50   35020943 snp-20160620/pruned_vcfs/eur/ALL.chr4.tar.gz
+2016-06-22 14:22:51   31671914 snp-20160620/pruned_vcfs/eur/ALL.chr5.tar.gz
+2016-06-22 14:22:52   31998310 snp-20160620/pruned_vcfs/eur/ALL.chr6.tar.gz
+2016-06-22 14:22:53   29757429 snp-20160620/pruned_vcfs/eur/ALL.chr7.tar.gz
+2016-06-22 14:22:54   27554450 snp-20160620/pruned_vcfs/eur/ALL.chr8.tar.gz
+2016-06-22 14:22:55   22716237 snp-20160620/pruned_vcfs/eur/ALL.chr9.tar.gz
+2016-06-22 14:22:56   16887369 snp-20160620/pruned_vcfs/eur/ALL.chrX.tar.gz
+2016-06-22 14:22:57     135498 snp-20160620/pruned_vcfs/eur/ALL.chrY.tar.gz
+
+

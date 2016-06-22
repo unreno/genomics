@@ -19,6 +19,10 @@ function usage(){
 	echo " instance_type .. $instance_type"
 	echo " key ............ $key (the key and file base name NEED to be the same)"
 	echo
+	echo "Key Pairs can easily be create like ..."
+	echo "aws ec2 create-key-pair --key-name KEYNAME --query 'KeyMaterial' --output text > ~/.aws/KEYNAME.pem"
+	echo "Key Pairs are also region specific."
+	echo
 	echo "        vCPU   ECU  Memory(GiB) Linux/UNIX Usage"
 	echo "General Purpose - Current Generation (US East - 20160405)"
 	echo "t2.nano   1  Variable  0.5  \$0.0065 per Hour"
@@ -42,11 +46,11 @@ while [ $# -ne 0 ] ; do
 	case $1 in
 		--NOT-DRY-RUN)
 			dry_run=""; shift ;;
-		-in*|-in*)
+		-in*|--in*)
 			shift; instance_type=$1; shift ;;
-		-im*|-im*)
+		-im*|--im*)
 			shift; image_id=$1; shift ;;
-		-k*|-k*)
+		-k*|--k*)
 			shift; key=$1; shift ;;
 		-h*|--h*)
 			usage ;;
@@ -183,8 +187,22 @@ echo $subnet_id
 #    ]
 #}
 
-command="aws ec2 run-instances
-	--dry-run
+
+vpcid=`aws ec2 describe-vpcs --filters "Name=isDefault,Values=true" | jq '.Vpcs[].VpcId' | tr -d '"'`
+
+echo "VPC ID: ${vpcid}"
+
+sg=`aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$vpcid,Name=description,Values=default VPC security group"`
+sgid=`echo $sg | jq '.SecurityGroups[].GroupId' | tr -d '"'`
+echo "Security Group Id: ${sgid}"
+
+echo "Explicitly enable ssh access (port 22)"
+aws ec2 authorize-security-group-ingress \
+	--protocol tcp --port 22 --cidr 0.0.0.0/0 \
+	--group-id $sgid
+
+
+command="aws ec2 run-instances $dry_run
 	--count 1
 	--image-id $image_id
 	--instance-type $instance_type
@@ -223,7 +241,7 @@ command="aws ec2 describe-instances
 echo
 echo $command
 echo
-echo "ssh -i ${key} ec2-user@#.#.#.#"
+echo "ssh -i ${key} -o StrictHostKeyChecking=no ec2-user@#.#.#.#"
 echo
 
 
