@@ -10,6 +10,9 @@ function usage(){
 	echo
 	echo "--NOT-DRY-RUN is a boolean flag to ACTUALLY start instance (without, does not)"
 	echo
+	echo "Image IDs are region specific."
+	echo "They must exist in the region specified in the user's ~/.aws/config"
+	echo
 	echo "Defaults:"
 	echo
 	echo " image_id ....... $image_id"
@@ -29,8 +32,8 @@ function usage(){
 
 image_id="ami-f303fb93"
 instance_type="t2.micro"
-key="~/.aws/KEYNAME.pem"
 #instance_type="t2.medium"
+key="~/.aws/KEYNAME.pem"
 volume_size=10
 dry_run="--dry-run"
 
