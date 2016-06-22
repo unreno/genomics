@@ -20,13 +20,15 @@ sudo shutdown -h now
 sudo raises this error `sudo: sorry, you must have a tty to run sudo`
 
 Adding -t, -tt, -ttt, -tttt to ssh doesn't change this but can get this instead....
-Pseudo-terminal will not be allocated because stdin is not a terminal.
+`Pseudo-terminal will not be allocated because stdin is not a terminal.`
 
 Only ...
 
 `sudo visudo` and comment out the following lines ...
+```BASH
 Defaults  requiretty
 Defaults !visiblepw
+```
 
 ... works.
 I don't believe that this is scriptable on instance creation of a standard instance.
