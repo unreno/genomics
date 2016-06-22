@@ -1,10 +1,12 @@
-
+#### AIM Creation Notes
 
 Initial AIM image id : ami-f303fb93
 
 
-Initial settings (minimize changes)
+##### Initial settings check (minimize changes)
 
+Input:
+```BASH
 ls /usr/bin/env	#	many of my scripts use this
 echo $PATH
 bash --version
@@ -24,21 +26,22 @@ ulimit -a
 ls -la ~/
 env
 set
+```
+
+
+Output:
+```BASH
+
+
+```
 
 
 
+##### Environment Changes
 
 
-
-
-
-
-
-
-Changes
-
-
->cat <<HERE ~/.bashrc
+```BASH
+cat <<HERE ~/.bashrc
 PS1='\[\e[1;1m\][\u@\h \w]\$\[\e[0m\] '
 export PYTHONUSERBASE=$HOME/.python
 export PATH=\${HOME}/.local/bin:\${HOME}/.python/bin:\${HOME}/.kentUtils/bin:\${HOME}/.blat:\${HOME}/.trinity:\${HOME}/.blast/bin:\${PATH}
@@ -57,43 +60,49 @@ alias c="for i in {1..50}; do echo; done"
 alias psme="ps -fU \$USER"
 alias awsq="mysql_queue.bash --defaults_file ~/awsqueue.cnf"
 HERE
+```
 
 
+```BASH
 >cat <<HERE >> ~/.inputrc
 set editing-mode vi
 "\e[A": history-search-backward
 "\e[B": history-search-forward
 set completion-ignore-case on
 HERE
+```
 
 
-> vi ~/awsqueue.cnf	#	add settings to the current queue although will likely change
+##### Software Updates and Additions
+
+Add mysql/mariadb settings to access the current queue, although will likely change.
+
+```BASH
+vi ~/awsqueue.cnf	
+chmod 400 ~/awsqueue.cnf
+```
+
+Make instance suicidable (comment out "Defaults requiretty" and "Defaults !visiblepw")
+```BASH
+sudo visudo 
+```
+
+Update the basic yum installed packages and add a few needed for compiling samtools.
+
+```BASH
+sudo yum update
+sudo yum install gcc ncurses-devel zlib-devel	
+```
+
+MAY need to install the aws client package.
+I think this is preinstalled, but will need to be able to update anyway, so...
+
+```BASH
+pip install --user --upgrade awscli
+```
 
 
-> chmod 400 ~/awsqueue.cnf
-
-
-> sudo visudo #	make suicidable (comment out "Defaults requiretty" and "Defaults !visiblepw")
-
-
-> sudo yum update
-
-
-> sudo yum install gcc ncurses-devel zlib-devel	#	needed for compiling samtools
-
-
-
-
-> python -m site --user-site
-
-
-> pip install --user --upgrade awscli
-
-> pip install --user --upgrade deeptools #	may not work with latest python
-
-
-
-# install plink
+###### plink
 mkdir -p ~/.local/bin
 mkdir ~/plink
 cd ~/plink
@@ -102,13 +111,13 @@ unzip plink_linux_x86_64.zip
 mv plink ~/.local/bin
 cd ~
 
-# install bowtie2
+###### bowtie2
 wget http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.9/bowtie2-2.2.9-linux-x86_64.zip/download -O bowtie2-2.2.9-linux-x86_64.zip
 unzip bowtie2-2.2.9-linux-x86_64.zip
 mv bowtie2-2.2.9-linux-x86_64/bowtie* ~/.local/bin/
 
 
-# install samtools
+###### samtools
 wget https://github.com/samtools/samtools/releases/download/1.3.1/samtools-1.3.1.tar.bz2
 bunzip samtools-1.3.1.tar.bz2
 tar xfv samtools-1.3.1.tar
@@ -130,7 +139,7 @@ make prefix=~/.local install
 
 
 
-Via AWS Web Console create AIM from running instance.
+##### Via AWS Web Console create AIM from running instance.
 
 
 
