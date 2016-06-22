@@ -563,5 +563,12 @@ make install
 
 ##### Via AWS Web Console create AIM from running instance.
 
+From AWS EC2 Dashboard,
+* select the running instance,
+* then click Actions -> Image -> Create Image
+* and give it a name.
+* The running instance will shutdown
+* a snapshot and image will be created
+* and the instance rebooted (unless No Reboot was selected from Create Image page)
 
 
