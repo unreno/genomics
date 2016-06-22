@@ -64,7 +64,7 @@ HERE
 
 
 ```BASH
->cat <<HERE >> ~/.inputrc
+cat <<HERE >> ~/.inputrc
 set editing-mode vi
 "\e[A": history-search-backward
 "\e[B": history-search-forward
