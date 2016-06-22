@@ -6,7 +6,7 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH] --NOT-DRY-RUN"
+	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH] [--user-data USERDATAFILE] [--NOT-DRY-RUN]"
 	echo
 	echo "--NOT-DRY-RUN is a boolean flag to ACTUALLY start instance (without, does not)"
 	echo
@@ -34,12 +34,15 @@ function usage(){
 	exit
 }
 
-image_id="ami-f303fb93"
+# initial image id "ami-f303fb93"
+image_id="ami-869552e6"
 instance_type="t2.micro"
 #instance_type="t2.medium"
 key="~/.aws/KEYNAME.pem"
 volume_size=10
 dry_run="--dry-run"
+#	--user-data file://aws_start_1000genomes_processing.sh
+user_data=""
 
 while [ $# -ne 0 ] ; do
 	#	Options MUST start with - or --.
@@ -52,6 +55,8 @@ while [ $# -ne 0 ] ; do
 			shift; image_id=$1; shift ;;
 		-k*|--k*)
 			shift; key=$1; shift ;;
+		-u*|--u*)
+			shift; user_data="--user-data file://$1"; shift ;;
 		-h*|--h*)
 			usage ;;
 		--)	#	just -- is a common and explicit "stop parsing options" option
@@ -210,7 +215,8 @@ command="aws ec2 run-instances $dry_run
 	--subnet-id $subnet_id
 	--associate-public-ip-address
 	--instance-initiated-shutdown-behavior terminate
-	--iam-instance-profile Name='ec2_processor'"
+	--iam-instance-profile Name='ec2_processor' ${user_data}"
+
 #	--user-data file://aws_start_1000genomes_processing.sh
 # --block-device-mappings '[{"DeviceName":"/dev/xvda", "Ebs":{"VolumeSize":100,"VolumeType":"gp2"}}]'
 #	--block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeSize":'${volume_size}',"VolumeType":"gp2"}}]'
