@@ -1,6 +1,6 @@
-#### AIM Creation Notes
+#### AMI Creation Notes
 
-Initial AIM image id : ami-f303fb93
+Initial AMI image id : ami-f303fb93
 Region : us-west-2 (Oregon)
 
 
@@ -561,7 +561,7 @@ make install
 ```
 
 
-##### Via AWS Web Console create AIM from running instance.
+##### Via AWS Web Console create AMI from running instance.
 
 From AWS EC2 Dashboard,
 * select the running instance,
