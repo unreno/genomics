@@ -1,46 +1,29 @@
 
 
-Initial AIM image id : 
+Initial AIM image id : ami-f303fb93
 
 
 Initial settings (minimize changes)
-> ls /usr/bin/env	#	many of my scripts use this
 
-> echo $PATH
-
-> bash --version
-
-> env --version
-
-> uname -a
-
-> df -h
-
-> python --version
-
-> pip --version
-
-> python -m site --user-site
-
-> awk --version
-
-> gawk --version
-
-> git --version
-
-> aws --version
-
-> lsof -v
-
-> ulimit
-
-> ulimit -a
-
-> ls -la ~/
-
-> env
-
-> set
+ls /usr/bin/env	#	many of my scripts use this
+echo $PATH
+bash --version
+env --version
+uname -a
+df -h
+python --version
+pip --version
+python -m site --user-site
+awk --version
+gawk --version
+git --version
+aws --version
+lsof -v
+ulimit
+ulimit -a
+ls -la ~/
+env
+set
 
 
 
@@ -55,7 +38,7 @@ Initial settings (minimize changes)
 Changes
 
 
->cat <<HERE 
+>cat <<HERE ~/.bashrc
 PS1='\[\e[1;1m\][\u@\h \w]\$\[\e[0m\] '
 export PYTHONUSERBASE=$HOME/.python
 export PATH=\${HOME}/.local/bin:\${HOME}/.python/bin:\${HOME}/.kentUtils/bin:\${HOME}/.blat:\${HOME}/.trinity:\${HOME}/.blast/bin:\${PATH}
@@ -76,7 +59,7 @@ alias awsq="mysql_queue.bash --defaults_file ~/awsqueue.cnf"
 HERE
 
 
->cat <<HERE >> .inputrc
+>cat <<HERE >> ~/.inputrc
 set editing-mode vi
 "\e[A": history-search-backward
 "\e[B": history-search-forward
@@ -105,6 +88,8 @@ HERE
 
 
 > pip install --user --upgrade awscli
+
+> pip install --user --upgrade deeptools #	may not work with latest python
 
 
 
