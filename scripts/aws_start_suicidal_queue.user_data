@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-su -l ec2-user -c 'nohup aws_start_suicidal_queue.bash --shutdown &> ~/aws_start_suicidal_queue.bash.log &'
+su -l ec2-user -c 'nohup aws_start_suicidal_queue.bash --shutdown &'
