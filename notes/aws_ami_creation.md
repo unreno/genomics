@@ -605,3 +605,5 @@ Given our previous usage, we will likely need to upgrade our limits on volume si
 Just arbitrary guesses at the moment, but 20 will not be enough.
 
 
+Probably should `yum install gawk env bash vim` to get the latest versions.
+
