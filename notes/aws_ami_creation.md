@@ -51,8 +51,10 @@ set
 #	In one case, control chars found on EVERY line if this were awk instead of gawk
 #		(/[[:cntrl:]]/)
 #
-#	Lastly, older versions did not support "interval expressions"
+#	Lastly, older versions of awk did not support "interval expressions"
 #		ie ({4}, {4,}, {4,6})
+#	Could potentially use --posix, but given other needs and 
+#	the availability, just upgrade to the latest gawk.
 ```
 
 
