@@ -568,6 +568,7 @@ cd ~
 ```
 
 
+###### clone my github repo
 
 ```BASH
 mkdir -p ~/github/unreno
