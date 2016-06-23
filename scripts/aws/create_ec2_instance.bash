@@ -6,7 +6,7 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--image_id AMI] [--instance_type AMITYPE] [--key KEY_WITH_PATH] [--user-data USERDATAFILE] [--NOT-DRY-RUN]"
+	echo "`basename $0` [--image-id AMI] [--instance-type AMITYPE] [--key KEY_WITH_PATH] [--user-data USERDATAFILE] [--volume-size INTEGER] [--NOT-DRY-RUN]"
 	echo
 	echo "--NOT-DRY-RUN is a boolean flag to ACTUALLY start instance (without, does not)"
 	echo
@@ -18,6 +18,7 @@ function usage(){
 	echo " image_id ....... $image_id"
 	echo " instance_type .. $instance_type"
 	echo " key ............ $key (the key and file base name NEED to be the same)"
+	echo " volume-size .... Default Image Volume Size"
 	echo
 	echo "Key Pairs can easily be create like ..."
 	echo "aws ec2 create-key-pair --key-name KEYNAME --query 'KeyMaterial' --output text > ~/.aws/KEYNAME.pem"
@@ -47,6 +48,7 @@ volume_size=10
 dry_run="--dry-run"
 #	--user-data file://aws_start_1000genomes_processing.sh
 user_data=""
+block=""	#	for the volume size
 
 while [ $# -ne 0 ] ; do
 	#	Options MUST start with - or --.
@@ -61,6 +63,9 @@ while [ $# -ne 0 ] ; do
 			shift; key=$1; shift ;;
 		-u*|--u*)
 			shift; user_data="--user-data file://$1"; shift ;;
+		-v*|--v*)
+			shift; block="--block-device-mappings DeviceName=/dev/xvda,Ebs={VolumeSize=${1},VolumeType=gp2}"; shift ;;
+#          VirtualName=string,DeviceName=string,Ebs={SnapshotId=string,VolumeSize=integer,DeleteOnTermination=boolean,VolumeType=string,Iops=integer,Encrypted=boolean},NoDevice=string ...
 		-h*|--h*)
 			usage ;;
 		--)	#	just -- is a common and explicit "stop parsing options" option
@@ -216,7 +221,7 @@ else
 	echo "SSH Access already exists. Skipping."
 fi
 
-command="aws ec2 run-instances $dry_run
+command="aws ec2 run-instances $dry_run $block
 	--count 1
 	--image-id $image_id
 	--instance-type $instance_type
