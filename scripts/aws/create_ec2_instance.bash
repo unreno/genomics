@@ -205,11 +205,16 @@ sg=`aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$vpcid,Name=d
 sgid=`echo $sg | jq '.SecurityGroups[].GroupId' | tr -d '"'`
 echo "Security Group Id: ${sgid}"
 
-echo "Explicitly enable ssh access (port 22)"
-aws ec2 authorize-security-group-ingress \
-	--protocol tcp --port 22 --cidr 0.0.0.0/0 \
-	--group-id $sgid
-
+echo "Checking for existing ssh access"
+ssh_access=`aws ec2 describe-security-groups --group-id ${sgid} --filters Name=group-name,Values=default Name=ip-permission.protocol,Values=tcp Name=ip-permission.from-port,Values=22 Name=ip-permission.to-port,Values=22 Name=ip-permission.cidr,Values='0.0.0.0/0' --query 'SecurityGroups[*].{Name:GroupName}'`
+if [ "$ssh_access" == "[]" ]; then
+	echo "Explicitly enable ssh access (port 22)"
+	aws ec2 authorize-security-group-ingress \
+		--protocol tcp --port 22 --cidr 0.0.0.0/0 \
+		--group-id $sgid
+else
+	echo "SSH Access already exists. Skipping."
+fi
 
 command="aws ec2 run-instances $dry_run
 	--count 1

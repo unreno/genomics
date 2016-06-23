@@ -102,13 +102,19 @@ echo "Security Group Id: ${sgid}"
 #	--protocol tcp --port 22 --cidr 0.0.0.0/0 \
 #	--group-id $sgid
 
-echo "Explicitly enable mysql/mariadb access (port 3306)"
-aws ec2 authorize-security-group-ingress \
-	--protocol tcp --port 3306 --cidr 0.0.0.0/0 \
-	--group-id $sgid
+echo "Checking for existing external access"
+ext_access=`aws ec2 describe-security-groups --group-id ${sgid} --filters Name=group-name,Values=default Name=ip-permission.protocol,Values=tcp Name=ip-permission.from-port,Values=3306 Name=ip-permission.to-port,Values=3306 Name=ip-permission.cidr,Values='0.0.0.0/0' --query 'SecurityGroups[*].{Name:GroupName}'`
+
+if [ "$ext_access" == "[]" ]; then
+	echo "Explicitly enable mysql/mariadb access (port 3306)"
+	aws ec2 authorize-security-group-ingress \
+		--protocol tcp --port 3306 --cidr 0.0.0.0/0 \
+		--group-id $sgid
+else
+	echo "Access already exists. Skipping."
+fi
 
 db_subnet_group_name='DbSubnetGroupName'
-
 
 subnet_ids=`aws ec2 describe-subnets | jq '.Subnets[].SubnetId' | paste -s -d' ' | tr -d '"'`
 echo "Subnet Ids: ${subnet_ids}"
