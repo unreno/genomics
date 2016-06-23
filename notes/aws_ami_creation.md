@@ -616,7 +616,14 @@ t2.medium instances complained until --bmax 169751586 --dcv 2048 options worked.
 Still running, but a larger instance may have been preferable for index creation.
 Creating hg38 no alts index on t2.large with --threads 2 is going much better.
 `bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts`
+Sadly, I ran out of disk space on both.
+Fasta is over 3GB. Final index likely about 4.5GB.
+Just missing it. Need to add volume size option.
+Also, should probably run nohup and capture STDOUT and STDERR to file.
+Tomorrow. Actually, start this evening.
 
-
+`aws/create_ec2_instance.bash --key ~/.aws/JakeHuman.pem --instance-type t2.large --volume-size 20`
+`nohup bowtie2-build --threads 2 hg19_no_alts.fa hg19_no_alts > bt2.out 2>&1 &`
+`nohup bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts > bt2.out 2>&1 &`
 
 
