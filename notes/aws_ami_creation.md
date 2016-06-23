@@ -46,14 +46,14 @@ set
 #	Also NEED gawk, not just awk for a couple scripts.
 #
 #	The bitwise command "and" is used when evaluating some sam files.
-#		( and( $2 , 64 ) ){ 
+#		( and( $2 , 64 ) ){
 #
 #	In one case, control chars found on EVERY line if this were awk instead of gawk
 #		(/[[:cntrl:]]/)
 #
 #	Lastly, older versions of awk did not support "interval expressions"
 #		ie ({4}, {4,}, {4,6})
-#	Could potentially use --posix, but given other needs and 
+#	Could potentially use --posix, but given other needs and
 #	the availability, just upgrade to the latest gawk.
 ```
 
@@ -150,7 +150,7 @@ lsof version information:
     constructed: Sat Jul 7 07:45:06 UTC 2012
     constructed by and on: mockbuild@gobi-build-31006.sea31.amazon.com
     compiler: cc
-    compiler version: 4.4.6 20110731 (Red Hat 4.4.6-3) (GCC) 
+    compiler version: 4.4.6 20110731 (Red Hat 4.4.6-3) (GCC)
     compiler flags: -DLINUXV=26016 -DGLIBCV=212 -DHASIPv6 -DHASSELINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DHAS_STRFTIME -DLSOF_VSTR="2.6.16" -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fno-strict-aliasing
     loader flags: -L./lib -llsof  -lselinux
     system info: Linux gobi-build-31006.sea31.amazon.com 2.6.18-164.el5az00 #1 SMP Tue Sep 15 14:19:07 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
@@ -347,7 +347,7 @@ chmod 400 ~/awsqueue.cnf
 Make instance suicidable (comment out "Defaults requiretty" and "Defaults !visiblepw")
 "Defaults requiretty" did not exist this time. Deprecated?
 ```BASH
-sudo visudo 
+sudo visudo
 ```
 
 
@@ -609,5 +609,14 @@ Given our previous usage, we will likely need to upgrade our limits on volume si
 Just arbitrary guesses at the moment, but 20 will not be enough.
 
 
-Probably should `yum install gawk env bash vim` to get the latest versions.
+Create Bowtie2 indexes for hg19 and hg38 without the alternates.
+`bowtie2-build hg19_no_alts.fa hg19_no_alts`
+t2.micro instances are too small.
+t2.medium instances complained until --bmax 169751586 --dcv 2048 options worked.
+Still running, but a larger instance may have been preferable for index creation.
+Creating hg38 no alts index on t2.large with --threads 2 is going much better.
+`bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts`
+
+
+
 
