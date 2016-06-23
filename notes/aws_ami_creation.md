@@ -35,6 +35,24 @@ env
 set
 ```
 
+```BASH
+#	requires bash >= 4.0
+#	${VARIABLE^^} converts to uppercase
+#	${VARIABLE,,} converts to lowercase
+#	[[ ${ext,,} =~ sam ]] && flag='-S' || flag=''
+```
+
+```BASH
+#	Also NEED gawk, not just awk for a couple scripts.
+#
+#	The bitwise command "and" is used when evaluating some sam files.
+#		( and( $2 , 64 ) ){ 
+#
+#	In one case, control chars found on EVERY line if this were awk instead of gawk
+#		(/[[:cntrl:]]/)
+#
+```
+
 
 Output:
 ```BASH
@@ -570,5 +588,19 @@ From AWS EC2 Dashboard,
 * The running instance will shutdown
 * a snapshot and image will be created
 * and the instance rebooted (unless No Reboot was selected from Create Image page)
+
+
+
+
+
+
+##### Still ToDo
+
+Previously, I noticed that using SQS as a processing queue would crash after running about 1000 jobs.
+I believe that this has something to do with limits on process ids.
+I should investigate this, perhaps by creating a bunch of quick jobs in a queue and running it.
+
+Given our previous usage, we will likely need to upgrade our limits on volume size from 20TB to 1000TB and instance limit from 20 to 1000?
+Just arbitrary guesses at the moment, but 20 will not be enough.
 
 
