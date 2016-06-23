@@ -31,6 +31,10 @@ function usage(){
 	echo "t2.medium 2  Variable  4    \$0.052 per Hour"
 	echo "t2.large  2  Variable  8    \$0.104 per Hour"
 	echo
+	echo "Example:"
+	echo
+	echo "`basename $0` --key ~/.aws/JakeHumanHome.pem --user-data aws_start_suicidal_queue.user_data"
+	echo
 	exit
 }
 
@@ -247,7 +251,7 @@ command="aws ec2 describe-instances
 echo
 echo $command
 echo
-echo "ssh -i ${key} -o StrictHostKeyChecking=no ec2-user@#.#.#.#"
+echo "ssh -i ${key} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@#.#.#.#"
 echo
 
 
