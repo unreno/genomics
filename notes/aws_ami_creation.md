@@ -626,4 +626,10 @@ Tomorrow. Actually, start this evening.
 `nohup bowtie2-build --threads 2 hg19_no_alts.fa hg19_no_alts > bt2.out 2>&1 &`
 `nohup bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts > bt2.out 2>&1 &`
 
+hg38_no_alts worked, however, hg19_no_alts failed :(
+Will try this again with something even bigger!
 
+[ec2-user@ip-172-31-6-85 ~/tmp]$ sudo grep bowtie /var/log/messages 
+Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.871268] [ 2670]   500  2670  2263699  1998935    3978      12        0             0 bowtie2-build-s
+Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.895694] Out of memory: Kill process 2670 (bowtie2-build-s) score 979 or sacrifice child
+Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.900283] Killed process 2670 (bowtie2-build-s) total-vm:9054796kB, anon-rss:7995740kB, file-rss:0kB
