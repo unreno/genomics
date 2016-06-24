@@ -1,0 +1,85 @@
+
+
+#########All files are here: /ccls/home/awallace/herv1/jake/test/
+#########We will be testing all insertion 7 insertion sites on alt chromosome 17
+#########This script uses the European SuperPopulation as an example. The test script will need to be run on all 5 SuperPopulations, changing the directories as appropriate
+#########SuperPopulation abbreviations: Europeans = eur, Amerindians = amr, Africans = afr, East Asians = eas, South Asians = sas 
+
+### GWAS Script and Code to select random 200,000 SNPs for QQ Plots and SNPS with P-value < 0.10 for Manhattan Plot 
+
+#!/bin/sh 
+
+for file1 in `ls -1d /ccls/home/awallace/herv1/jake/test/input/pheno_files/eur/*` 
+
+
+	
+	do
+		echo $file1
+		baseN=`basename $file1`
+		echo $baseN loop 1
+		mkdir "/ccls/home/awallace/herv1/jake/test/output/eur/"$baseN
+		outfile="/ccls/home/awallace/herv1/jake/test/output/eur/"$baseN
+		for file in `ls -1d /ccls/home/awallace/herv1/jake/test/input/pruned_vcfs/eur/*.bed`
+			do
+				echo $file
+				fileN=`echo $file | sed 's/.bed//'`
+				outfile1=$outfile/`basename $fileN`.eur
+				echo $outfile1 loop 2
+				export PATH=/opt/bin:$PATH &&
+				srun --exclusive -p all -w n001 plink --bfile $fileN --snps-only --logistic hide-covar --covar /ccls/home/awallace/herv1/jake/test/input/1kg_all_chroms_pruned_mds.mds --covar-name C1,C2,C3,C4,C5,C6 --pheno $file1 --allow-no-sex --out ${outfile1}.no.covar  --threads 8 
+			
+			awk -F" " '{print $1,$2,$3,$9,$4,$7}' ${outfile1}.no.covar.assoc.logistic > ${outfile1}.for.plot.txt
+			rm ${outfile1}.no.covar.assoc.logistic
+
+			done
+
+			cat ${outfile}/*.for.plot.txt | grep -v "CHR" > ${outfile}/${baseN}.for.plot.all.eur.txt
+			rm ${outfile}/*.for.plot.txt
+			echo "CHR SNP BP P A1 OR" > ${outfile}/header.txt
+			cat ${outfile}/header.txt ${outfile}/${baseN}.for.plot.all.eur.txt> ${outfile}/temp
+			mv ${outfile}/temp ${outfile}/${baseN}.for.plot.all.eur.txt
+			rm ${outfile}/header.txt
+			grep -v "NA" ${outfile}/${baseN}.for.plot.all.eur.txt > ${outfile}/${baseN}.for.plot.all.noNA.eur.txt
+			shuf -n 200000 ${outfile}/${baseN}.for.plot.all.noNA.eur.txt > ${outfile}/${baseN}.for.qq.plot.eur
+			rm ${outfile}/${baseN}.for.plot.all.noNA.eur.txt
+			awk '$4 < 0.10' ${outfile}/${baseN}.for.plot.all.txt > ${outfile}/${baseN}.for.manhattan.plot.eur
+	done
+
+
+########## R Script to make Manhattan and QQ Plots
+###Exclude files where *.for.manhattan.plot is empty
+
+############################ R CODE #########################################################
+
+mfiles <- list.files(path="/ccls/home/awallace/herv1/jake/test/output/eur", pattern="*.for.manhattan.plot.eur", full.names=T, recursive=FALSE)
+qfiles<- list.files(path="/ccls/home/awallace/herv1/jake/test/output/eur", pattern="*.for.qq.plot.eur", full.names=T, recursive=FALSE) 
+
+length(mfiles)
+length(qfiles)
+
+somePNGPath = "/ccls/home/awallace/herv1/jake/test/output/eur/plots/"  
+
+install.packages("qqman")
+library("qqman") 
+
+for (i in length(mfiles))   
+{   
+	 
+	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
+	db<-read.table(mfiles[i], sep=" ")
+	dbgP<-data.frame(SNP=db$V2, CHR=db$V1, BP=db$V3, P=db$V4)
+	dbgP$P<-ifelse(dbgP$P==0.000e+00,1.000e-302,dbgP$P)
+	dq<-read.table(qfiles[i], sep=" ")
+	dqgP<-data.frame(SNP=dq$V2, CHR=dq$V1, BP=dq$V3, P=dq$V4)
+	par(mfrow=c(2,1)) 
+	manhattan(dbgP, chr = "CHR", main=basename(mfiles[i]))
+	qq(dqgP$P, main=basename(qfiles[i]))
+	dev.off()
+	rm(db)
+	rm(dq)
+	rm(dbgP)
+	rm(dqgP)
+} 
+
+
+
