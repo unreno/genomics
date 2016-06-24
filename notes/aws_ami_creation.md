@@ -612,12 +612,16 @@ Just arbitrary guesses at the moment, but 20 will not be enough.
 
 
 Create Bowtie2 indexes for hg19 and hg38 without the alternates.
+
 `bowtie2-build hg19_no_alts.fa hg19_no_alts`
+
 t2.micro instances are too small.
 t2.medium instances complained until --bmax 169751586 --dcv 2048 options worked.
 Still running, but a larger instance may have been preferable for index creation.
 Creating hg38 no alts index on t2.large with --threads 2 is going much better.
+
 `bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts`
+
 Sadly, I ran out of disk space on both.
 Fasta is over 3GB. Final index likely about 4.5GB.
 Just missing it. Need to add volume size option.
@@ -652,8 +656,8 @@ Apparently, the 32GB SSD is not true. I've only got 8GB. Perhaps that's the max?
 
 
 
-echo "alias topme="top -U \$USER"" >> ~/.bashrc
+`echo "alias topme="top -U \$USER"" >> ~/.bashrc`
 
-alias topme="top -U \$USER"
+`alias topme="top -U \$USER"`
 
 
