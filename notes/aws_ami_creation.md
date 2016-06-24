@@ -661,3 +661,6 @@ Apparently, the 32GB SSD is not true. I've only got 8GB. Perhaps that's the max?
 `alias topme="top -U \$USER"`
 
 
+hg19 on r3.large was done in about 1.5 hours. 
+hg38 on the t2.large took around 8 hours.
+
