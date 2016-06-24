@@ -625,21 +625,27 @@ Also, should probably run nohup and capture STDOUT and STDERR to file.
 Tomorrow. Actually, start this evening.
 
 `aws/create_ec2_instance.bash --key ~/.aws/JakeHuman.pem --instance-type t2.large --volume-size 20`
+
 `nohup bowtie2-build --threads 2 hg19_no_alts.fa hg19_no_alts > hg19_no_alts.log.bt2 2>&1 &`
+
 `nohup bowtie2-build --threads 2 hg38_no_alts.fa hg38_no_alts > hg38_no_alts.log.bt2 2>&1 &`
 
 hg38_no_alts worked, however, hg19_no_alts failed :(
 Will try this again with something even bigger!
 
+```
 [ec2-user@ip-172-31-6-85 ~/tmp]$ sudo grep bowtie /var/log/messages 
 Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.871268] [ 2670]   500  2670  2263699  1998935    3978      12        0             0 bowtie2-build-s
 Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.895694] Out of memory: Kill process 2670 (bowtie2-build-s) score 979 or sacrifice child
 Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.900283] Killed process 2670 (bowtie2-build-s) total-vm:9054796kB, anon-rss:7995740kB, file-rss:0kB
+```
 
 r3.large has 15GB memory, compared to t2.large's 8GB.
 Also, r3.large uses a 32GB SSD drive, not EBS so can't specify size, but big enough.
 Apparently, the 32GB SSD is not true. I've only got 8GB. Perhaps that's the max?
+
 `aws/create_ec2_instance.bash --key ~/.aws/JakeHuman.pem --instance-type r3.large`
+
 `nohup bowtie2-build --threads 2 hg19_no_alts.fa hg19_no_alts > hg19_no_alts.log.bt2 2>&1 &`
 
 
@@ -647,6 +653,7 @@ Apparently, the 32GB SSD is not true. I've only got 8GB. Perhaps that's the max?
 
 
 echo "alias topme="top -U \$USER"" >> ~/.bashrc
+
 alias topme="top -U \$USER"
 
 
