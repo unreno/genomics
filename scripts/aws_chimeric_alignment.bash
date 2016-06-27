@@ -26,6 +26,10 @@ function usage(){
 	echo "${index}.insertion_points must exist in \$PWD"
 	echo "Contains a list of entries in the format ... chrY:6749856:EF"
 	echo
+	echo "Example:"
+	echo "nohup aws_chimeric_alignment.bash --index hg19_no_alts > aws_chimeric_alignment.bash.out 2>&1 &"
+	echo "nohup aws_chimeric_alignment.bash --index hg38_no_alts > aws_chimeric_alignment.bash.out 2>&1 &"
+	echo
 	exit
 }
 
