@@ -1,0 +1,451 @@
+
+
+#########Amelia will do Steps 1-3 and place input files here: /ccls/home/awallace/herv1/jake/input/
+
+
+#########STEP 1: FILTER THE 1000 Genomes VCF FILES TO INCLUDE ONLY [SUPERPOP] AND ONLY SITES WITH MINOR ALLELE COUNT > 1
+############################
+##EUROPEANS
+
+for num in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/originals/*.vcf`
+do
+baseN=`basename $num`.eur.pruned
+vcftools --vcf  $num --keep /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eur.superpop.txt --mac 1 --recode --recode-INFO-all --out /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eur/$baseN
+done
+
+
+##########################
+##AFRICANS
+
+for num in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/originals/*.vcf`
+	do
+		baseN=`basename $num`.afr.pruned
+		vcftools --vcf  $num --keep /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/afr.superpop.txt --mac 1 --recode --recode-INFO-all --out /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/afr/$baseN
+	done
+
+
+#########################
+##AMERINDIANS
+
+for num in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/originals/*.vcf`
+	do
+		baseN=`basename $num`.amr.pruned
+		vcftools --vcf  $num --keep /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/amr.superpop.txt --mac 1 --recode --recode-INFO-all --out /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/amr/$baseN
+	done
+
+
+###########################
+##EAST ASIANS
+
+for num in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/originals*.vcf`
+	do
+		baseN=`basename $num`.eas.pruned
+		vcftools --vcf  $num --keep /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eas.superpop.txt --mac 1 --recode --recode-INFO-all --out /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eas/$baseN
+	done
+
+
+############################
+##SOUTH ASIANS
+
+for num in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/originals/*.vcf`
+	do
+		baseN=`basename $num`.sas.pruned
+		vcftools --vcf  $num --keep /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/sas.superpop.txt --mac 1 --recode --recode-INFO-all --out /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/sas/$baseN
+	done
+
+
+####################################################################################
+############STEP 2: Convert Pruned VCF Files to Plink Format
+##EUROPEANS
+#!/bin/sh                                                                                                                                                                                                                                  
+for file in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eur/*.vcf`
+			do
+
+				echo $file
+				fileN=`echo $file | sed 's/.recode.vcf//'`
+				outfile=/ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eur/plink.format/`basename $fileN`
+				export PATH=/opt/bin:$PATH &&
+				plink --vcf $file --out ${outfile}  
+			done
+			
+#################
+##AFRICANS
+#!/bin/sh                                                                                                                                                                                                                                  
+for file in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/afr/*.vcf`
+			do
+
+				echo $file
+				fileN=`echo $file | sed 's/.recode.vcf//'`
+				outfile=/ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/afr/plink.format/`basename $fileN`
+				export PATH=/opt/bin:$PATH &&
+				plink --vcf $file --out ${outfile}  
+			done
+
+#########################
+##AMERINDIANS
+#!/bin/sh                                                                                                                                                                                                                                  
+for file in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/amr/*.vcf`
+			do
+
+				echo $file
+				fileN=`echo $file | sed 's/.recode.vcf//'`
+				outfile=/ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/amr/plink.format/`basename $fileN`
+				export PATH=/opt/bin:$PATH &&
+				plink --vcf $file --out ${outfile}  
+			done
+
+###########################
+##EAST ASIANS
+#!/bin/sh                                                                                                                                                                                                                                  
+for file in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eas/*.vcf`
+			do
+
+				echo $file
+				fileN=`echo $file | sed 's/.recode.vcf//'`
+				outfile=/ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/eas/plink.format/`basename $fileN`
+				export PATH=/opt/bin:$PATH &&
+				plink --vcf $file --out ${outfile}  
+			done
+
+############################
+##SOUTH ASIANS
+#!/bin/sh                                                                                                                                                                                                                                  
+for file in `ls -1d /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/sas/*.vcf`
+			do
+
+				echo $file
+				fileN=`echo $file | sed 's/.recode.vcf//'`
+				outfile=/ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/sas/plink.format/`basename $fileN`
+				export PATH=/opt/bin:$PATH &&
+				plink --vcf $file --out ${outfile}  
+			done
+
+#########
+cp -r /ccls/home/awallace/herv1/1k_genome_vcf/recodevcf/* /ccls/home/awallace/herv1/jake/input/pruned_vcfs/
+
+###########STEP 3: Create individual phenotype files for each insertion site that denote the presence or absence of each HERV insertion site in each individual in the 1000 genomes - all sites are included regardless of minor allele count 
+#We will need 4 versions of these files: 2 for hg19 (with and without ALT chromosomes) and 2 for hg38 (with and without ALT chromosomes)
+#I have attached a separate code (which I executed in R) to create the individual phenotype files in the correct format
+#Path: /ccls/home/awallace/herv1/forjake/input/pheno_files/hg19_alt/eur/
+#/ccls/home/awallace/herv1/forjake/input/pheno_files/hg19_alt/amr/
+#/ccls/home/awallace/herv1/forjake/input/pheno_files/hg19_alt/afr/
+#/ccls/home/awallace/herv1/forjake/input/pheno_files/hg19_alt/eas/
+#/ccls/home/awallace/herv1/forjake/input/pheno_files/hg19_alt/sas/
+
+########################## R CODE #######################################################
+########Steve Will Provide hg38_alt, Jake will provide hg19_noalt and hg38_noalt
+
+#HERV Tagging SNP Analysis
+#UPDATED 05/05/2016
+
+##Read in complete list of 1000 genomes phase 3 HERV insertion sites
+ins<-read.csv("~/Desktop/HERV_TAG/working_insertion.hg19.Q00.sample.sorted.grouped_Amy.csv")
+dim(ins)
+colnames(ins)
+ins<-ins[,-1]
+dim(ins)
+###Read in demographics for 1K genomes
+dem<-read.csv("~/Desktop/HERV_TAG/1KG_pops_outbred.csv")
+#head(dem)
+#dim(dem)
+
+out<-dem[dem$TGP2261=="YES",]
+dim(out)
+head(out)
+out$sex<-ifelse(out$GENDER=="male",1,2)
+out<-data.frame(iid=out$IID, fid=out$IID, pop= out$POP, superpop=out$SUPER.POP, sex= out$sex)
+head(out)
+dim(out)
+
+#########Run this code for each of 5 SuperPopulations
+###EUROPEANS
+#Prune dem file to only include europeans
+eur<-out[out$superpop=="EUR",]
+dim(eur)
+head(eur)
+
+###Merge insertion sites with demographics in europeans
+sites<-merge(eur, ins, by.x="iid", by.y="SAMPLE_NAME") 
+dim(sites)
+head(sites)
+#steve2ind<-apply(sites[,6:steve[2]],1,sum)
+#steve2site<-data.frame(site=colnames(sites[,6:steve[2]]), sum=apply(sites[,6:steve[2]],2,sum))
+#head(steve2site)
+#summary(steve2site)
+#length(steve2site[steve2site$sum==0,])
+
+########Write each column (insertion site) to a seperate text file for phenotype in plink
+
+for (i in (6:ncol(sites))) {
+path<-paste("~/Desktop/HERV_TAG/jake/input/pheno_files/hg19_alt/eur/",noquote(names(sites[i])), sep="")
+data<-cbind(sites[,1:2], sites[,i])
+data$pheno<-ifelse(data[,3]==1, 2, 1)
+data2<-data[,-3]
+#head(data2)
+write.table(data2, path, quote=FALSE, row.names=FALSE, col.names=FALSE)
+}
+
+###AMERINDIANS
+#Prune dem file to only include amerindians
+amr<-out[out$superpop=="AMR",]
+dim(amr)
+head(amr)
+
+###Merge insertion sites with demographics in europeans
+sites<-merge(amr, ins, by.x="iid", by.y="SAMPLE_NAME") 
+dim(sites)
+
+########Write each column (insertion site) to a seperate text file for phenotype in plink
+
+for (i in (6:ncol(sites))) {
+path<-paste("~/Desktop/HERV_TAG/jake/input/pheno_files/hg19_alt/amr/",noquote(names(sites[i])), sep="")
+data<-cbind(sites[,1:2], sites[,i])
+data$pheno<-ifelse(data[,3]==1, 2, 1)
+data2<-data[,-3]
+#head(data2)
+write.table(data2, path, quote=FALSE, row.names=FALSE, col.names=FALSE)
+}
+
+###AFRICANS
+#Prune dem file to only include europeans
+afr<-out[out$superpop=="AFR",]
+dim(afr)
+head(afr)
+
+###Merge insertion sites with demographics in europeans
+sites<-merge(afr, ins, by.x="iid", by.y="SAMPLE_NAME") 
+dim(sites)
+
+########Write each column (insertion site) to a seperate text file for phenotype in plink
+
+for (i in (6:ncol(sites))) {
+path<-paste("~/Desktop/HERV_TAG/jake/input/pheno_files/hg19_alt/afr/",noquote(names(sites[i])), sep="")
+data<-cbind(sites[,1:2], sites[,i])
+data$pheno<-ifelse(data[,3]==1, 2, 1)
+data2<-data[,-3]
+#head(data2)
+write.table(data2, path, quote=FALSE, row.names=FALSE, col.names=FALSE)
+}
+
+###EAST ASIAN
+#Prune dem file to only include europeans
+eas<-out[out$superpop=="EAS",]
+dim(eas)
+head(eas)
+
+###Merge insertion sites with demographics in europeans
+sites<-merge(eas, ins, by.x="iid", by.y="SAMPLE_NAME") 
+dim(sites)
+
+########Write each column (insertion site) to a seperate text file for phenotype in plink
+
+for (i in (6:ncol(sites))) {
+path<-paste("~/Desktop/HERV_TAG/jake/input/pheno_files/hg19_alt/eas/",noquote(names(sites[i])), sep="")
+data<-cbind(sites[,1:2], sites[,i])
+data$pheno<-ifelse(data[,3]==1, 2, 1)
+data2<-data[,-3]
+#head(data2)
+write.table(data2, path, quote=FALSE, row.names=FALSE, col.names=FALSE)
+}
+
+###SOUTH ASIANS
+#Prune dem file to only include europeans
+sas<-out[out$superpop=="SAS",]
+dim(sas)
+head(sas)
+
+###Merge insertion sites with demographics in europeans
+sites<-merge(sas, ins, by.x="iid", by.y="SAMPLE_NAME") 
+dim(sites)
+
+########Write each column (insertion site) to a separate text file for phenotype in plink
+
+for (i in (6:ncol(sites))) {
+path<-paste("~/Desktop/HERV_TAG/jake/input/pheno_files/hg19_alt/sas/",noquote(names(sites[i])), sep="")
+data<-cbind(sites[,1:2], sites[,i])
+data$pheno<-ifelse(data[,3]==1, 2, 1)
+data2<-data[,-3]
+#head(data2)
+write.table(data2, path, quote=FALSE, row.names=FALSE, col.names=FALSE)
+}
+
+##############################################################################################
+
+########## STEP 4: GWAS Script for Pruned VCFs #######There will need to be 5(x4 SEE BELOW) versions of this script, one for each SuperPopulation in the 1000 Genomes - Here I use Europeans (EUR) and hg19_alt as an example
+#The other SuperPopulations are as follows: Africans (AFR) , Amerindians (AMR), East Asians (EAS), South Asians (SAS)
+
+#Within each SuperPopulation, there will be 4 versions of this script, 2 for hg19 (with and without ALT chromosomes) and 2 for hg38 (with and without ALT chromosomes)
+ 
+#!/bin/sh 
+
+for file1 in `ls -1d /ccls/home/awallace/herv1/jake/input/pheno_files/hg19_alt/eur/*` 
+
+#These are individual text files that denote the presence or absence of each HERV insertion site in each individual in the 1000 genomes
+#I will create 4 versions of these files: 2 for hg19 (with and without ALT chromosomes) and 2 for hg38 (with and without ALT chromosomes)
+#I have attached the R code that I used to create the individual phenotype files in the correct format (see Step 3)
+	
+	do
+		echo $file1
+		baseN=`basename $file1`
+		echo $baseN loop 1
+		mkdir "/ccls/home/awallace/herv1/jake/output/hg19_alt/eur/"$baseN
+		outfile="/ccls/home/awallace/herv1/jake/output/hg19_alt/eur/"$baseN
+		for file in `ls -1d /ccls/home/awallace/herv1/jake/input/pruned_vcfs/eur/*.bed`
+			do
+				echo $file
+				fileN=`echo $file | sed 's/.bed//'`
+				outfile1=$outfile/`basename $fileN`
+				echo $outfile1 loop 2
+				export PATH=/opt/bin:$PATH &&
+				srun --exclusive -p all -w n001 plink --bfile $fileN --snps-only --logistic hide-covar --covar /ccls/home/awallace/herv1/jake/input/hg19_alt/1kg_all_chroms_pruned_mds.mds --covar-name C1,C2,C3,C4,C5,C6 --pheno $file1 --allow-no-sex --out ${outfile1}.no.covar  --threads 8 
+			
+			awk -F" " '{print $1,$2,$3,$9,$4,$7}' ${outfile1}.no.covar.assoc.logistic > ${outfile1}.for.plot.txt
+			rm ${outfile1}.no.covar.assoc.logistic
+
+			done
+
+			cat ${outfile}/*.for.plot.txt | grep -v "CHR" > ${outfile}/${baseN}.for.plot.all.txt
+			rm ${outfile}/*.for.plot.txt
+			echo "CHR SNP BP P A1 OR" > ${outfile}/header.txt
+			cat ${outfile}/header.txt ${outfile}/${baseN}.for.plot.all.txt> ${outfile}/temp
+			mv ${outfile}/temp ${outfile}/${baseN}.for.plot.all.txt
+			rm ${outfile}/header.txt
+	done
+
+
+
+#######Code to select random 200,000 SNPs for QQ Plots and P-value < 0.10 for Manhattan Plot
+
+#!/bin/sh
+                                                                                                                                                                                                                                 
+   	for file1 in `ls -1d /ccls/home/awallace/herv1/jake/output/hg19_alt/eur/*`
+		do
+			echo $file1
+			baseN=`basename $file1`
+			grep -v "NA" $file1/$baseN.for.plot.all.txt > $file1/$baseN.for.plot.all.noNA.txt
+			shuf -n 200000 $file1/$baseN.for.plot.all.noNA.txt > $baseN.for.qq.plot
+			rm $file1/$baseN.for.plot.all.noNA.txt
+			awk '$4 < 0.10' $file1/$baseN.for.plot.all.txt > $baseN.for.manhattan.plot		
+		done
+
+
+########## STEP 5: R Script to make Manhattan and QQ Plots
+###Exclude files where *.for.manhattan.plot is empty
+
+############################ R CODE #########################################################
+
+mfiles <- list.files(path="/Users/amelia/sync/for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=FALSE)
+qfiles<- list.files(path="/Users/amelia/sync/for_plots", pattern="*.for.qq.plot", full.names=T, recursive=FALSE) 
+
+length(mfiles)
+length(qfiles)
+
+somePNGPath = "/Users/amelia/Desktop/HERV_TAG/plots/"
+#pdf(file=somePDFPath)  
+
+library("qqman") 
+
+for (i in length(mfiles))   
+{   
+	 
+	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
+	db<-read.table(mfiles[i], sep=" ")
+	dbgP<-data.frame(SNP=db$V2, CHR=db$V1, BP=db$V3, P=db$V4)
+	dbgP$P<-ifelse(dbgP$P==0.000e+00,1.000e-302,dbgP$P)
+	dq<-read.table(qfiles[i], sep=" ")
+	dqgP<-data.frame(SNP=dq$V2, CHR=dq$V1, BP=dq$V3, P=dq$V4)
+	par(mfrow=c(2,1)) 
+	manhattan(dbgP, chr = "CHR", main=basename(mfiles[i]))
+	qq(dqgP$P, main=basename(qfiles[i]))
+	dev.off()
+	rm(db)
+	rm(dq)
+	rm(dbgP)
+	rm(dqgP)
+} 
+
+
+nohup Rscript ./plots.r > plots.out &
+
+####################Script to deal with errors in making plots in R#####################
+  574  wc -l
+  575  ls ./ | wc -l
+  576  ls ./ > done.list.txt 
+  579  cp done.list.txt done.list.qq
+  580  vi done.list.qq
+	:%s/$/.for.qq.plot/ 
+  581  vi done.list.txt
+	:%s/$/.for.manhattan.plot/ 
+  582  cat done.list.txt done.list.qq > done.list.final
+  583  wc -l done.list.final 
+  584  cd
+  585  cd sync/
+  586  cd for_plots/
+  587  mkdir done
+  589  ls | wc -l
+  597  (cat /Users/amelia/Desktop/HERV_TAG/plots/done/done.list.final; echo /Users/amelia/sync/for_plots/done/) | xargs mv
+  598  vi /Users/amelia/Desktop/HERV_TAG/plots/done/done.list.final
+		:%s!^!/Users/amelia/sync/for_plots/!
+  601  (cat /Users/amelia/Desktop/HERV_TAG/plots/done/done.list.final; echo /Users/amelia/sync/for_plots/done/) | xargs mv
+  605  ls | wc -l
+
+
+##########STEP 6: VISUALLY INSPECT MANHATTAN PLOTS FOR CLEAN PEAKS AND MOVE TO SEPERATE FOLDER
+
+
+##########STEP 7: EXTRACT SIGNIFICANT SNPS FROM PEAK IN CLEAN PLOTS
+#####Pull gwas result files for those sites
+cd /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/
+ls ./ > clean.list.txt
+vi clean.list.txt
+ :%s/.png//
+ :%s!^!/Users/amelia/sync/for_plots/!
+cd /Users/amelia/sync/for_plots/ 
+(cat /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/clean.list.txt; echo /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/) | xargs cp
+cd /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/
+mkdir plots
+mv *.png plots/
+
+#####Sort by p value
+for file in `ls -1d /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/*.for.manhattan.plot`
+do 
+awk '{print $0 | "sort -k 4 -g"}' $file > $file.sorted
+done 
+
+##################come up with way to extract all peak SNPs#####################################
+
+########Pull top snp from each site into text file for Steve
+for file in `ls -1d /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/*.for.manhattan.plot.sorted`
+do
+head -n1 $file >> temp
+echo $file >>temp2
+done
+
+paste temp2 temp | column -s $',' -t > top.snps
+
+########Look at BP location to decide how to extract "peak snps"
+for file in `ls -1d /Users/amelia/Desktop/HERV_TAG/plots/Pilot/clean/chr10_135355522_R_PRE.for.manhattan.plot.sorted`
+do
+head -n1 $file > temp
+chr = awk '{print $1}' temp
+
+
+########Pull top snps and look in UCSC
+awk '{print $3}' top.snps > top.snps.rs.only
+
+###############Downloaded output from SNAP - All snps in ld with top hit
+
+######Cat files together
+mv header > all_ld.txt
+tail -n +2 -q *.csv >> all_ld.txt
+
+######Pulls SNP2
+
+awk '{print $8}' all_ld.txt > top.ld.snps.txt 
+
+
+
+
+
+
+  
