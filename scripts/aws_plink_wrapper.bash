@@ -36,6 +36,7 @@ while [ $# -ne 0 ] ; do
 	esac
 done
 
+[ -z ${pheno_name} ] && usage
 [ $# -ne 0 ] && usage
 
 
@@ -57,51 +58,33 @@ mkdir -p $REFS
 mkdir -p $WORK
 cd $WORK
 
+#	The pheno files are small, but once run, no need to keep them.
+/bin/rm -rf ${REFS}/pheno_files/
+
 mkdir -p ${REFS}/pheno_files/${genome}/${population}
+
 [ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
 	aws s3 cp s3://herv/snp-20160701/pheno_files/${genome}/${population}/${pheno_name} \
 		${REFS}/pheno_files/${genome}/${population}/
 
-#mkdir -p ${REFS}/pruned_vcfs/${population}
-#[ -f ${REFS}/pruned_vcfs/${population}/ALL.chrX.*bed ] ||
-#	aws s3 cp s3://herv/snp-20160701/pruned_vcfs/$population/ \
-#		${REFS}/pruned_vcfs/${population}/ --recursive \
-#		--exclude "*" --include "ALL.chr*.*.tar.gz"
+
+#	Pruned vcfs are large. Delete entire tree if current population doesn't exist?
+#	This way, if population is same as previous run, already got it.
+[ -d ${REFS}/pruned_vcfs/${population} ] ||
+	rm -rf ${REFS}/pruned_vcfs/
+
+mkdir -p ${REFS}/pruned_vcfs/
 
 [ -d ${REFS}/pruned_vcfs/${population} ] ||
 	aws s3 cp s3://herv/snp-20160701/pruned_vcfs/${population}.tar.gz \
 		${REFS}/pruned_vcfs/
 
-[ -d ${REFS}/pruned_vcfs/${population} ] ||
+[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
 	tar -xvzC ${REFS}/pruned_vcfs/ \
-		-f ${REFS}/pruned_vcfs/${population}.*.gz
+		-f ${REFS}/pruned_vcfs/${population}.tar.gz
 
-[ -f ${REFS}/pruned_vcfs/${population} ] &&
-	\rm ${REFS}/pruned_vcfs/${population}.*.gz
-
-
-
-
-
-
-
-
-exit
-
-
-
-
-
-
-
-
-#	untar/gunzip bed,bim,fam files
-#[ -f ${REFS}/pruned_vcfs/${population}/ALL.chr${chromosome}.*bed ] ||
-#[ -f ${REFS}/pruned_vcfs/${population}/ALL.chrX.*bed ] ||
-#	tar -xvzC ${REFS}/pruned_vcfs/${population}/ \
-#		-f ${REFS}/pruned_vcfs/${population}/ALL.chr${chromosome}.*.gz
-
-
+[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
+	rm -f ${REFS}/pruned_vcfs/${population}.tar.gz
 
 for bedfile in `ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed` ; do
 
@@ -129,7 +112,7 @@ grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for
 
 awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
 
-tar cfz - ${pheno_name}.for.plot.all.txt \
+tar cvf - ${pheno_name}.for.plot.all.txt \
 	${pheno_name}.for.qq.plot \
 	${pheno_name}.for.manhattan.plot \
 	*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
