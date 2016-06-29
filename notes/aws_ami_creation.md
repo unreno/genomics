@@ -647,6 +647,7 @@ Jun 24 06:10:56 ip-172-31-6-85 kernel: [18985.900283] Killed process 2670 (bowti
 r3.large has 15GB memory, compared to t2.large's 8GB.
 Also, r3.large uses a 32GB SSD drive, not EBS so can't specify size, but big enough.
 Apparently, the 32GB SSD is not true. I've only got 8GB. Perhaps that's the max?
+That has something to do with additional optional storage. Ignoring.
 
 `aws/create_ec2_instance.bash --key ~/.aws/JakeHuman.pem --instance-type r3.large`
 
