@@ -73,7 +73,7 @@ mkdir -p $REFS/pruned_vcfs/${population}
 [ -f $REFS/pruned_vcfs/${population}/ALL.chrX.*bed ] ||
 	aws s3 cp s3://herv/snp-20160701/pruned_vcfs/$population/ \
 		$REFS/pruned_vcfs/${population}/ --recursive \
-		--exclude "*" --include "ALL.chr${chromosome}.*.tar.gz"
+		--exclude "*" --include "ALL.chr*.*.tar.gz"
 
 
 
@@ -86,7 +86,7 @@ mkdir -p $REFS/pruned_vcfs/${population}
 
 
 
-for bedfile in `ls $REFS/pruned_vcfs/${population}/ALL.chr${chromosome}.*bed` ; do
+for bedfile in `ls $REFS/pruned_vcfs/${population}/ALL.chr*.*bed` ; do
 
 	bfile=${bedfile%.*} # drop the shortest suffix match to ".*" (the .bed extension)
 	bfile_base=${bedfile##*/}	#	drop the longest prefix match to "*/" (the path)
