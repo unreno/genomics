@@ -147,12 +147,14 @@ list(){
 	$mysql -e "SELECT * FROM $table_name"
 }
 
+#	Many items are queued so quickly that they have the same queued_at date.
+#	In order to process in the order that they were queued, ORDER BY id ASC
 start_next(){
 	read -d '' var <<- EOF
 		LOCK TABLES $table_name WRITE;
 		SELECT id INTO @last FROM $table_name
 			WHERE started_at = 0
-			ORDER BY queued_at ASC
+			ORDER BY id ASC
 			LIMIT 1;
 		UPDATE $table_name
 			SET started_at = CURRENT_TIMESTAMP,
