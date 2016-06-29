@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-basedir=~/plinking/test/input
+#basedir=~/s3/herv/snp-20160620
+basedir=~/s3/herv/snp-20160701
 
 #	Aliases don't work here, but redefining it should
 echo "alias awsq='mysql_queue.bash --defaults_file ~/.awsqueue.cnf'"
@@ -15,8 +16,8 @@ for population in eur amr afr eas sas ; do	#	5
 	
 #		for chromosome in `seq 1 22 && echo X && echo Y` ; do
 
-			echo "awsq push 'aws_plink_wrapper.bash --index hg19_alt --pop ${population} --pheno ${pheno_name}"
-#			echo "awsq push 'aws_plink_wrapper.bash --index hg19_alt --pop ${population} --pheno ${pheno_name} --chromosome ${chromosome}'"
+			echo "awsq push 'aws_plink_wrapper.bash --genome hg19_alt --pop ${population} --pheno ${pheno_name}"
+#			echo "awsq push 'aws_plink_wrapper.bash --genome hg19_alt --pop ${population} --pheno ${pheno_name} --chromosome ${chromosome}'"
 #			echo "awsq push 'aws_plink_wrapper.bash ${population} ${pheno_name} ${chromosome}'"
 
 #		done
