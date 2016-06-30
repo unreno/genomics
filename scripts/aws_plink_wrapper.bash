@@ -107,9 +107,8 @@ done
 echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
 grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
 
-grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
-#	tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
-
+#grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
+tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
 
 awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
 
