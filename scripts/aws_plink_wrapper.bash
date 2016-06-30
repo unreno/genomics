@@ -43,20 +43,17 @@ done
 BASE=~/snpprocessing
 REFS=$BASE/references
 WORK=$BASE/working
+S3=s3://herv/snp-20160701
 
-#	It would be nice to avoid repeated copying, but that would take up much space.
-#	So, start fresh every go
-#/bin/rm -rf $BASE
 /bin/rm -rf $WORK
 
 mkdir -p $REFS
-
-[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
-	aws s3 cp s3://herv/snp-20160701/1kg_all_chroms_pruned_mds.mds ${REFS}/
-
-#/bin/rm -rf $WORK
 mkdir -p $WORK
 cd $WORK
+
+
+[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
+	aws s3 cp ${S3}/1kg_all_chroms_pruned_mds.mds ${REFS}/
 
 #	The pheno files are small, but once run, no need to keep them.
 /bin/rm -rf ${REFS}/pheno_files/
@@ -64,7 +61,7 @@ cd $WORK
 mkdir -p ${REFS}/pheno_files/${genome}/${population}
 
 [ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
-	aws s3 cp s3://herv/snp-20160701/pheno_files/${genome}/${population}/${pheno_name} \
+	aws s3 cp ${S3}/pheno_files/${genome}/${population}/${pheno_name} \
 		${REFS}/pheno_files/${genome}/${population}/
 
 
@@ -76,7 +73,7 @@ mkdir -p ${REFS}/pheno_files/${genome}/${population}
 mkdir -p ${REFS}/pruned_vcfs/
 
 [ -d ${REFS}/pruned_vcfs/${population} ] ||
-	aws s3 cp s3://herv/snp-20160701/pruned_vcfs/${population}.tar.gz \
+	aws s3 cp ${S3}/pruned_vcfs/${population}.tar.gz \
 		${REFS}/pruned_vcfs/
 
 [ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
@@ -103,24 +100,27 @@ for bedfile in `ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed` ; do
 
 	awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
 
+	mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
+
 done
 
 echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
 grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
 
 grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
+#	tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
+
 
 awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
 
 tar cvf - ${pheno_name}.for.plot.all.txt \
 	${pheno_name}.for.qq.plot \
 	${pheno_name}.for.manhattan.plot \
-	*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
+	${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
 
 aws s3 cp ${pheno_name}.tar.gz \
-	s3://herv/snp-20160701/output/${genome}/${population}/
+	${S3}/output/${genome}/${population}/
 
 cd ~/
-#/bin/rm -rf $BASE
 /bin/rm -rf $WORK
 
