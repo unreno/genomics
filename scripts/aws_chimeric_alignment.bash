@@ -61,7 +61,7 @@ done
 
 find . -name \*pre\*fasta -execdir align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned \; > align_herv_k113_chimerics_to_index.sh.out
 
-#ln -s ../../${index}.insertion_points
+
 
 for q in 20 10 00 ; do
 	echo $q
