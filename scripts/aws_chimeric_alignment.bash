@@ -117,6 +117,6 @@ for q in 20 10 00 ; do
 done
 
 mkdir extracted
-mv align* compile* ${index}* insertion* overlap* extracted/
+mv compile* ${index}* insertion* overlap* extracted/
 chmod -R -w extracted
 
