@@ -53,9 +53,19 @@ done
 
 : ${BOWTIE2_INDEXES:="${HOME}/s3/herv/indexes"}
 
-[ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] || (echo -e "\nIndex not found.\n\n" && usage)
+#	I think that the "exit" call in the usage function just ends the subshell.
+#[ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] || (echo -e "\nIndex not found.\n\n" && usage)
+if [ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] ; then
+	echo -e "\nIndex not found.\n\n"
+	usage
+fi
 
-[ -e "${index}.insertion_points" ] || (echo -e "\nInsertion points list not found.\n\n" && usage)
+#	I think that the "exit" call in the usage function just ends the subshell.
+#[ -e "${index}.insertion_points" ] || (echo -e "\nInsertion points list not found.\n\n" && usage)
+if [ -e "${index}.insertion_points" ] ; then
+	echo -e "\nInsertion points list not found.\n\n"
+	usage
+fi
 
 
 
@@ -66,31 +76,42 @@ find . -name \*pre\*fasta -execdir align_herv_k113_chimerics_to_index.sh --index
 for q in 20 10 00 ; do
 	echo $q
 
+	echo compile_all_overlappers.sh --mapq $q --index ${index}
 	compile_all_overlappers.sh --mapq $q --index ${index} \
 		--core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
 
 	q="Q${q}"
 
+	echo insertion_points_to_table.sh --skip-table \*${q}\*points
 	insertion_points_to_table.sh --skip-table \*${q}\*points > insertion_points_to_table.${q}.irrelevant
 
 	mv tmpfile.\*${q}\*points.* insertion_points.${index}.${q}
 
+	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
 	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
 
+	echo positions_within_10bp_of_reference.sh -p reference
 	positions_within_10bp_of_reference.sh -p reference overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
 
+	echo positions_within_10bp_of_reference.sh
 	positions_within_10bp_of_reference.sh overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
 
+	echo to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
 	to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines > insertion_points_near_reference.${index}.${q}.reference.csv
 
+	echo to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
 	to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines > insertion_points_near_reference.${index}.${q}.sample.csv
 
-	$( head -1 insertion_points_near_reference.${index}.${q}.reference.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.reference.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.reference.sorted.csv
+#	don't think the leading $ is correct
+	( head -1 insertion_points_near_reference.${index}.${q}.reference.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.reference.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 
+	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv > insertion_points_near_reference.${index}.${q}.reference.sorted.grouped.csv
 
-	$(head -1 insertion_points_near_reference.${index}.${q}.sample.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.sample.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.sample.sorted.csv
+#	don't think the leading $ is correct
+	( head -1 insertion_points_near_reference.${index}.${q}.sample.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.sample.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 
+	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv > insertion_points_near_reference.${index}.${q}.sample.sorted.grouped.csv
 
 done

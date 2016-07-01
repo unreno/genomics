@@ -657,11 +657,26 @@ That has something to do with additional optional storage. Ignoring.
 
 
 
-`echo "alias topme="top -U \$USER"" >> ~/.bashrc`
-
-`alias topme="top -U \$USER"`
-
-
 hg19 on r3.large was done in about 1.5 hours. 
 hg38 on the t2.large took around 8 hours.
+
+
+
+
+Gawk 3 is just too old for some of my scripts and the yum package hasn't been updated.
+
+```BASH
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.3.tar.gz
+cd gawk-4.1.3
+./configure --prefix $HOME/.local
+make
+make install
+```
+
+Updating find would likely be a good idea as well
+```BASH
+http://ftp.gnu.org/pub/gnu/findutils/findutils-4.6.0.tar.gz
+```
+
+
 
