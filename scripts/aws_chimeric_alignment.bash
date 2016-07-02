@@ -69,7 +69,31 @@ fi
 
 
 
-find . -name \*pre\*fasta -execdir align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned \; > align_herv_k113_chimerics_to_index.sh.out
+#find . -name \*pre\*fasta -execdir align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned \; > align_herv_k113_chimerics_to_index.sh.out
+#
+#	Trying to resolve this which occurs after about 100
+#
+#	+ '[' 0 -gt 0 ']'
+#	/home/ec2-user/.local/bin/align_herv_k113_chimerics_to_index.sh: cannot make pipe for command substitution: Too many open files
+#	  base=
+#	++ basename /home/ec2-user/.local/bin/align_herv_k113_chimerics_to_index.sh
+#	/home/ec2-user/.local/bin/align_herv_k113_chimerics_to_index.sh: redirection error: cannot duplicate fd: Too many open files
+#	/home/ec2-user/.local/bin/align_herv_k113_chimerics_to_index.sh: line 215: 1: Too many open files
+#	/usr/bin/env: error while loading shared libraries: libc.so.6: cannot open shared object file: Error 24
+#	20
+#	+ mapq=20
+
+#find . -name \*pre\*fasta -execdir sh -c "align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned > align_herv_k113_chimerics_to_index.sh.out 2>&1" \; > align_herv_k113_chimerics_to_index.sh.out
+
+
+
+initial_PWD=$PWD
+for file in `find . -name \*pre\*fasta` ; do
+  cd $initial_PWD 
+  cd `dirname $file`
+  align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
+# > align_herv_k113_chimerics_to_index.sh.out
+done
 
 
 
