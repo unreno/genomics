@@ -674,8 +674,17 @@ make install
 ```
 
 Updating find would likely be a good idea as well
+This fails after 1018 files. But for some reason, not inside a bash script?
+```find . -name \*pre\*fasta -execdir sh -c "ls > test.out 2>&1" \;```
+
+Updating find didn't make a difference.
+
 ```BASH
 http://ftp.gnu.org/pub/gnu/findutils/findutils-4.6.0.tar.gz
+cd findutils-4.6.0
+./configure --prefix $HOME/.local
+make
+make install
 ```
 
 
