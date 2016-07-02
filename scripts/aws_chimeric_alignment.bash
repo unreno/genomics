@@ -55,14 +55,14 @@ done
 
 #	I think that the "exit" call in the usage function just ends the subshell.
 #[ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] || (echo -e "\nIndex not found.\n\n" && usage)
-if [ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] ; then
+if [ ! -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] ; then
 	echo -e "\nIndex not found.\n\n"
 	usage
 fi
 
 #	I think that the "exit" call in the usage function just ends the subshell.
 #[ -e "${index}.insertion_points" ] || (echo -e "\nInsertion points list not found.\n\n" && usage)
-if [ -e "${index}.insertion_points" ] ; then
+if [ ! -e "${index}.insertion_points" ] ; then
 	echo -e "\nInsertion points list not found.\n\n"
 	usage
 fi
