@@ -89,7 +89,7 @@ fi
 
 initial_PWD=$PWD
 for file in `find . -name \*pre\*fasta` ; do
-  cd $initial_PWD 
+  cd $initial_PWD
   cd `dirname $file`
   align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
 # > align_herv_k113_chimerics_to_index.sh.out
