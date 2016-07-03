@@ -92,7 +92,6 @@ for file in `find . -name \*pre\*fasta` ; do
   cd $initial_PWD
   cd `dirname $file`
   align_herv_k113_chimerics_to_index.sh --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
-# > align_herv_k113_chimerics_to_index.sh.out
 done
 
 
@@ -126,13 +125,13 @@ for q in 20 10 00 ; do
 	echo to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
 	to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines > insertion_points_near_reference.${index}.${q}.sample.csv
 
-#	don't think the leading $ is correct
+	echo sort insertion_points_near_reference.${index}.${q}.reference.csv
 	( head -1 insertion_points_near_reference.${index}.${q}.reference.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.reference.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 
 	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv > insertion_points_near_reference.${index}.${q}.reference.sorted.grouped.csv
 
-#	don't think the leading $ is correct
+	echo sort insertion_points_near_reference.${index}.${q}.sample.csv
 	( head -1 insertion_points_near_reference.${index}.${q}.sample.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.sample.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 
 	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv
