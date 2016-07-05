@@ -119,6 +119,8 @@ cd $WORK
 
 	awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
 
+	df -h .
+
 	echo "Ending"
 	date
 } > ${pheno_name}.log 2>&1
