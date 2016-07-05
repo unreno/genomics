@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -v
+#set -v
+set -x
 
 function usage(){
 	echo
