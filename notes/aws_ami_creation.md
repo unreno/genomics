@@ -585,6 +585,16 @@ ln -s Makefile.example Makefile
 make install
 ```
 
+Gawk 3 is just too old for some of my scripts and the yum package hasn't been updated.
+
+```BASH
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.3.tar.gz
+cd gawk-4.1.3
+./configure --prefix $HOME/.local
+make
+make install
+```
+
 
 ##### Via AWS Web Console create AMI from running instance.
 
@@ -662,16 +672,6 @@ hg38 on the t2.large took around 8 hours.
 
 
 
-
-Gawk 3 is just too old for some of my scripts and the yum package hasn't been updated.
-
-```BASH
-wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.3.tar.gz
-cd gawk-4.1.3
-./configure --prefix $HOME/.local
-make
-make install
-```
 
 Updating find would likely be a good idea as well
 This fails after 1018 files. But for some reason, not inside a bash script?
