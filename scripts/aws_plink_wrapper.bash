@@ -56,7 +56,7 @@ cd $WORK
 
 #	Begin logging
 {
-	echo "Starting"
+	echo "Starting ..."
 	date
 
 	[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
@@ -125,7 +125,7 @@ cd $WORK
 
 	df -h .
 
-	echo "Ending"
+	echo "Ending ..."
 	date
 } > ${pheno_name}.log 2>&1
 
