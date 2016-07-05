@@ -41,7 +41,8 @@ function usage(){
 
 # initial image id "ami-f303fb93"
 #	image_id="ami-869552e6"	#	Base HERV 3
-image_id="ami-bbd918db"	#	Base HERV 4
+#image_id="ami-bbd918db"	#	Base HERV 4
+image_id="ami-3cbe7e5c"	#	Base HERV 5
 instance_type="t2.micro"
 #instance_type="t2.medium"
 key="~/.aws/KEYNAME.pem"
