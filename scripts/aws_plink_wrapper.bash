@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -v
+
 function usage(){
 	echo
 	echo "Usage:"
