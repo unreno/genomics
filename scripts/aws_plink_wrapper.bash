@@ -110,6 +110,7 @@ cd $WORK
 
 		#	Try to manage disk space as could be tight.
 		rm ${bedfile_core}.no.covar.assoc.logistic
+		rm ${bedfile_core}.no.covar.nosex
 
 	done
 
