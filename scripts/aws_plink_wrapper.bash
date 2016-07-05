@@ -40,22 +40,21 @@ done
 [ $# -ne 0 ] && usage
 
 
+BASE=~/snpprocessing
+REFS=$BASE/references
+WORK=$BASE/working
+S3=s3://herv/snp-20160701
+
+/bin/rm -rf $WORK
+
+mkdir -p $REFS
+mkdir -p $WORK
+cd $WORK
+
 #	Begin logging
 {
 	echo "Starting"
 	date
-
-	BASE=~/snpprocessing
-	REFS=$BASE/references
-	WORK=$BASE/working
-	S3=s3://herv/snp-20160701
-
-	/bin/rm -rf $WORK
-
-	mkdir -p $REFS
-	mkdir -p $WORK
-	cd $WORK
-
 
 	[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
 		aws s3 cp ${S3}/1kg_all_chroms_pruned_mds.mds ${REFS}/
