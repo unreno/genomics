@@ -40,79 +40,89 @@ done
 [ $# -ne 0 ] && usage
 
 
-BASE=~/snpprocessing
-REFS=$BASE/references
-WORK=$BASE/working
-S3=s3://herv/snp-20160701
+#	Begin logging
+{
+	echo "Starting"
+	date
 
-/bin/rm -rf $WORK
+	BASE=~/snpprocessing
+	REFS=$BASE/references
+	WORK=$BASE/working
+	S3=s3://herv/snp-20160701
 
-mkdir -p $REFS
-mkdir -p $WORK
-cd $WORK
+	/bin/rm -rf $WORK
 
-
-[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
-	aws s3 cp ${S3}/1kg_all_chroms_pruned_mds.mds ${REFS}/
-
-#	The pheno files are small, but once run, no need to keep them.
-/bin/rm -rf ${REFS}/pheno_files/
-
-mkdir -p ${REFS}/pheno_files/${genome}/${population}
-
-[ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
-	aws s3 cp ${S3}/pheno_files/${genome}/${population}/${pheno_name} \
-		${REFS}/pheno_files/${genome}/${population}/
+	mkdir -p $REFS
+	mkdir -p $WORK
+	cd $WORK
 
 
-#	Pruned vcfs are large. Delete entire tree if current population doesn't exist?
-#	This way, if population is same as previous run, already got it.
-[ -d ${REFS}/pruned_vcfs/${population} ] ||
-	rm -rf ${REFS}/pruned_vcfs/
+	[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
+		aws s3 cp ${S3}/1kg_all_chroms_pruned_mds.mds ${REFS}/
 
-mkdir -p ${REFS}/pruned_vcfs/
+	#	The pheno files are small, but once run, no need to keep them.
+	/bin/rm -rf ${REFS}/pheno_files/
 
-[ -d ${REFS}/pruned_vcfs/${population} ] ||
-	aws s3 cp ${S3}/pruned_vcfs/${population}.tar.gz \
-		${REFS}/pruned_vcfs/
+	mkdir -p ${REFS}/pheno_files/${genome}/${population}
 
-[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
-	tar -xvzC ${REFS}/pruned_vcfs/ \
-		-f ${REFS}/pruned_vcfs/${population}.tar.gz
+	[ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
+		aws s3 cp ${S3}/pheno_files/${genome}/${population}/${pheno_name} \
+			${REFS}/pheno_files/${genome}/${population}/
 
-[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
-	rm -f ${REFS}/pruned_vcfs/${population}.tar.gz
 
-for bedfile in `ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed` ; do
+	#	Pruned vcfs are large. Delete entire tree if current population doesn't exist?
+	#	This way, if population is same as previous run, already got it.
+	[ -d ${REFS}/pruned_vcfs/${population} ] ||
+		rm -rf ${REFS}/pruned_vcfs/
 
-	bedfile_noext=${bedfile%.*} # drop the shortest suffix match to ".*" (the .bed extension)
-	bedfile_core=${bedfile_noext##*/}	#	drop the longest prefix match to "*/" (the path)
+	mkdir -p ${REFS}/pruned_vcfs/
 
-	plink --snps-only \
-			--threads 8 \
-			--allow-no-sex \
-			--logistic hide-covar \
-			--covar-name C1,C2,C3,C4,C5,C6 \
-			--bfile ${bedfile_noext} \
-			--pheno ${REFS}/pheno_files/${genome}/${population}/${pheno_name} \
-			--out ${bedfile_core}.no.covar \
-			--covar ${REFS}/1kg_all_chroms_pruned_mds.mds
+	[ -d ${REFS}/pruned_vcfs/${population} ] ||
+		aws s3 cp ${S3}/pruned_vcfs/${population}.tar.gz \
+			${REFS}/pruned_vcfs/
 
-	awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
+	[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
+		tar -xvzC ${REFS}/pruned_vcfs/ \
+			-f ${REFS}/pruned_vcfs/${population}.tar.gz
 
-	mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
+	[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
+		rm -f ${REFS}/pruned_vcfs/${population}.tar.gz
 
-done
+	for bedfile in `ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed` ; do
 
-echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
-grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
+		bedfile_noext=${bedfile%.*} # drop the shortest suffix match to ".*" (the .bed extension)
+		bedfile_core=${bedfile_noext##*/}	#	drop the longest prefix match to "*/" (the path)
 
-#grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
-tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
+		plink --snps-only \
+				--threads 8 \
+				--allow-no-sex \
+				--logistic hide-covar \
+				--covar-name C1,C2,C3,C4,C5,C6 \
+				--bfile ${bedfile_noext} \
+				--pheno ${REFS}/pheno_files/${genome}/${population}/${pheno_name} \
+				--out ${bedfile_core}.no.covar \
+				--covar ${REFS}/1kg_all_chroms_pruned_mds.mds
 
-awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
+		awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
+
+		mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
+
+	done
+
+	echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
+	grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
+
+	#grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
+	tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
+
+	awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
+
+	echo "Ending"
+	date
+} > ${pheno_name}.log 2>&1
 
 tar cvf - ${pheno_name}.for.plot.all.txt \
+	${pheno_name}.log \
 	${pheno_name}.for.qq.plot \
 	${pheno_name}.for.manhattan.plot \
 	${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
