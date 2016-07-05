@@ -45,7 +45,7 @@ REFS=$BASE/references
 WORK=$BASE/working
 S3=s3://herv/snp-20160701
 
-/bin/rm -rf $WORK
+#/bin/rm -rf $WORK
 
 mkdir -p $REFS
 mkdir -p $WORK
@@ -106,6 +106,9 @@ cd $WORK
 
 		mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
 
+		#	Try to manage disk space as could be tight.
+		rm ${bedfile_core}.no.covar.assoc.logistic
+
 	done
 
 	echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
@@ -130,5 +133,5 @@ aws s3 cp ${pheno_name}.tar.gz \
 	${S3}/output/${genome}/${population}/
 
 cd ~/
-/bin/rm -rf $WORK
+#/bin/rm -rf $WORK
 
