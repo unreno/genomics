@@ -44,7 +44,7 @@ done
 } 1>>$log_file 2>&1
 
 gzip --best $log_file
-aws s3 cp $log_file.gz s3://herv/snp-20160620/logs/
+aws s3 cp $log_file.gz s3://herv/suicidal_logs/
 
 #	sudo raises this error
 #	sudo: sorry, you must have a tty to run sudo
