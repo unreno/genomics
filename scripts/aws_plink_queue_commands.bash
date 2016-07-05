@@ -25,7 +25,7 @@ for population in eur amr afr eas sas ; do	#	5
 	
 #		for chromosome in `seq 1 22 && echo X && echo Y` ; do
 
-			echo "awsq push 'aws_plink_wrapper.bash --genome ${genome} --pop ${population} --pheno ${pheno_name}"
+			echo "awsq push 'aws_plink_wrapper.bash --genome ${genome} --pop ${population} --pheno ${pheno_name}'"
 #			echo "awsq push 'aws_plink_wrapper.bash --genome hg19_alt --pop ${population} --pheno ${pheno_name} --chromosome ${chromosome}'"
 #			echo "awsq push 'aws_plink_wrapper.bash ${population} ${pheno_name} ${chromosome}'"
 
