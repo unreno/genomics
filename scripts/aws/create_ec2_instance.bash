@@ -24,17 +24,20 @@ function usage(){
 	echo "aws ec2 create-key-pair --key-name KEYNAME --query 'KeyMaterial' --output text > ~/.aws/KEYNAME.pem"
 	echo "Key Pairs are also region specific."
 	echo
-	echo "        vCPU   ECU  Memory(GiB) Linux/UNIX Usage"
-	echo "General Purpose - Current Generation (US West 2 - 20160705)"
-	echo "t2.nano   1  Variable  0.5  \$0.0065 per Hour"
-	echo "t2.micro  1  Variable  1    \$0.013 per Hour (Free Tier)"
-	echo "t2.small  1  Variable  2    \$0.026 per Hour"
-	echo "t2.medium 2  Variable  4    \$0.052 per Hour"
-	echo "t2.large  2  Variable  8    \$0.104 per Hour"
+	echo "          vCPU   ECU  Memory(GiB) Linux/UNIX Usage (US West 2 - 20160705)"
+	echo "t2.nano     1    Var     0.5     \$0.0065 per Hour"
+	echo "t2.micro    1    Var     1       \$0.013 per Hour (Free Tier)"
+	echo "t2.small    1    Var     2       \$0.026 per Hour"
+	echo "t2.medium   2    Var     4       \$0.052 per Hour"
+	echo "t2.large    2    Var     8       \$0.104 per Hour"
+	echo "m3.medium   1     3      3.75    \$0.067 per Hour"
+	echo "m3.large    2     6.5    7.5     \$0.133 per Hour"
+	echo "m3.xlarge   4    13     15       \$0.266 per Hour"
+	echo "m3.2xlarge  8    26     30       \$0.532 per Hour"
 	echo
 	echo "Example:"
 	echo
-	echo "`basename $0` --key ~/.aws/JakeHumanHome.pem --user-data aws_start_suicidal_queue.user_data"
+	echo "`basename $0` --key ~/.aws/JakeHuman.pem --user-data aws_start_suicidal_queue.user_data"
 	echo
 	exit
 }
