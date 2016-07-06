@@ -48,7 +48,7 @@ REFS=$BASE/references
 WORK=$BASE/working
 S3=s3://herv/snp-20160701
 
-#/bin/rm -rf $WORK
+/bin/rm -rf $WORK
 
 mkdir -p $REFS
 mkdir -p $WORK
