@@ -13,10 +13,10 @@ function usage(){
 	exit 1
 }
 #	Basically, this is TRUE AND DO ...
-#[ $# -eq 0 ] && usage
-[ $# -ne 1 ] && usage
+[ $# -eq 0 ] && usage
+#[ $# -ne 1 ] && usage
 
-remote_command=$1
+remote_command=$@
 
 #	Don't think needed. What happens in scripts, stays in scripts!
 initial_IFS=$IFS
@@ -31,6 +31,7 @@ i=0
 #for ip in `aws ec2 describe-instances --filters Name=instance-state-name,Values=running \
 #	the above works, but "running" seems to be the default
 for ip_and_keyname in `aws ec2 describe-instances \
+	--filters "Name=instance-state-name,Values=running" \
 	--query 'Reservations[].Instances[].[PublicIpAddress,KeyName]' --output text` ; do 
 
 	let i++
