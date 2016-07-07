@@ -18,7 +18,7 @@ Cancelled t2.micro (too slow) and m3.xlarge (too expensive)
 type      | cost        | sets | time   | cost / set
 --------- | ----------- | ---- | ------ | ------------
 t2.medium | $0.052 / hr |  37  | 40 hrs | $ 0.056 / set
-c4.large  | $0.105 / hr |  78  | 40 hrs | $ 0.0538 / set
+c4.large  | $0.105 / hr |  79  | 40 hrs | $ 0.053 / set
 t2.large  | $0.104 / hr |  54  | 40 hrs | $ 0.077 / set
 m3.medium | $0.067 / hr |  22  | 24 hrs | $ 0.069 / set
 m3.large  | $0.133 / hr |  47  | 24 hrs | $ 0.068 / set
