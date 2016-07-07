@@ -6,7 +6,7 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--image-id AMI] [--instance-type AMITYPE] [--key KEY_WITH_PATH] [--user-data USERDATAFILE] [--volume-size INTEGER] [--NOT-DRY-RUN]"
+	echo "`basename $0` [--image-id AMI] [--instance-type AMITYPE] [--key KEY_WITH_PATH] [--user-data USERDATAFILE] [--volume-size INTEGER] [--count INTEGER] [--NOT-DRY-RUN]"
 	echo
 	echo "--NOT-DRY-RUN is a boolean flag to ACTUALLY start instance (without, does not)"
 	echo
@@ -15,10 +15,11 @@ function usage(){
 	echo
 	echo "Defaults:"
 	echo
-	echo " image_id ....... $image_id"
-	echo " instance_type .. $instance_type"
-	echo " key ............ $key (the key and file base name NEED to be the same)"
+	echo " image_id ....... ${image_id}"
+	echo " instance_type .. ${instance_type}"
+	echo " key ............ ${key} (the key and file base name NEED to be the same)"
 	echo " volume-size .... Default Image Volume Size"
+	echo " count .......... ${count}"
 	echo
 	echo "Key Pairs can easily be create like ..."
 	echo "aws ec2 create-key-pair --key-name KEYNAME --query 'KeyMaterial' --output text > ~/.aws/KEYNAME.pem"
@@ -46,7 +47,8 @@ function usage(){
 #	image_id="ami-869552e6"	#	Base HERV 3
 #image_id="ami-bbd918db"	#	Base HERV 4
 #image_id="ami-3cbe7e5c"	#	Base HERV 5
-image_id="ami-10c40470"	#	Base HERV 6
+#image_id="ami-10c40470"	#	Base HERV 6
+image_id="ami-000"	#	Base HERV 7
 instance_type="t2.micro"
 #instance_type="t2.medium"
 key="~/.aws/KEYNAME.pem"
@@ -55,12 +57,15 @@ dry_run="--dry-run"
 #	--user-data file://aws_start_1000genomes_processing.sh
 user_data=""
 block=""	#	for the volume size
+count=1
 
 while [ $# -ne 0 ] ; do
 	#	Options MUST start with - or --.
 	case $1 in
 		--NOT-DRY-RUN)
 			dry_run=""; shift ;;
+		--count)	#	no short cuts here. count and only count.
+			shift; count=$1; shift ;;
 		-in*|--in*)
 			shift; instance_type=$1; shift ;;
 		-im*|--im*)
@@ -227,12 +232,12 @@ else
 	echo "SSH Access already exists. Skipping."
 fi
 
-command="aws ec2 run-instances $dry_run $block
-	--count 1
-	--image-id $image_id
-	--instance-type $instance_type
+command="aws ec2 run-instances ${dry_run} ${block}
+	--count ${count}
+	--image-id ${image_id}
+	--instance-type ${instance_type}
 	--key-name ${key_name}
-	--subnet-id $subnet_id
+	--subnet-id ${subnet_id}
 	--associate-public-ip-address
 	--instance-initiated-shutdown-behavior terminate
 	--iam-instance-profile Name='ec2_processor' ${user_data}"
