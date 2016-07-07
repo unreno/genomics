@@ -36,7 +36,7 @@ done
 	echo "Starting at ..."
 	date
 
-	mysql_queue.bash --defaults_file ~/awsqueue.cnf start
+	mysql_queue.bash --defaults_file ~/.awsqueue.cnf start
 
 	echo
 	echo "Finished at ..."
