@@ -26,7 +26,7 @@ m3.large  | $0.133 / hr |  47  | 24 hrs | $ 0.068 / set
 
 `awsdb -e "select hostname, avg(timediff(completed_at, started_at)) as time, count(1) as count from queue where completed_at IS NOT NULL group by hostname"`
 
-|------------------|------------|-------|
+
 | hostname         | time       | count |
 |------------------|------------|-------|
 | NULL             |     0.0000 |  6643 |
@@ -37,5 +37,4 @@ m3.large  | $0.133 / hr |  47  | 24 hrs | $ 0.068 / set
 | ip-172-31-33-109 | 10230.2381 |    22 |
 | ip-172-31-6-13   |  2385.7222 |    18 |
 | ip-172-31-8-34   |  3028.4130 |    47 |
-|------------------|------------|-------|
 
