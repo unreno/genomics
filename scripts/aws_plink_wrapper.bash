@@ -13,7 +13,7 @@ function usage(){
 	echo "  genome ...... ${genome}"
 	echo "  population .. ${population}"
 	echo
-	echo "`basename $0` --genome hg19_alt --population eur --pheno chr17_ctg5_hap1_504028_F_PRE" 
+	echo "`basename $0` --genome hg19_alt --population eur --pheno chr17_ctg5_hap1_504028_F_PRE"
 	echo
 	exit 1
 }
@@ -115,11 +115,19 @@ cd $WORK
 
 	done
 
-	echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
-	grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
+	#	Not keeping for.plot.all.txt so doesn't need a header
+	#echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
+	#grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
+	#grep --invert-match --no-filename "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
+	grep --invert-match --no-filename "CHR" *.for.plot.txt > ${pheno_name}.for.plot.all.txt
 
-	#grep -v "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
-	tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
+	#	No wildcards, so don't need to specify --no-filename
+	grep --invert-match "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
+	#	If not keeping header, don't need to skip the first line anymore!
+	#tail -n +2 ${pheno_name}.for.plot.all.txt | grep -v "NA" | shuf -n 200000 > ${pheno_name}.for.qq.plot
+
+	#	Keeping the NA rows now
+	grep "NA" ${pheno_name}.for.plot.all.txt > ${pheno_name}.NA.txt
 
 	awk '$4 < 0.10' ${pheno_name}.for.plot.all.txt > ${pheno_name}.for.manhattan.plot
 
@@ -129,15 +137,38 @@ cd $WORK
 	date
 } > ${pheno_name}.log 2>&1
 
-tar cvf - ${pheno_name}.for.plot.all.txt \
-	${pheno_name}.log \
-	${pheno_name}.for.qq.plot \
-	${pheno_name}.for.manhattan.plot \
-	${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
 
-aws s3 cp ${pheno_name}.tar.gz \
+gzip --best ${pheno_name}.NA.txt
+aws s3 cp ${pheno_name}.NA.txt.gz \
+		${S3}/output/${genome}/${population}/
+
+gzip --best ${pheno_name}.log
+aws s3 cp ${pheno_name}.log.gz \
+		${S3}/output/${genome}/${population}/
+
+gzip --best ${pheno_name}.for.qq.plot
+aws s3 cp ${pheno_name}.for.qq.plot.gz \
+		${S3}/output/${genome}/${population}/
+
+gzip --best ${pheno_name}.for.manhattan.plot
+aws s3 cp ${pheno_name}.for.manhattan.plot.gz \
+		${S3}/output/${genome}/${population}/
+
+tar cvf - ${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.no.covar.logs.tar.gz
+aws s3 cp ${pheno_name}.no.covar.logs.tar.gz \
 	${S3}/output/${genome}/${population}/
 
+
+#
+#	tar cvf - ${pheno_name}.for.plot.all.txt \
+#		${pheno_name}.log \
+#		${pheno_name}.for.qq.plot \
+#		${pheno_name}.for.manhattan.plot \
+#		${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.tar.gz
+#
+#	aws s3 cp ${pheno_name}.tar.gz \
+#		${S3}/output/${genome}/${population}/
+#
 cd ~/
 #/bin/rm -rf $WORK
 
