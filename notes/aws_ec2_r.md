@@ -73,3 +73,38 @@ Install "optparse" as well
 
 
 
+
+
+
+
+##### Testing
+
+This seems to work.
+
+```BASH
+#	add to .bashrc
+R_LIBS="/home/ec2-user/.R"
+#	mkdir /home/ec2-user/.R
+> sudo yum install R
+> R
+> install.packages('qqman')
+> install.packages('optparse')
+```
+
+Download and process all ....
+
+```
+mkdir ~/for_plots
+aws s3 sync s3://herv/snp-20160701/output/hg19_alt/ ~/for_plots/ --recursive --exclude "*" --include "*.plot.gz"
+cd ~/for_plots/
+gunzip *gz
+
+cd ~/
+
+aws_plink_plots.r
+
+aws s3 sync plots/ s3://herv/snp-20160701/output/hg19_alt/
+```
+
+
+
