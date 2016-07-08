@@ -1,8 +1,5 @@
 #!/usr/bin/env Rscript
 
-message()
-message('Begin')
-
 #	manhattan_plot.r -m for_plots/chr10_127658643_R_PRE.for.manhattan.plot -q for_plots/chr10_127658643_R_PRE.for.qq.plot -o ~/Desktop/
 
 #	http://tuxette.nathalievilla.org/?p=1696
@@ -36,6 +33,14 @@ if (is.null(opt$qq)){
   print_help(opt_parser)
   stop("QQ file required.\n", call.=FALSE)
 }
+
+if( ( file.info(opt$manhattan)$size == 0 ) || ( file.info(opt$qq)$size == 0 ) ){
+  stop("Manhattan or QQ file is empty\n", call.=FALSE)
+}
+
+#dir.create(file.path(opt$outpath), showWarnings = FALSE)
+dir.create(opt$outpath, showWarnings = FALSE)
+
 
 library("qqman") 
 

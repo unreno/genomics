@@ -1,7 +1,5 @@
 #!/usr/bin/env Rscript
 
-message( 'Begin' )
-
 mfiles <- list.files(path="for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=FALSE)
 qfiles <- list.files(path="for_plots", pattern="*.for.qq.plot", full.names=T, recursive=FALSE) 
 
@@ -12,6 +10,8 @@ length(qfiles)
 somePNGPath = "plots/"
 #pdf(file=somePDFPath)  
 
+#dir.create(file.path(somePNGPath), showWarnings = FALSE)
+dir.create(somePNGPath, showWarnings = FALSE)	#	works
 library("qqman") 
 
 #	Disable all the warnings
@@ -27,6 +27,11 @@ for (i in 1:length(mfiles))
 	message( i," / ",length(mfiles) )
 	message( mfiles[i] )
 	 
+	if( ( file.info(mfiles[i])$size == 0 ) || ( file.info(qfiles[i])$size == 0 ) ){
+	  message("Manhattan or QQ file is empty. Skipping.")
+		next
+	}
+
 	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
 	db<-read.table(mfiles[i], sep=" ")
 	dbgP<-data.frame(SNP=db$V2, CHR=db$V1, BP=db$V3, P=db$V4)
