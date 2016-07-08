@@ -210,11 +210,14 @@ start(){
 #		command=${command:9}
 #		echo "--${command}--"
 	
+		log "Date ...... `date`"
 		log "Running ... id $id"
 		log "Running ... $command"
 
 		#	run the command
 		eval $command
+
+		log "Date ...... `date`"
 
 		#	mark as complete record with id = $id
 		read -d '' var <<- EOF
