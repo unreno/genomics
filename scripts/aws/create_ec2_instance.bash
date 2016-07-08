@@ -256,8 +256,8 @@ echo "$command"
 instance=`$command`
 echo "$instance"
 
-instance_id=`echo "$instance" | jq '.Instances[].InstanceId' | tr -d '"'`
-echo $instance_id
+instance_ids=`echo "$instance" | jq '.Instances[].InstanceId' | tr -d '"'`
+echo $instance_ids
 
 
 
@@ -269,8 +269,8 @@ echo $instance_id
 
 
 command="aws ec2 describe-instances
-	--query 'Reservations[0].Instances[0].PublicIpAddress'
-	--instance-ids $instance_id"
+	--query 'Reservations[0].Instances[].PublicIpAddress'
+	--instance-ids $instance_ids"
 echo
 echo $command
 echo
