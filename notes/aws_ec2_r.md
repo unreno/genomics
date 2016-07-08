@@ -48,3 +48,21 @@ Also may need to install additional modules.
 
 `yum list R-\*`
 
+
+
+
+
+
+
+Once R was installed on my local machine, I had to install the 'qqman' package.
+
+```R
+R
+> install.packages("qqman")
+> q()
+```
+
+then the command 
+
+`Rscript scripts/aws_plink_plots.r`
+
