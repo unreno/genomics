@@ -66,3 +66,10 @@ then the command
 
 `Rscript scripts/aws_plink_plots.r`
 
+
+
+
+Install "optparse" as well
+
+
+

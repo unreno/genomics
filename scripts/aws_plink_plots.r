@@ -1,8 +1,9 @@
+#!/usr/bin/env Rscript
+
+message( 'Begin' )
 
 mfiles <- list.files(path="for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=FALSE)
 qfiles <- list.files(path="for_plots", pattern="*.for.qq.plot", full.names=T, recursive=FALSE) 
-
-print( mfiles )
 
 length(mfiles)
 length(qfiles)
@@ -13,11 +14,18 @@ somePNGPath = "plots/"
 
 library("qqman") 
 
-#for (i in length(mfiles))   
+#	Disable all the warnings
+options(warn=-1)
+#Warning messages:
+#1: In min(d[d$CHR == i, ]$pos) :
+#  no non-missing arguments to min; returning Inf
+#2: In max(d[d$CHR == i, ]$pos) :
+#  no non-missing arguments to max; returning -Inf
+
 for (i in 1:length(mfiles))   
 {   
-	print( i )
-	print( mfiles[i] )
+	message( i," / ",length(mfiles) )
+	message( mfiles[i] )
 	 
 	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
 	db<-read.table(mfiles[i], sep=" ")
@@ -35,4 +43,4 @@ for (i in 1:length(mfiles))
 	rm(dqgP)
 } 
 
-print( 'Done' )
+message( 'Done' )
