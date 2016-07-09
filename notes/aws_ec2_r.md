@@ -97,7 +97,7 @@ Download and process all ....
 mkdir ~/for_plots
 aws s3 sync s3://herv/snp-20160701/output/hg19_alt/ ~/for_plots/ --recursive --exclude "*" --include "*.plot.gz"
 cd ~/for_plots/
-gunzip *gz
+gunzip */*gz
 
 cd ~/
 
