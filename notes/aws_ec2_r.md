@@ -103,7 +103,7 @@ cd ~/
 
 aws_plink_plots.r
 
-aws s3 sync plots/ s3://herv/snp-20160701/output/hg19_alt/
+aws s3 sync plots/for_plots/ s3://herv/snp-20160701/output/hg19_alt/
 ```
 
 

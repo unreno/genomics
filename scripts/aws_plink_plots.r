@@ -14,7 +14,7 @@ somePNGPath = "plots/"
 #pdf(file=somePDFPath)
 
 #dir.create(file.path(somePNGPath), showWarnings = FALSE)
-dir.create(somePNGPath, showWarnings = FALSE)	#	works
+#dir.create(somePNGPath, showWarnings = FALSE)	#	works
 library("qqman")
 
 #	Disable all the warnings
@@ -34,6 +34,11 @@ for (i in 1:length(mfiles))
 	  message("Manhattan or QQ file is empty. Skipping.")
 		next
 	}
+
+	#	Sadly, this will include for_plots/, but deal with it later.
+	#	Can't find easy way to trim it off.
+	dir.create(file.path(somePNGPath, dirname(mfiles[i])),
+		showWarnings = FALSE, recursive = TRUE )
 
 #	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
 	png(paste(somePNGPath, mfiles[i], '.png', sep=""))
