@@ -103,7 +103,7 @@ manhattan_qq_plots.r >> manhattan_qq_plots.log 2>&1 &
 aws s3 sync ~/plots/ s3://herv/snp-20160701/output/hg19_alt/
 ```
 
-So, as it takes about 1 minute to create the image and 7000 minutes is about 5 days, I'll use the queue again.
+So, as it takes about 1 minute to create the image and 7000 minutes is about 5 days, I'll use the queue instead.
 
 Rather than pushing new commands, I'll just copy the current commands and modify.
 
