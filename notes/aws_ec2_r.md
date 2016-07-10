@@ -103,5 +103,13 @@ manhattan_qq_plots.r >> manhattan_qq_plots.log 2>&1 &
 aws s3 sync ~/plots/ s3://herv/snp-20160701/output/hg19_alt/
 ```
 
+So, as it takes about 1 minute to create the image and 7000 minutes is about 5 days, I'll use the queue again.
 
+Rather than pushing new commands, I'll just copy the current commands and modify.
+
+`INSERT INTO queue (queued_at, command) SELECT queued_at, REPLACE(command,'plink','manhattan') FROM queue;`
+
+Now I need to prepare a script that will run from ...
+
+`aws_manhattan_wrapper.bash --genome hg19_alt --pop sas --pheno chrY_8311408_R_PRE`
 
