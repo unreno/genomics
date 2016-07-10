@@ -82,7 +82,7 @@ Install "optparse" as well
 This seems to work.
 
 ```BASH
-#	add to .bashrc
+#	add to .bashrc (3.2) or .Renviron (3.3)
 R_LIBS="/home/ec2-user/.R"
 #	mkdir /home/ec2-user/.R
 > sudo yum install R
@@ -94,16 +94,13 @@ R_LIBS="/home/ec2-user/.R"
 Download and process all ....
 
 ```
-mkdir ~/for_plots
-aws s3 sync s3://herv/snp-20160701/output/hg19_alt/ ~/for_plots/ --recursive --exclude "*" --include "*.plot.gz"
-cd ~/for_plots/
-gunzip */*gz
+cd ~
+aws s3 sync s3://herv/snp-20160701/output/hg19_alt/ ~/for_plots/ --exclude "*" --include "*.plot.gz"
+gunzip -v ~/for_plots/*/*gz
 
-cd ~/
+manhattan_qq_plots.r >> manhattan_qq_plots.log 2>&1 &
 
-aws_plink_plots.r
-
-aws s3 sync plots/for_plots/ s3://herv/snp-20160701/output/hg19_alt/
+aws s3 sync ~/plots/ s3://herv/snp-20160701/output/hg19_alt/
 ```
 
 

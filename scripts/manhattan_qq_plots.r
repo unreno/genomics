@@ -3,18 +3,24 @@
 #mfiles <- list.files(path="for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=FALSE)
 #qfiles <- list.files(path="for_plots", pattern="*.for.qq.plot", full.names=T, recursive=FALSE)
 
-mfiles <- list.files(path="for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=TRUE)
-qfiles <- list.files(path="for_plots", pattern="*.for.qq.plot", full.names=T, recursive=TRUE)
+#mfiles <- list.files(path="for_plots", pattern="*.for.manhattan.plot", full.names=T, recursive=TRUE)
+#qfiles <- list.files(path="for_plots", pattern="*.for.qq.plot", full.names=T, recursive=TRUE)
+
+#	Doing it this way instead of above to place the in-dir in one place.
+#	Could then set with variables
+
+message( getwd() )
+setwd("for_plots")
+message( getwd() )
+mfiles <- list.files(pattern="*.for.manhattan.plot", full.names=T, recursive=TRUE)
+qfiles <- list.files(pattern="*.for.qq.plot", full.names=T, recursive=TRUE)
+
 
 length(mfiles)
 length(qfiles)
 
-#	Output dir MUST already exist. R won't create it.
-somePNGPath = "plots/"
-#pdf(file=somePDFPath)
+somePNGPath = "plots"
 
-#dir.create(file.path(somePNGPath), showWarnings = FALSE)
-#dir.create(somePNGPath, showWarnings = FALSE)	#	works
 library("qqman")
 
 #	Disable all the warnings
@@ -28,20 +34,22 @@ options(warn=-1)
 for (i in 1:length(mfiles))
 {
 	message( i," / ",length(mfiles) )
-	message( mfiles[i] )
+	message( "Manhattan file: ", mfiles[i] )
+	message( "Q-Q file: ", qfiles[i] )
 
 	if( ( file.info(mfiles[i])$size == 0 ) || ( file.info(qfiles[i])$size == 0 ) ){
 	  message("Manhattan or QQ file is empty. Skipping.")
 		next
 	}
 
-	#	Sadly, this will include for_plots/, but deal with it later.
-	#	Can't find easy way to trim it off.
-	dir.create(file.path(somePNGPath, dirname(mfiles[i])),
-		showWarnings = FALSE, recursive = TRUE )
+	outdir=file.path( "..", somePNGPath, dirname(mfiles[i]) )
+	message( outdir )
+	dir.create( outdir, showWarnings = FALSE, recursive = TRUE )
 
-#	png(paste(somePNGPath, basename(mfiles[i]), '.png', sep=""))
-	png(paste(somePNGPath, mfiles[i], '.png', sep=""))
+	outpng=paste( file.path("..", somePNGPath, mfiles[i]), '.png', sep="")
+	message( outpng )
+	png( outpng )
+
 	db<-read.table(mfiles[i], sep=" ")
 	dbgP<-data.frame(SNP=db$V2, CHR=db$V1, BP=db$V3, P=db$V4)
 	dbgP$P<-ifelse(dbgP$P==0.000e+00,1.000e-302,dbgP$P)
