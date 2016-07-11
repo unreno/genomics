@@ -70,9 +70,9 @@ cd $WORK
 
 	echo "Ending ..."
 	date
-} > ${pheno_name}.plot.log 2>&1
+} > ${pheno_name}.for.manhattan.plot.log 2>&1
 
-aws s3 cp ${pheno_name}.plot.log \
+aws s3 cp ${pheno_name}.for.manhattan.plot.log \
 	${S3}/output/${genome}/${population}/
 
 cd ~/
