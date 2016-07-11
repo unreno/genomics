@@ -65,8 +65,9 @@ cd $WORK
 
 	manhattan_qq_plot.r -m ${pheno_name}.for.manhattan.plot -q ${pheno_name}.for.qq.plot 
 
-	aws s3 cp ${pheno_name}.for.manhattan.plot.png \
-		${S3}/output/${genome}/${population}/
+	[ -f ${pheno_name}.for.manhattan.plot.png ] &&
+		aws s3 cp ${pheno_name}.for.manhattan.plot.png \
+			${S3}/output/${genome}/${population}/
 
 	echo "Ending ..."
 	date
