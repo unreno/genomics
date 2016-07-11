@@ -14,9 +14,8 @@ option_list = list(
 		help="output file name [default= %default]", metavar="character")
 ); 
  
-#opt_parser = OptionParser(option_list=option_list);
-#opt = parse_args(opt_parser);
-opt <- parse_args(OptionParser(option_list=option_list))
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
 
 message( "Manhattan: ",opt$manhattan )
 message( "QQ:  ",opt$qq )
