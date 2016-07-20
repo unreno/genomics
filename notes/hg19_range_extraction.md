@@ -15,6 +15,7 @@ A range that starts with a negative number gets you nothing.
 
 Not sure what happens if they are too close to the other end. We shall see.
 It simply takes as much as exists, so yay. No special handling needed.
+However, samtools does mark the read with the requested range, not the actual range.
 
 
 ```BASH
