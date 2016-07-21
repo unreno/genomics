@@ -96,7 +96,7 @@ done
 
 
 initial_PWD=$PWD
-for file in `find . -name HG0009\*pre\*fasta` ; do
+for file in `find . -name \*pre\*fasta` ; do
 	cd $initial_PWD
 	cd `dirname $file`
 	base=`basename $PWD`
@@ -149,11 +149,14 @@ index="multiindex"
 cd $initial_PWD
 
 
+#	This compiles everything there, not just matches to glob
+
+
 for q in 20 10 00 ; do
 	echo $q
 
 	echo compile_all_overlappers.sh --mapq $q --index ${index}
-	compile_all_overlappers.sh --mapq $q --index ${index} \
+	compile_all_overlappers.bash --mapq $q --index ${index} \
 		--core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
 
 	q="Q${q}"

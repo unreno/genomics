@@ -140,64 +140,92 @@ base=`basename $PWD`
 #	done
 #
 
+	for q in 00 10 20 ; do LOOP
+
+		#	splitting on : takes into consideration of the chromosome
+		#	is actually a sub range. 
+		#	Surprisingly p[2], which could be 160772870-161772870 takes
+		#	the first numeric portion when adding which is what I want.
+		#	I expected to have to parse that too, but yay!
+		#	Seems to work regardless.
+
+		samtools view -q $q -F 20 $base.pre_ltr.bowtie2.$index.sam \
+			| awk '{split($3,p,":");print p[1]":"p[2]+$4+length($10)}' \
+			| sort > $base.pre_ltr.bowtie2.$index.Q${q}.insertion_points
+		samtools view -q $q -F 20 $base.post_ltr.bowtie2.$index.sam \
+			| awk '{split($3,p,":"); print p[1]":"p[2]+$4}' \
+			| sort > $base.post_ltr.bowtie2.$index.Q${q}.insertion_points
+		positions_within_10bp.bash $base.*.bowtie2.$index.Q${q}.insertion_points \
+			| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q${q}.insertion_points.overlappers
+	
+		samtools view -q $q -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
+			| awk '{split($3,p,":"); print p[1]":"p[2]+$4}' \
+			| sort > $base.pre_ltr.bowtie2.$index.Q${q}.rc_insertion_points
+		samtools view -q $q -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
+			| awk '{split($3,p,":"); print p[1]":"p[2]+$4+length($10)}' \
+			| sort > $base.post_ltr.bowtie2.$index.Q${q}.rc_insertion_points
+		positions_within_10bp.bash $base.*.bowtie2.$index.Q${q}.rc_insertion_points \
+			| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q${q}.rc_insertion_points.rc_overlappers
+
+	done
 
 
 
-	samtools view -F 20 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q00.insertion_points
-	samtools view -F 20 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q00.insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q00.insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q00.insertion_points.overlappers
-
-	samtools view -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q00.rc_insertion_points
-	samtools view -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q00.rc_insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q00.rc_insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q00.rc_insertion_points.rc_overlappers
-
-
-	samtools view -q 10 -F 20 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q10.insertion_points
-	samtools view -q 10 -F 20 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q10.insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q10.insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q10.insertion_points.overlappers
-
-	samtools view -q 10 -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q10.rc_insertion_points
-	samtools view -q 10 -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q10.rc_insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q10.rc_insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q10.rc_insertion_points.rc_overlappers
-
-
-	samtools view -q 20 -F 20 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q20.insertion_points
-	samtools view -q 20 -F 20 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q20.insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q20.insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q20.insertion_points.overlappers
-
-	samtools view -q 20 -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4}' \
-		| sort > $base.pre_ltr.bowtie2.$index.Q20.rc_insertion_points
-	samtools view -q 20 -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
-		| awk '{print $3":"$4+length($10)}' \
-		| sort > $base.post_ltr.bowtie2.$index.Q20.rc_insertion_points
-	positions_within_10bp.bash $base.*.bowtie2.$index.Q20.rc_insertion_points \
-		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q20.rc_insertion_points.rc_overlappers
+#	samtools view -F 20 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q00.insertion_points
+#	samtools view -F 20 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q00.insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q00.insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q00.insertion_points.overlappers
+#
+#	samtools view -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q00.rc_insertion_points
+#	samtools view -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q00.rc_insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q00.rc_insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q00.rc_insertion_points.rc_overlappers
+#
+#
+#	samtools view -q 10 -F 20 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q10.insertion_points
+#	samtools view -q 10 -F 20 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q10.insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q10.insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q10.insertion_points.overlappers
+#
+#	samtools view -q 10 -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q10.rc_insertion_points
+#	samtools view -q 10 -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q10.rc_insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q10.rc_insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q10.rc_insertion_points.rc_overlappers
+#
+#
+#	samtools view -q 20 -F 20 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q20.insertion_points
+#	samtools view -q 20 -F 20 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q20.insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q20.insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q20.insertion_points.overlappers
+#
+#	samtools view -q 20 -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4}' \
+#		| sort > $base.pre_ltr.bowtie2.$index.Q20.rc_insertion_points
+#	samtools view -q 20 -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
+#		| awk '{print $3":"$4+length($10)}' \
+#		| sort > $base.post_ltr.bowtie2.$index.Q20.rc_insertion_points
+#	positions_within_10bp.bash $base.*.bowtie2.$index.Q20.rc_insertion_points \
+#		| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q20.rc_insertion_points.rc_overlappers
 
 
 	samtools view -S -b -o $base.pre_ltr.bowtie2.$index.bam  $base.pre_ltr.bowtie2.$index.sam

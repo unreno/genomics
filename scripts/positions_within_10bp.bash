@@ -14,11 +14,11 @@ function usage(){
 	echo "chr9:105365407"
 	echo "chrX:74554211"
 	echo "chrY:14564844"
-	echo "... OR ..."
-	echo "chrX:154433612-155433612:68228"
-	echo "chrX:154433612-155433612:790825"
-	echo "chrX:93085499-94085499:110644"
-	echo "chrX:93085499-94085499:112146"
+#	echo "... OR ..."
+#	echo "chrX:154433612-155433612|68228"
+#	echo "chrX:154433612-155433612|790825"
+#	echo "chrX:93085499-94085499|110644"
+#	echo "chrX:93085499-94085499|112146"
 	echo "..."
 	echo
 	echo "Example:"
@@ -43,12 +43,25 @@ fi
 
 for line in `cat $1` ; do
 
-#	echo $line
+#	I think that the format changed.
+#	chr is first this. pos is last thing.
+#	However, I think that it CAN be chr:position:direction
+
+#	echo "line:" $line
 	chr=${line%%:*}	#	remove everything after first colon (including colon)
+#	chr=${line%%|*}	#	remove everything after first colon (including colon)
+#	echo "chr: " $chr
 	line=${line#*:}	#	remove everything before first colon (including colon)
+#	line=${line#*|}	#	remove everything before first colon (including colon)
+#	echo "line:" $line
+
+
 	pos=${line%%:*}	#	remove everything after first colon (including colon)
-#	echo $chr
-#	echo $pos
+#	pos=${line%%|*}	#	remove everything after first colon (including colon)
+#	pos=${line##*:}	#	remove everything before last colon (including colon)
+
+
+#	echo "pos: " $pos
 
 	#	Expecting file content format like so ...
 	#	chrY:6616930:
