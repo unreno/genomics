@@ -21,9 +21,10 @@ However, samtools does mark the read with the requested range, not the actual ra
 ```BASH
 mkdir hg19
 awk 'NR > 1 {
+	c=( $2 == 23 ) ? "X" : $2;
 	s=( $3 <= 500000 ) ? 1 : $3-500000;
 	e=$3+500000;
-	print "samtools faidx hg19.fa chr"$2":"s"-"e " > hg19/chr"$2":"s"-"e".fa"
+	print "samtools faidx hg19.fa chr"c":"s"-"e " > hg19/chr"c":"s"-"e".fa"
 }' ALL_top.snps.final_collapsed_jake.txt    |  sh -x
 
 
