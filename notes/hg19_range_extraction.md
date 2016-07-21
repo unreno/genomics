@@ -19,17 +19,17 @@ However, samtools does mark the read with the requested range, not the actual ra
 
 
 ```BASH
-mkdir hg19
+mkdir hg19_select
 awk 'NR > 1 {
 	c=( $2 == 23 ) ? "X" : $2;
 	s=( $3 <= 500000 ) ? 1 : $3-500000;
 	e=$3+500000;
-	print "samtools faidx hg19.fa chr"c":"s"-"e " > hg19/chr"c":"s"-"e".fa"
+	print "samtools faidx hg19.fa chr"c":"s"-"e " > hg19_select/chr"c":"s"-"e".fa"
 }' ALL_top.snps.final_collapsed_jake.txt    |  sh -x
 
 
-samtools faidx hg19.fa chr1:54809587-55809587 > hg19/chr1:54809587-55809587.fa
-samtools faidx hg19.fa chr1:64188073-65188073 > hg19/chr1:64188073-65188073.fa
+samtools faidx hg19.fa chr1:54809587-55809587 > hg19_select/chr1:54809587-55809587.fa
+samtools faidx hg19.fa chr1:64188073-65188073 > hg19_select/chr1:64188073-65188073.fa
 ...
 ```
 
@@ -37,7 +37,7 @@ samtools faidx hg19.fa chr1:64188073-65188073 > hg19/chr1:64188073-65188073.fa
 
 
 ```BASH
-cd hg19
+cd hg19_select
 ls *fa | awk '{print "bowtie2-build "$0" "substr($0,1,index($0,".")-1)}' | sh -x
 
 
@@ -46,4 +46,10 @@ bowtie2-build chr1:111305474-112305474.fa chr1:111305474-112305474
 ...
 ```
 
+```BASH
+chmod -w *
+cd ..
+tar cvf - hg19_select | gzip --best > hg19_select.tar.gz
+aws s3 cp hg19_select.tar.gz s3://herv/indexes/
+```
 
