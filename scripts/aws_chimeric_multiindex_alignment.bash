@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 threads=2
-index="hg38_no_alts"
+index_glob="*"
 core="bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned"
 
 #	If passed 1 fast[aq], check for chimeric reads.
@@ -11,20 +11,20 @@ function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "`basename $0` [--threads 4] [--index hg19]"
+	echo "`basename $0` [--threads INTEGER] [--index_glob BOWTIE2 INDEX NAME GLOB]"
 	echo "[--core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned]"
 	echo
 	echo "Defaults:"
 	echo "  threads ..... : $threads (for bowtie2)"
-	echo "  index   ..... : $index (for bowtie2)"
-	echo "  core    ..... : $core"
+	echo "  index_glob .. : $index_glob (for bowtie2)"
+	echo "  core ........ : $core"
 	echo
 	echo "core is what is between \$PWD. and .pre_ltr.fasta"
-	echo
-	echo "Bowtie2 index must exist in \$BOWTIE2_INDEXES"
-	echo
-	echo "${index}.insertion_points must exist in \$PWD"
-	echo "Contains a list of entries in the format ... chrY:6749856:EF"
+#	echo
+#	echo "Bowtie2 index must exist in \$BOWTIE2_INDEXES"
+#	echo
+#	echo "${index}.insertion_points must exist in \$PWD"
+#	echo "Contains a list of entries in the format ... chrY:6749856:EF"
 	echo
 	echo "Example:"
 	echo "nohup `basename $0` --index hg19_no_alts > `basename $0`.out 2>&1 &"
@@ -38,7 +38,7 @@ while [ $# -ne 0 ] ; do
 		-t|--t*)
 			shift; threads=$1; shift ;;
 		-i|--i*)
-			shift; index=$1; shift ;;
+			shift; index_glob=$1; shift ;;
 		-c|--c*)
 			shift; core=$1; shift ;;
 		-*)
@@ -53,19 +53,27 @@ done
 
 : ${BOWTIE2_INDEXES:="${HOME}/s3/herv/indexes"}
 
-#	I think that the "exit" call in the usage function just ends the subshell.
-#[ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] || (echo -e "\nIndex not found.\n\n" && usage)
-if [ ! -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] ; then
-	echo -e "\nIndex not found.\n\n"
-	usage
-fi
+
+
+
+
+
+
+
 
 #	I think that the "exit" call in the usage function just ends the subshell.
-#[ -e "${index}.insertion_points" ] || (echo -e "\nInsertion points list not found.\n\n" && usage)
-if [ ! -e "${index}.insertion_points" ] ; then
-	echo -e "\nInsertion points list not found.\n\n"
-	usage
-fi
+#[ -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] || (echo -e "\nIndex not found.\n\n" && usage)
+#if [ ! -e "${BOWTIE2_INDEXES}/${index}.1.bt2" ] ; then
+#	echo -e "\nIndex not found.\n\n"
+#	usage
+#fi
+
+##	I think that the "exit" call in the usage function just ends the subshell.
+##[ -e "${index}.insertion_points" ] || (echo -e "\nInsertion points list not found.\n\n" && usage)
+#if [ ! -e "${index}.insertion_points" ] ; then
+#	echo -e "\nInsertion points list not found.\n\n"
+#	usage
+#fi
 
 
 
@@ -88,14 +96,56 @@ fi
 
 
 initial_PWD=$PWD
-for file in `find . -name \*pre\*fasta` ; do
+for file in `find . -name HG0009\*pre\*fasta` ; do
 	cd $initial_PWD
 	cd `dirname $file`
-	align_herv_k113_chimerics_to_index.bash --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
+	base=`basename $PWD`
+	echo $base
+
+	for index in `find ${BOWTIE2_INDEXES} -name ${index_glob}.rev.1.bt2` ; do
+
+		index=${index%%.rev.1.bt2}	#	remove .rev.1.bt2
+		index=${index##*/}	#	drop the longest prefix match to "*/" (the path)
+
+		align_herv_k113_chimerics_to_index.bash --index ${index} --core bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.bowtie2.herv_k113.unaligned
+
+	done
+
+	mkdir parts
+
+	for q in 20 10 00 ; do
+
+		mv *${core}.pre_ltr.bowtie2.*.Q${q}.insertion_points parts/
+		cat parts/*${core}.pre_ltr.bowtie2.*.Q${q}.insertion_points \
+			> ${base}.${core}.pre_ltr.bowtie2.multiindex.Q${q}.insertion_points
+
+		mv *${core}.pre_ltr.bowtie2.*.Q${q}.rc_insertion_points parts/
+		cat parts/*${core}.pre_ltr.bowtie2.*.Q${q}.rc_insertion_points \
+			> ${base}.${core}.pre_ltr.bowtie2.multiindex.Q${q}.rc_insertion_points \
+
+		mv *${core}.post_ltr.bowtie2.*.Q${q}.rc_insertion_points parts/
+		cat parts/*${core}.post_ltr.bowtie2.*.Q${q}.rc_insertion_points \
+			> ${base}.${core}.post_ltr.bowtie2.multiindex.Q${q}.rc_insertion_points \
+
+		mv *${core}.post_ltr.bowtie2.*.Q${q}.insertion_points parts/
+		cat parts/*${core}.post_ltr.bowtie2.*.Q${q}.insertion_points \
+			> ${base}.${core}.post_ltr.bowtie2.multiindex.Q${q}.insertion_points \
+
+		mv *${core}.both_ltr.bowtie2.*.Q${q}.rc_insertion_points.rc_overlappers parts/
+		cat parts/*${core}.both_ltr.bowtie2.*.Q${q}.rc_insertion_points.rc_overlappers \
+			> ${base}.${core}.both_ltr.bowtie2.multiindex.Q${q}.rc_insertion_points.rc_overlappers \
+
+		mv *${core}.both_ltr.bowtie2.*.Q${q}.insertion_points.overlappers parts/
+		cat parts/*${core}.both_ltr.bowtie2.*.Q${q}.insertion_points.overlappers \
+			> ${base}.${core}.both_ltr.bowtie2.multiindex.Q${q}.insertion_points.overlappers \
+
+	done
+
 done
 
 
-#	Not sure how the script worked without this.
+index="multiindex"
+
 cd $initial_PWD
 
 
@@ -113,8 +163,15 @@ for q in 20 10 00 ; do
 
 	mv tmpfile.\*${q}\*points.* insertion_points.${index}.${q}
 
-	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
-	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
+
+
+
+#	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
+#	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
+	echo cat overlapper_reference.${index}.${q}
+	cat overlapper_reference.${index}.${q} | sort > overlapper_reference_with_existing_insertions.${index}.${q}
+
+
 
 	echo positions_within_10bp_of_reference.sh -p reference
 	positions_within_10bp_of_reference.sh -p reference overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
