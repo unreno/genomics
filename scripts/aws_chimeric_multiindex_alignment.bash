@@ -169,11 +169,8 @@ for q in 20 10 00 ; do
 
 
 
-#	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
-#	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
-	echo cat overlapper_reference.${index}.${q}
-	cat overlapper_reference.${index}.${q} | sort > overlapper_reference_with_existing_insertions.${index}.${q}
-
+	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
+	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
 
 
 	echo positions_within_10bp_of_reference.sh -p reference
