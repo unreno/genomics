@@ -166,12 +166,8 @@ for q in 20 10 00 ; do
 
 	mv tmpfile.\*${q}\*points.* insertion_points.${index}.${q}
 
-
-
-
 	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
 	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
-
 
 	echo positions_within_10bp_of_reference.sh -p reference
 	positions_within_10bp_of_reference.sh -p reference overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
@@ -196,6 +192,27 @@ for q in 20 10 00 ; do
 
 	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv > insertion_points_near_reference.${index}.${q}.sample.sorted.grouped.csv
+
+
+
+
+
+
+
+
+	echo overlappers_to_table.sh '*Q20*overlappers'
+	overlappers_to_table.sh '*Q20*overlappers' > overlappers.Q20.csv
+	\rm tmpfile.\*Q20\*overlappers.*
+
+	echo overlappers_to_table.sh '*Q10*overlappers'
+	overlappers_to_table.sh '*Q10*overlappers' > overlappers.Q10.csv
+	\rm tmpfile.\*Q10\*overlappers.*
+
+	echo overlappers_to_table.sh '*Q00*overlappers'
+	overlappers_to_table.sh '*Q00*overlappers' > overlappers.Q00.csv
+	\rm tmpfile.\*Q00\*overlappers.*
+
+
 
 done
 
