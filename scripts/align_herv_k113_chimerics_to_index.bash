@@ -135,12 +135,12 @@ base=`basename $PWD`
 
 #
 #	TODO REPLACE next lines of code with ...
-#	for mapq in 0 10 20 ; do LOOP
+#	for mapq in 0 10 20 ; do
 #		extract_insertion_points_and_overlappers.sh --index $index --mapq $mapq --core $core $PWD
 #	done
 #
 
-	for q in 00 10 20 ; do LOOP
+	for q in 00 10 20 ; do
 
 		#	splitting on : takes into consideration of the chromosome
 		#	is actually a sub range. 
@@ -148,6 +148,8 @@ base=`basename $PWD`
 		#	the first numeric portion when adding which is what I want.
 		#	I expected to have to parse that too, but yay!
 		#	Seems to work regardless.
+
+#	Should add this to extract_insertion_points_and_overlappers.sh
 
 		samtools view -q $q -F 20 $base.pre_ltr.bowtie2.$index.sam \
 			| awk '{split($3,p,":");print p[1]":"p[2]+$4+length($10)}' \
