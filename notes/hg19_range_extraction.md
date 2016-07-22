@@ -53,3 +53,63 @@ tar cvf - hg19_select | gzip --best > hg19_select.tar.gz
 aws s3 cp hg19_select.tar.gz s3://herv/indexes/
 ```
 
+
+
+
+
+
+
+#### Attaching overlappers to ALL_top.snps.final_collapsed_jake.txt
+
+
+`NR` is the record number over all.
+
+`FNR` is the record number of the current file.
+
+so ...
+
+`NR==FNR` essentially means the FIRST file.
+
+`NR!=FNR` essentially means the NOT the FIRST file.
+
+
+```BASH
+awk 'BEGIN{OFS=","}
+NR==FNR{
+	l[$2][$3]= $1","$2","$3","$4","$5","$6","$7
+}
+NR!=FNR{
+	FS=","
+	split($1,p,":")
+	#	p[1] = chr???
+	chr=p[1]
+	sub("chr","",chr)
+	position=p[2]
+
+
+
+#	still deving 
+
+
+
+}' ALL_top.snps.final_collapsed_jake.txt overlappers.Q20.csv
+
+
+FILE,CHR,BP,SNP,P,A1,OR
+
+
+
+awk 'BEGIN{OFS=","}
+NR > 1 {
+	c=( $2 == 23 ) ? "X" : $2;
+	s=( $3 <= 500000 ) ? 1 : $3-500000;
+	e=$3+500000;
+#	print "samtools faidx hg19.fa chr"c":"s"-"e " > hg19_select/chr"c":"s"-"e".fa"
+	grep
+
+
+```
+
+
+
+
