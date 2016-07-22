@@ -589,6 +589,7 @@ Gawk 3 is just too old for some of my scripts and the yum package hasn't been up
 
 ```BASH
 wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.3.tar.gz
+tar xfvz gawk-4.1.3.tar.gz
 cd gawk-4.1.3
 ./configure --prefix $HOME/.local
 make
