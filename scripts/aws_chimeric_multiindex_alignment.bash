@@ -24,7 +24,7 @@ function usage(){
 #	echo "Bowtie2 index must exist in \$BOWTIE2_INDEXES"
 #	echo
 #	echo "${index}.insertion_points must exist in \$PWD"
-#	echo "Contains a list of entries in the format ... chrY:6749856:EF"
+#	echo "Contains a list of entries in the format ... chrY|6749856|EF"
 	echo
 	echo "Example:"
 	echo "nohup `basename $0` --index hg19_no_alts > `basename $0`.out 2>&1 &"
@@ -194,25 +194,9 @@ for q in 20 10 00 ; do
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv > insertion_points_near_reference.${index}.${q}.sample.sorted.grouped.csv
 
 
-
-
-
-
-
-
-	echo overlappers_to_table.bash '*Q20*overlappers'
-	overlappers_to_table.bash '*Q20*overlappers' > overlappers.Q20.csv
-	\rm tmpfile.\*Q20\*overlappers.*
-
-	echo overlappers_to_table.bash '*Q10*overlappers'
-	overlappers_to_table.bash '*Q10*overlappers' > overlappers.Q10.csv
-	\rm tmpfile.\*Q10\*overlappers.*
-
-	echo overlappers_to_table.bash '*Q00*overlappers'
-	overlappers_to_table.bash '*Q00*overlappers' > overlappers.Q00.csv
-	\rm tmpfile.\*Q00\*overlappers.*
-
-
+	echo overlappers_to_table.bash \*${q}\*overlappers
+	overlappers_to_table.bash \*${q}\*overlappers > overlappers.${q}.csv
+	\rm tmpfile.\*${q}\*overlappers.*
 
 done
 
