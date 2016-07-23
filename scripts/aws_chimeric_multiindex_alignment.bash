@@ -161,36 +161,36 @@ for q in 20 10 00 ; do
 
 	q="Q${q}"
 
-	echo insertion_points_to_table.sh --skip-table \*${q}\*points
-	insertion_points_to_table.sh --skip-table \*${q}\*points > insertion_points_to_table.${q}.irrelevant
+	echo insertion_points_to_table.bash --skip-table \*${q}\*points
+	insertion_points_to_table.bash --skip-table \*${q}\*points > insertion_points_to_table.${q}.irrelevant
 
 	mv tmpfile.\*${q}\*points.* insertion_points.${index}.${q}
 
 	echo cat overlapper_reference.${index}.${q} ${index}.insertion_points
 	cat overlapper_reference.${index}.${q} ${index}.insertion_points | sort > overlapper_reference_with_existing_insertions.${index}.${q}
 
-	echo positions_within_10bp_of_reference.sh -p reference
-	positions_within_10bp_of_reference.sh -p reference overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
+	echo positions_within_10bp_of_reference.bash -p reference
+	positions_within_10bp_of_reference.bash -p reference overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
 
-	echo positions_within_10bp_of_reference.sh
-	positions_within_10bp_of_reference.sh overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
+	echo positions_within_10bp_of_reference.bash
+	positions_within_10bp_of_reference.bash overlapper_reference_with_existing_insertions.${index}.${q} insertion_points.${index}.${q} > insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
 
-	echo to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
-	to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines > insertion_points_near_reference.${index}.${q}.reference.csv
+	echo to_table.bash insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines
+	to_table.bash insertion_points.${index}.${q}.within_10bp_of_reference.reference_lines > insertion_points_near_reference.${index}.${q}.reference.csv
 
-	echo to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
-	to_table.sh insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines > insertion_points_near_reference.${index}.${q}.sample.csv
+	echo to_table.bash insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines
+	to_table.bash insertion_points.${index}.${q}.within_10bp_of_reference.sample_lines > insertion_points_near_reference.${index}.${q}.sample.csv
 
 	echo sort insertion_points_near_reference.${index}.${q}.reference.csv
 	( head -1 insertion_points_near_reference.${index}.${q}.reference.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.reference.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 
-	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv
+	echo csv_table_group_rows.bash insertion_points_near_reference.${index}.${q}.reference.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.reference.sorted.csv > insertion_points_near_reference.${index}.${q}.reference.sorted.grouped.csv
 
 	echo sort insertion_points_near_reference.${index}.${q}.sample.csv
 	( head -1 insertion_points_near_reference.${index}.${q}.sample.csv && tail -n +2 insertion_points_near_reference.${index}.${q}.sample.csv | sort -t: -k1,1 -k2,2n ) > insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 
-	echo csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv
+	echo csv_table_group_rows.bash insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 	csv_table_group_rows.sh insertion_points_near_reference.${index}.${q}.sample.sorted.csv > insertion_points_near_reference.${index}.${q}.sample.sorted.grouped.csv
 
 
@@ -200,16 +200,16 @@ for q in 20 10 00 ; do
 
 
 
-	echo overlappers_to_table.sh '*Q20*overlappers'
-	overlappers_to_table.sh '*Q20*overlappers' > overlappers.Q20.csv
+	echo overlappers_to_table.bash '*Q20*overlappers'
+	overlappers_to_table.bash '*Q20*overlappers' > overlappers.Q20.csv
 	\rm tmpfile.\*Q20\*overlappers.*
 
-	echo overlappers_to_table.sh '*Q10*overlappers'
-	overlappers_to_table.sh '*Q10*overlappers' > overlappers.Q10.csv
+	echo overlappers_to_table.bash '*Q10*overlappers'
+	overlappers_to_table.bash '*Q10*overlappers' > overlappers.Q10.csv
 	\rm tmpfile.\*Q10\*overlappers.*
 
-	echo overlappers_to_table.sh '*Q00*overlappers'
-	overlappers_to_table.sh '*Q00*overlappers' > overlappers.Q00.csv
+	echo overlappers_to_table.bash '*Q00*overlappers'
+	overlappers_to_table.bash '*Q00*overlappers' > overlappers.Q00.csv
 	\rm tmpfile.\*Q00\*overlappers.*
 
 

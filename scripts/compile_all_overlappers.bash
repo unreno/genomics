@@ -79,9 +79,9 @@ log_file=`basename $0`.$quality.$index.$date.out
 		| sort -u > $index.$quality.rc_insertion_points.rc_overlappers.sort.uniq
 
 
-	awk '{print $0":F"}' $index.$quality.insertion_points.overlappers.sort.uniq \
+	awk '{print $0"|F"}' $index.$quality.insertion_points.overlappers.sort.uniq \
 		> overlapper_reference.$index.$quality
-	awk '{print $0":R"}' $index.$quality.rc_insertion_points.rc_overlappers.sort.uniq \
+	awk '{print $0"|R"}' $index.$quality.rc_insertion_points.rc_overlappers.sort.uniq \
 		>> overlapper_reference.$index.$quality
 
 	sort overlapper_reference.$index.$quality > overlapper_reference.$index.$quality.sorted
