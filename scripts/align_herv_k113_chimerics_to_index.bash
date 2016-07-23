@@ -151,20 +151,46 @@ base=`basename $PWD`
 
 #	Should add this to extract_insertion_points_and_overlappers.sh
 
+
+#	OOPS. Ranges and positions start at 1 so adding one to the other
+#		will offset the output position by 1.
+
+#	In order to work with and without a range, will need to check.
+#	Can't just subtract 1, which would work in this case.
+#	That would offset positions in the future by -1.
+
+#	offset=(p[2])?p[2]-1:0;
+#	| awk '{split($3,p,":");o=(p[2])?p[2]-1:0;print p[1]":"o+$4+length($10)}'
+
+
+#	chrX:154433612-155433612:809997
+#	chrX:154433612-155433612:721705
+#	chrX:154433612-155433612:614371
+#	chrX:154433612-155433612:592614
+#	chrX:154433612-155433612:263014 ( 154696626 ) 
+#	chrX:154433612-155433612:378858	( 154812470 )
+
+#	chrX:155243608
+#	chrX:155155316
+#	chrX:155047982
+#	chrX:155026225
+#	chrX:154696625
+#	chrX:154812469
+
 		samtools view -q $q -F 20 $base.pre_ltr.bowtie2.$index.sam \
-			| awk '{split($3,p,":");print p[1]":"p[2]+$4+length($10)}' \
+			| awk '{split($3,p,":"); o=(p[2])?p[2]-1:0; print p[1]":"o+$4+length($10)}' \
 			| sort > $base.pre_ltr.bowtie2.$index.Q${q}.insertion_points
 		samtools view -q $q -F 20 $base.post_ltr.bowtie2.$index.sam \
-			| awk '{split($3,p,":"); print p[1]":"p[2]+$4}' \
+			| awk '{split($3,p,":"); o=(p[2])?p[2]-1:0; print p[1]":"o+$4}' \
 			| sort > $base.post_ltr.bowtie2.$index.Q${q}.insertion_points
 		positions_within_10bp.bash $base.*.bowtie2.$index.Q${q}.insertion_points \
 			| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q${q}.insertion_points.overlappers
 	
 		samtools view -q $q -F 4 -f 16 $base.pre_ltr.bowtie2.$index.sam \
-			| awk '{split($3,p,":"); print p[1]":"p[2]+$4}' \
+			| awk '{split($3,p,":"); o=(p[2])?p[2]-1:0; print p[1]":"o+$4}' \
 			| sort > $base.pre_ltr.bowtie2.$index.Q${q}.rc_insertion_points
 		samtools view -q $q -F 4 -f 16 $base.post_ltr.bowtie2.$index.sam \
-			| awk '{split($3,p,":"); print p[1]":"p[2]+$4+length($10)}' \
+			| awk '{split($3,p,":"); o=(p[2])?p[2]-1:0; print p[1]":"o+$4+length($10)}' \
 			| sort > $base.post_ltr.bowtie2.$index.Q${q}.rc_insertion_points
 		positions_within_10bp.bash $base.*.bowtie2.$index.Q${q}.rc_insertion_points \
 			| sort | uniq -c > $base.both_ltr.bowtie2.$index.Q${q}.rc_insertion_points.rc_overlappers
