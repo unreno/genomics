@@ -72,42 +72,40 @@ so ...
 
 `NR!=FNR` essentially means the NOT the FIRST file.
 
+NOTE: these positions are off by 1 due to adding the range start to position.
+SUBTRACTING 1 from p[2].
+The offending script has been corrected.
+
+This ALL.txt file ended had trailing \r.
+
+Sadly, this is resulting is duplicates as the 1Mbp ranges overlap on a few occassions.
+Knowing now, I wouldn't have added the position to the range and would have used a different separator.
+Actually, still would be an issue. Just a little different.
+
 
 ```BASH
-awk 'BEGIN{OFS=","}
-NR==FNR{
-	l[$2][$3]= $1","$2","$3","$4","$5","$6","$7
+gawk '
+NR==FNR {
+	s=$0
+	gsub("\r","",s)
+	gsub("\t",",",s)
+	l[$2][$3]=s
 }
-NR!=FNR{
+NR!=FNR && FNR==1{
+	print l["CHR"]["BP"]","$0
+}
+NR!=FNR && FNR>1{
 	FS=","
 	split($1,p,":")
-	#	p[1] = chr???
-	chr=p[1]
-	sub("chr","",chr)
-	position=p[2]
-
-
-
-#	still deving 
-
-
-
+	sub("chr","",p[1])
+	chr=(p[1]=="X")?"23":p[1]
+	position=p[2]-1
+	for( ref in l[chr] ){
+		if( ( position < ( ref + 500000) ) && ( position > ( ref - 500000 ) ) ) {
+			print l[chr][ref]","$0
+		}
+	}
 }' ALL_top.snps.final_collapsed_jake.txt overlappers.Q20.csv
-
-
-FILE,CHR,BP,SNP,P,A1,OR
-
-
-
-awk 'BEGIN{OFS=","}
-NR > 1 {
-	c=( $2 == 23 ) ? "X" : $2;
-	s=( $3 <= 500000 ) ? 1 : $3-500000;
-	e=$3+500000;
-#	print "samtools faidx hg19.fa chr"c":"s"-"e " > hg19_select/chr"c":"s"-"e".fa"
-	grep
-
-
 ```
 
 
