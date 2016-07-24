@@ -92,19 +92,16 @@ NR==FNR {
 	l[$2][$3]=s
 }
 NR!=FNR && FNR==1{
-	print l["CHR"]["BP"]","$0
+	print l["CHR"]["BP"]",absolute_position,"$0
 }
 NR!=FNR && FNR>1{
 	FS=","
-	split($1,p,":")
+	split($1,p,"|")	#	chrX:93085499-94085499|110644|F
 	sub("chr","",p[1])
-	chr=(p[1]=="X")?"23":p[1]
-	position=p[2]-1
-	for( ref in l[chr] ){
-		if( ( position < ( ref + 500000) ) && ( position > ( ref - 500000 ) ) ) {
-			print l[chr][ref]","$0
-		}
-	}
+	split(p[1],r,":")	#	X:93085499-94085499
+	chr=(r[1]=="X")?"23":r[1]
+	split(r[2],t,"-")
+	print l[chr][t[2]-500000]","t[2]-500000+p[2]-1","$0
 }' ALL_top.snps.final_collapsed_jake.txt overlappers.Q20.csv
 ```
 
