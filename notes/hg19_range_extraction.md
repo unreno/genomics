@@ -72,15 +72,7 @@ so ...
 
 `NR!=FNR` essentially means the NOT the FIRST file.
 
-NOTE: these positions are off by 1 due to adding the range start to position.
-SUBTRACTING 1 from p[2].
-The offending script has been corrected.
-
 This ALL.txt file ended had trailing \r.
-
-Sadly, this is resulting is duplicates as the 1Mbp ranges overlap on a few occassions.
-Knowing now, I wouldn't have added the position to the range and would have used a different separator.
-Actually, still would be an issue. Just a little different.
 
 
 ```BASH
