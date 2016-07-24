@@ -85,5 +85,5 @@ done
 
 #dir=`dirname $0`
 #gawk -f "$dir/to_table.gawk" $tmpfile
-to_table.sh $tmpfile
+to_table.bash $tmpfile
 
