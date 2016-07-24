@@ -66,7 +66,7 @@ for line in `cat $1` ; do
 	#	Expecting file content format like so ...
 	#	chrY|6616930|
 
-	awk -F| -v chr="$chr" -v pos="$pos" '
+	awk -F\| -v chr="$chr" -v pos="$pos" '
 		( ( $1 == chr ) && ( (pos-10) < $NF ) && ( (pos+10) > $NF ) ){
 			print
 		}' $2

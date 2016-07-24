@@ -101,7 +101,7 @@ while [ $# -ne 0 ] ; do
 #	the reference line DOES NOT INCLUDE THE SAMPLE NAME
 #	the sample line contains the sample name and count.  NEED TO EXTRACT IT
 
-		awk -F| -v chr="$chr" -v pos="$pos" -v line="$line" -v printwhat="$printwhat" '
+		awk -F\| -v chr="$chr" -v pos="$pos" -v line="$line" -v printwhat="$printwhat" '
 			( ( $1 == chr ) && ( (pos-10) < $2 ) && ( (pos+10) > $2 ) ){
 				if( printwhat=="sample" ){
 					print $0
