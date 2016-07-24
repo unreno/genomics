@@ -93,7 +93,7 @@ NR!=FNR && FNR>1{
 	split(p[1],r,":")	#	X:93085499-94085499
 	chr=(r[1]=="X")?"23":r[1]
 	split(r[2],t,"-")
-	print l[chr][t[2]-500000]","t[2]-500000+p[2]-1","$0
+	print l[chr][t[2]-500000]","t[1]+p[2]-1","$0
 }' ALL_top.snps.final_collapsed_jake.txt overlappers.Q20.csv
 ```
 
