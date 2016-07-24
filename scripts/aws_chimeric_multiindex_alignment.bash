@@ -96,9 +96,11 @@ done
 
 
 initial_PWD=$PWD
-for file in `find . -name \*pre\*fasta` ; do
+#for file in `find . -name \*pre\*fasta` ; do
+for file in `find . -type d -maxdepth 1` ; do
 	cd $initial_PWD
-	cd `dirname $file`
+#	cd `dirname $file`
+	cd $file
 	base=`basename $PWD`
 	echo $base
 
