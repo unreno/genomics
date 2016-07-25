@@ -73,8 +73,6 @@ for file in `find . -mindepth 1 -maxdepth 1 -type d` ; do
 
 done
 
-index="multiindex"
-
 cd $initial_PWD
 
 
@@ -86,6 +84,26 @@ for q in 20 10 00 ; do
 	echo overlappers_to_table.bash \*${q}\*overlappers
 	overlappers_to_table.bash \*${q}\*overlappers > overlappers.${q}.csv
 	\rm tmpfile.\*${q}\*overlappers.*
+
+gawk '
+NR==FNR {
+	s=$0
+	gsub("\r","",s)
+	gsub("\t",",",s)
+	l[$2][$3]=s
+}
+NR!=FNR && FNR==1{
+	print l["CHR"]["BP"]",absolute_position,"$0
+}
+NR!=FNR && FNR>1{
+	FS=","
+	split($1,p,"|")	#	chrX:93085499-94085499|110644|F
+	sub("chr","",p[1])
+	split(p[1],r,":")	#	X:93085499-94085499
+	chr=(r[1]=="X")?"23":r[1]
+	split(r[2],t,"-")
+	print l[chr][t[2]-500000]","t[1]+p[2]-1","$0
+}' ALL_top.snps.final_collapsed_jake.txt overlappers.${q}.csv > overlappers.${q}.merged.csv
 
 done
 
