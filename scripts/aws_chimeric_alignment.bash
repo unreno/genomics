@@ -140,6 +140,13 @@ for q in 20 10 00 ; do
 	echo csv_table_group_rows.bash insertion_points_near_reference.${index}.${q}.sample.sorted.csv
 	csv_table_group_rows.bash insertion_points_near_reference.${index}.${q}.sample.sorted.csv > insertion_points_near_reference.${index}.${q}.sample.sorted.grouped.csv
 
+
+
+	echo overlappers_to_table.bash \*${q}\*overlappers
+	overlappers_to_table.bash \*${q}\*overlappers > overlappers.${q}.csv
+#	\rm tmpfile.\*${q}\*overlappers.*
+
+
 done
 
 mkdir extracted

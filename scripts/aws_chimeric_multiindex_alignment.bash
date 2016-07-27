@@ -198,7 +198,7 @@ for q in 20 10 00 ; do
 
 	echo overlappers_to_table.bash \*${q}\*overlappers
 	overlappers_to_table.bash \*${q}\*overlappers > overlappers.${q}.csv
-	\rm tmpfile.\*${q}\*overlappers.*
+#	\rm tmpfile.\*${q}\*overlappers.*
 
 done
 
