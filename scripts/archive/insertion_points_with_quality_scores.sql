@@ -4,10 +4,10 @@ CREATE DATABASE insertion_points_with_quality_scores;
 USE insertion_points_with_quality_scores;
 
 CREATE TABLE insertion_points (
-	subject_id VARCHAR(10), 
-	name VARCHAR(20),
+	subject_id VARCHAR(10),
+	name VARCHAR(50),
 	q_score INT,
-	chromosome VARCHAR(10), 
+	chromosome VARCHAR(10),
 	position INT,
 	direction VARCHAR(1),
 	pre_or_post_herv VARCHAR(4)
@@ -30,4 +30,24 @@ CREATE INDEX position ON insertion_points ( position );
 
 --ALTER TABLE insertion_points CHANGE insertion_point_name name VARCHAR(20);
 --ALTER TABLE insertion_points CHANGE map_quality_score q_score INT;
+
+
+SELECT 'name', 'name_count', 'subject_count',
+	'ave_per_subject',
+	'aveQ', 'minQ', 'maxQ',
+	'stdQ', 'varQ'
+UNION
+SELECT name, COUNT(name) AS name_count,
+	COUNT(DISTINCT subject_id) AS subject_count,
+	TRUNCATE(COUNT(subject_id)/COUNT(DISTINCT subject_id),3) AS ave_per_subject,
+	TRUNCATE(AVG(q_score), 3) AS aveQ, MIN(q_score) AS minQ, MAX(q_score) AS maxQ,
+	TRUNCATE(STDDEV_POP(q_score),3) AS stdQ, TRUNCATE(VAR_POP(q_score),3) AS varQ
+FROM insertion_points
+GROUP BY name
+INTO OUTFILE '/tmp/points.csv'
+	FIELDS TERMINATED BY ','
+	LINES TERMINATED BY '\n';
+
+--WHERE chromosome = 'chrY'
+--HAVING AVG(q_score) > 10
 
