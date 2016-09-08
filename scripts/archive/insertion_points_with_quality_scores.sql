@@ -84,9 +84,14 @@ SELECT name, COUNT(name) AS name_count,
 	TRUNCATE(AVG(q_score), 3) AS aveQ, MIN(q_score) AS minQ, MAX(q_score) AS maxQ,
 	TRUNCATE(STDDEV_POP(q_score),3) AS stdQ, TRUNCATE(VAR_POP(q_score),3) AS varQ
 FROM input i
-OUTER JOIN insertion_points p ON i.siteq00 = p.name
+RIGHT JOIN insertion_points p ON i.siteq00 = p.name
 GROUP BY name
 INTO OUTFILE '/tmp/points.csv'
 	FIELDS TERMINATED BY ','
 	LINES TERMINATED BY '\n';
+
+
+
+
+
 
