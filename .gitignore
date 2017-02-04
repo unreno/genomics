@@ -1,2 +1,3 @@
 /Makefile
+.DS_Store
 mysql_queue.bash.*.log
