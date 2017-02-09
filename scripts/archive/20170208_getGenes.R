@@ -12,11 +12,11 @@ load("gownTransMap2.rda")
 
 ## annotate to Ensembl genes
 gtf="Homo_sapiens.GRCh37.73_chrPrefix.gtf"
-genes = getGenes(gtf, gownTransMap2,attribute = "gene_name")
+genes = getGenes(gtf, gownTransMap2, UCSC=FALSE, attribute = "gene_name")
 names(genes) = names(gownTransMap2)
 eqtl$geneSymbol = genes[match(eqtl$gene, names(genes))]
 
-genes2 = getGenes(gtf, gownTransMap2,attribute = "gene_id")
+genes2 = getGenes(gtf, gownTransMap2, UCSC=FALSE, attribute = "gene_id")
 names(genes2) = names(gownTransMap2)
 eqtl$ensemblGeneID = genes2[match(eqtl$gene, names(genes2))]
 
