@@ -10,6 +10,11 @@ load("eQTL_GEUVADIS_imputed_list_cis_1e6_snpM)IKZF.rda")
 load("eqtl_rs2290400.rda")
 load("gownTransMap2.rda")
 
+#	The getGenes function strips of the first and last character unless UCSC=FALSE is given.
+#	It treats them as quotes, but doesn't actually check!
+
+gene_ids<-getGenes(gtf, gownTransMap2, UCSC=FALSE, attribute = "gene_id")
+
 ## annotate to Ensembl genes
 gtf="Homo_sapiens.GRCh37.73_chrPrefix.gtf"
 genes = getGenes(gtf, gownTransMap2, UCSC=FALSE, attribute = "gene_name")
