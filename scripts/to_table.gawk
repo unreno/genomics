@@ -26,4 +26,4 @@ END{
 #		}
 	}
 }
-#	This REQUIRES >= gawk 4
+#	Multidimensional arrays REQUIRE >= gawk 4 (or perhaps a newer awk)
