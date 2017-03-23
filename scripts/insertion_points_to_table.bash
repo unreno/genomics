@@ -76,7 +76,8 @@ for file in `find $wd -maxdepth 2 -type f -name $1` ; do
 #	echo $ext
 	filename=${file##*/}	#	just in case given path
 #	echo $filename
-	subject=${filename%%.*}	#	delete everything after the first .  
+#	subject=${filename%%.*}	#	delete everything after the first .  
+	subject=${filename%%.bowtie2*}	#	delete everything after the first ".bowtie2"
 # expecting filename like this ... TCGA-41-5651-10A.bowtie2.herv_k113_ltr_ends.__very_sensitive_local.aligned.pre_ltr.bowtie2.hg19.rc_insertion_points
 #	echo $subject
 
@@ -100,7 +101,8 @@ for file in `find $wd -maxdepth 2 -type f -name $1` ; do
 	#		*.pre_ltr.*.insertion_points
 	#		*.pre_ltr.*.rc_insertion_points
 
-	[[ ${filename} =~ pre_ltr ]] && pre_or_post='PRE' || pre_or_post='POST'
+#	[[ ${filename} =~ pre_ltr ]] && pre_or_post='PRE' || pre_or_post='POST'
+	[[ ${filename} =~ pre ]] && pre_or_post='PRE' || pre_or_post='POST'
 
 	#	Expecting file content like ...
 	#	chr4|179554141
@@ -139,6 +141,6 @@ done
 
 #dir=`dirname $0`
 #gawk -f "$dir/to_table.gawk" $tmpfile
-[[ $skip_table == 'false' ]] && to_table.sh $tmpfile || echo 'skipping table creation'
+[[ $skip_table == 'false' ]] && to_table.bash $tmpfile || echo 'skipping table creation'
 #	added the || so last command doesn't return a non-zero exit code
 
