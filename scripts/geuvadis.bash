@@ -27,13 +27,13 @@ export BOWTIE2_INDEXES
 	echo >> geuvadis_counts.tsv
 
 #	for bam in HG00096.1.M_111124_6.bam HG00101.1.M_111124_4.bam HG00104.1.M_111124_5.bam HG00117.1.M_111124_2.bam HG00121.1.M_111124_7.bam HG00125.1.M_111124_6.bam HG00126.1.M_111124_8.bam HG00127.1.M_111124_2.bam HG00128.1.M_111124_6.bam ; do
-	for bam in $(head ../geuvadis.txt) ; do
+	for bam in $(head -n 20 ../geuvadis.txt) ; do
 		echo "$bam"
 		bam_base=${bam%.*}
 		echo "$bam_base"
 
 		if [ ! -f "raw/$bam" ] ; then
-			echo "WGetting bam"
+			echo "WGetting bam."
 			if [ -f "$bam" ] ; then
 				echo "Removing existing download."
 				rm "$bam"
@@ -41,28 +41,46 @@ export BOWTIE2_INDEXES
 			wget "http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/$bam"
 			mv "$bam" raw/
 		else
-			echo "Already have this bam"
+			echo "Already have this bam."
 		fi
 
-		echo "Total read count"
+		if [ ! -f "raw/$bam.bai" ] ; then
+			echo "Indexing raw file."
+			samtools index "raw/$bam"
+		fi
+
+		if [ ! -f "$bam_base.ERG.bam" ] ; then
+			echo "Extracting ERG region."
+			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38367261-38662045"
+		fi
+
+		if [ ! -f "$bam_base.ERG.bam.bai" ] ; then
+			echo "Indexing ERG extraction."
+			samtools index "$bam_base.ERG.bam"
+		fi
+
+		echo "Extracting total read count."
 		total_read_count=`samtools view "raw/$bam" | wc -l`
 		echo "$total_read_count"
 
 		if [ ! -f "$bam_base.human_unaligned.sorted.bam" ] ; then
+			echo "Selecting unaligned (not mapped & mate not mapped)."
 			samtools view -h -f12 "raw/$bam" | samtools sort -n -o "$bam_base.human_unaligned.sorted.bam" -
 		fi
 
-		echo "Unmapped read count"
+		echo "Extracting unmapped read count."
 		unmapped_read_count=`samtools view "$bam_base.human_unaligned.sorted.bam" | wc -l`
 		echo "$unmapped_read_count"
 
 		if [ ! -f "$bam_base.human_unaligned.1.fastq" ] ; then
+			echo "Creating fastq files."
 			bamToFastq -i "$bam_base.human_unaligned.sorted.bam" \
 				-fq  "$bam_base.human_unaligned.1.fastq" \
 				-fq2 "$bam_base.human_unaligned.2.fastq"
 		fi
 
 		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
+			echo "Aligning to geuvadis viral list."
 			bowtie2 -x geuvadis \
 				-1 "$bam_base.human_unaligned.1.fastq" \
 				-2 "$bam_base.human_unaligned.2.fastq" \
@@ -70,11 +88,14 @@ export BOWTIE2_INDEXES
 #		fi
 #
 #		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
-			samtools view -b "$bam_base.human_unaligned.viral_aligned.sam" > "$bam_base.human_unaligned.viral_aligned.bam"
+			echo "Converting sam to bam."
+			samtools view -b -o "$bam_base.human_unaligned.viral_aligned.bam" "$bam_base.human_unaligned.viral_aligned.sam"
+			# > "$bam_base.human_unaligned.viral_aligned.bam"
+			echo "Removing sam."
 			rm "$bam_base.human_unaligned.viral_aligned.sam"
 		fi
 
-		echo "Aligned read counts"
+		echo "Extracting aligned read counts."
 		aligned_output=$(samtools view -F4 "$bam_base.human_unaligned.viral_aligned.bam" | awk 'BEGIN{FS="\t"}{print $3}' | sort | uniq -c )
 		#	output likely contains an * which bash will likely glob totally mucking this up. QUOTE IT!
 		echo "$aligned_output"
