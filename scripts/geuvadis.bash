@@ -62,20 +62,20 @@ export BOWTIE2_INDEXES
 				-fq2 "$bam_base.human_unaligned.2.fastq"
 		fi
 
-		if [ ! -f "$bam_base.human_unaligned.viral_aligned.sam" ] ; then
+		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
 			bowtie2 -x geuvadis \
 				-1 "$bam_base.human_unaligned.1.fastq" \
 				-2 "$bam_base.human_unaligned.2.fastq" \
 				-S "$bam_base.human_unaligned.viral_aligned.sam"
-		fi
-
-		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
+#		fi
+#
+#		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
 			samtools view -b "$bam_base.human_unaligned.viral_aligned.sam" > "$bam_base.human_unaligned.viral_aligned.bam"
 			rm "$bam_base.human_unaligned.viral_aligned.sam"
 		fi
 
 		echo "Aligned read counts"
-		aligned_output=$(samtools view "$bam_base.human_unaligned.viral_aligned.bam" | awk 'BEGIN{FS="\t"}{print $3}' | sort | uniq -c )
+		aligned_output=$(samtools view -F4 "$bam_base.human_unaligned.viral_aligned.bam" | awk 'BEGIN{FS="\t"}{print $3}' | sort | uniq -c )
 		#	output likely contains an * which bash will likely glob totally mucking this up. QUOTE IT!
 		echo "$aligned_output"
 
