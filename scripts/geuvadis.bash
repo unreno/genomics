@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-script=`basename $0`
+script=$(basename $0)
 
 
 #	E-GEUV-1 - RNA-sequencing of 465 lymphoblastoid cell lines from the 1000 Genomes
@@ -26,8 +26,7 @@ export BOWTIE2_INDEXES
 	done
 	echo >> geuvadis_counts.tsv
 
-#	for bam in HG00096.1.M_111124_6.bam HG00101.1.M_111124_4.bam HG00104.1.M_111124_5.bam HG00117.1.M_111124_2.bam HG00121.1.M_111124_7.bam HG00125.1.M_111124_6.bam HG00126.1.M_111124_8.bam HG00127.1.M_111124_2.bam HG00128.1.M_111124_6.bam ; do
-	for bam in $(head -n 20 ../geuvadis.txt) ; do
+	for bam in $(head -n 40 ../geuvadis.txt) ; do
 		echo "$bam"
 		bam_base=${bam%.*}
 		echo "$bam_base"
@@ -40,6 +39,7 @@ export BOWTIE2_INDEXES
 			fi
 			wget "http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/$bam"
 			mv "$bam" raw/
+			chmod -w "raw/$bam"
 		else
 			echo "Already have this bam."
 		fi
@@ -51,48 +51,63 @@ export BOWTIE2_INDEXES
 
 		if [ ! -f "$bam_base.ERG.bam" ] ; then
 			echo "Extracting ERG region."
-			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38367261-38662045"
+#			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38367261-38662045"
+			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38366261-38663045"
+			chmod -w "$bam_base.ERG.bam"
 		fi
 
 		if [ ! -f "$bam_base.ERG.bam.bai" ] ; then
 			echo "Indexing ERG extraction."
 			samtools index "$bam_base.ERG.bam"
+			chmod -w "$bam_base.ERG.bam.bai"
 		fi
 
 		echo "Extracting total read count."
-		total_read_count=`samtools view "raw/$bam" | wc -l`
+		total_read_count=$(samtools view "raw/$bam" | wc -l)
 		echo "$total_read_count"
 
 		if [ ! -f "$bam_base.human_unaligned.sorted.bam" ] ; then
-			echo "Selecting unaligned (not mapped & mate not mapped)."
+			echo "Selecting unaligned (-f12) (not mapped & mate not mapped)."
 			samtools view -h -f12 "raw/$bam" | samtools sort -n -o "$bam_base.human_unaligned.sorted.bam" -
+			chmod -w "$bam_base.human_unaligned.sorted.bam"
 		fi
 
 		echo "Extracting unmapped read count."
-		unmapped_read_count=`samtools view "$bam_base.human_unaligned.sorted.bam" | wc -l`
+		unmapped_read_count=$(samtools view "$bam_base.human_unaligned.sorted.bam" | wc -l)
 		echo "$unmapped_read_count"
 
-		if [ ! -f "$bam_base.human_unaligned.1.fastq" ] ; then
-			echo "Creating fastq files."
-			bamToFastq -i "$bam_base.human_unaligned.sorted.bam" \
-				-fq  "$bam_base.human_unaligned.1.fastq" \
-				-fq2 "$bam_base.human_unaligned.2.fastq"
-		fi
-
 		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
-			echo "Aligning to geuvadis viral list."
-			bowtie2 -x geuvadis \
-				-1 "$bam_base.human_unaligned.1.fastq" \
-				-2 "$bam_base.human_unaligned.2.fastq" \
-				-S "$bam_base.human_unaligned.viral_aligned.sam"
-#		fi
-#
-#		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
+
+			if [ ! -f "$bam_base.human_unaligned.1.fastq" ] ; then
+				echo "Creating fastq files."
+				bamToFastq -i "$bam_base.human_unaligned.sorted.bam" \
+					-fq  "$bam_base.human_unaligned.1.fastq" \
+					-fq2 "$bam_base.human_unaligned.2.fastq"
+			fi
+
+			if [ ! -f "$bam_base.human_unaligned.viral_aligned.sam" ] ; then
+				echo "Aligning to geuvadis viral list."
+				bowtie2 -x geuvadis \
+					-1 "$bam_base.human_unaligned.1.fastq" \
+					-2 "$bam_base.human_unaligned.2.fastq" \
+					-S "$bam_base.human_unaligned.viral_aligned.sam"
+			fi
+
 			echo "Converting sam to bam."
-			samtools view -b -o "$bam_base.human_unaligned.viral_aligned.bam" "$bam_base.human_unaligned.viral_aligned.sam"
-			# > "$bam_base.human_unaligned.viral_aligned.bam"
-			echo "Removing sam."
-			rm "$bam_base.human_unaligned.viral_aligned.sam"
+			samtools view -b -o "$bam_base.human_unaligned.viral_aligned.bam" \
+				"$bam_base.human_unaligned.viral_aligned.sam"
+
+			chmod -w "$bam_base.human_unaligned.viral_aligned.bam"
+
+			if [ -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
+				echo "Removing fastqs."
+				rm "$bam_base.human_unaligned.1.fastq"
+				rm "$bam_base.human_unaligned.2.fastq"
+
+				echo "Removing sam."
+				rm "$bam_base.human_unaligned.viral_aligned.sam"
+			fi
+
 		fi
 
 		echo "Extracting aligned read counts."
