@@ -26,7 +26,7 @@ export BOWTIE2_INDEXES
 	done
 	echo >> geuvadis_counts.tsv
 
-	for bam in $(head -n 40 ../geuvadis.txt) ; do
+	for bam in $(head -n 50 ../geuvadis.txt) ; do
 		echo "$bam"
 		bam_base=${bam%.*}
 		echo "$bam_base"
@@ -65,16 +65,18 @@ export BOWTIE2_INDEXES
 		echo "Extracting total read count."
 		total_read_count=$(samtools view "raw/$bam" | wc -l)
 		echo "$total_read_count"
+		echo "$total_read_count" > "$bam_base.total_raw_read_count"
 
 		if [ ! -f "$bam_base.human_unaligned.sorted.bam" ] ; then
 			echo "Selecting unaligned (-f12) (not mapped & mate not mapped)."
 			samtools view -h -f12 "raw/$bam" | samtools sort -n -o "$bam_base.human_unaligned.sorted.bam" -
-			chmod -w "$bam_base.human_unaligned.sorted.bam"
+#			chmod -w "$bam_base.human_unaligned.sorted.bam"
 		fi
 
 		echo "Extracting unmapped read count."
 		unmapped_read_count=$(samtools view "$bam_base.human_unaligned.sorted.bam" | wc -l)
 		echo "$unmapped_read_count"
+		echo "$unmapped_read_count" > "$bam_base.unmapped_raw_read_count"
 
 		if [ ! -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
 
@@ -83,6 +85,8 @@ export BOWTIE2_INDEXES
 				bamToFastq -i "$bam_base.human_unaligned.sorted.bam" \
 					-fq  "$bam_base.human_unaligned.1.fastq" \
 					-fq2 "$bam_base.human_unaligned.2.fastq"
+				chmod +w "$bam_base.human_unaligned.sorted.bam"
+				rm "$bam_base.human_unaligned.sorted.bam"
 			fi
 
 			if [ ! -f "$bam_base.human_unaligned.viral_aligned.sam" ] ; then
@@ -101,10 +105,13 @@ export BOWTIE2_INDEXES
 
 			if [ -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
 				echo "Removing fastqs."
+				chmod +w "$bam_base.human_unaligned.1.fastq"
+				chmod +w "$bam_base.human_unaligned.2.fastq"
 				rm "$bam_base.human_unaligned.1.fastq"
 				rm "$bam_base.human_unaligned.2.fastq"
 
 				echo "Removing sam."
+				chmod +w "$bam_base.human_unaligned.viral_aligned.sam"
 				rm "$bam_base.human_unaligned.viral_aligned.sam"
 			fi
 
@@ -113,8 +120,9 @@ export BOWTIE2_INDEXES
 		echo "Extracting aligned read counts."
 		aligned_output=$(samtools view -F4 "$bam_base.human_unaligned.viral_aligned.bam" | awk 'BEGIN{FS="\t"}{print $3}' | sort | uniq -c )
 		#	output likely contains an * which bash will likely glob totally mucking this up. QUOTE IT!
+		#	* removed by adding the -F4
 		echo "$aligned_output"
-
+		echo "$aligned_output" > "$bam_base.viral_aligned_counts"
 
 		echo -ne "$bam\t$total_read_count\t$unmapped_read_count\t" >> geuvadis_counts.tsv
 		for virus in $(grep "^>" ~/BOWTIE2_INDEXES/geuvadis.fa | awk '{print $1}' | cut -c 2-) ; do
