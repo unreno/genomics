@@ -3,6 +3,7 @@
 script=$(basename $0)
 
 #	currently requires samtools, bedtools, bowtie2
+#	sudo apt install samtools bedtools bowtie2
 
 #	E-GEUV-1 - RNA-sequencing of 465 lymphoblastoid cell lines from the 1000 Genomes
 #	http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/
