@@ -143,10 +143,10 @@ export BOWTIE2_INDEXES
 
 
 
-#		chmod +w "raw/$bam.bai"
-#		rm "raw/$bam.bai"
-#		chmod +w "raw/$bam"
-#		rm "raw/$bam"
+		chmod +w "raw/$bam.bai"
+		rm "raw/$bam.bai"
+		chmod +w "raw/$bam"
+		rm "raw/$bam"
 
 	done
 
