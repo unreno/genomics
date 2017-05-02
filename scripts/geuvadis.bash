@@ -26,7 +26,8 @@ export BOWTIE2_INDEXES
 	done
 	echo >> geuvadis_counts.tsv
 
-	for bam in $(head -n 50 ../geuvadis.txt) ; do
+#	for bam in $(head -n 50 ../geuvadis.txt) ; do
+	for bam in $(cat geuvadis.txt) ; do
 		echo "$bam"
 		bam_base=${bam%.*}
 		echo "$bam_base"
@@ -44,10 +45,10 @@ export BOWTIE2_INDEXES
 			echo "Already have this bam."
 		fi
 
-		if [ ! -f "raw/$bam.bai" ] ; then
-			echo "Indexing raw file."
-			samtools index "raw/$bam"
-		fi
+#		if [ ! -f "raw/$bam.bai" ] ; then
+#			echo "Indexing raw file."
+#			samtools index "raw/$bam"
+#		fi
 
 		if [ ! -f "$bam_base.ERG.bam" ] ; then
 			echo "Extracting ERG region."
@@ -136,6 +137,13 @@ export BOWTIE2_INDEXES
 		done
 
 		echo >> geuvadis_counts.tsv
+
+
+
+		chmod +w "raw/$bam.bai"
+		rm "raw/$bam.bai"
+		chmod +w "raw/$bam"
+		rm "raw/$bam"
 
 	done
 
