@@ -2,6 +2,7 @@
 
 script=$(basename $0)
 
+#	currently requires samtools, bedtools, bowtie2
 
 #	E-GEUV-1 - RNA-sequencing of 465 lymphoblastoid cell lines from the 1000 Genomes
 #	http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/
@@ -45,10 +46,11 @@ export BOWTIE2_INDEXES
 			echo "Already have this bam."
 		fi
 
-#		if [ ! -f "raw/$bam.bai" ] ; then
-#			echo "Indexing raw file."
-#			samtools index "raw/$bam"
-#		fi
+		if [ ! -f "raw/$bam.bai" ] ; then
+			#	NEEDED for region selection
+			echo "Indexing raw file."
+			samtools index "raw/$bam"
+		fi
 
 		if [ ! -f "$bam_base.ERG.bam" ] ; then
 			echo "Extracting ERG region."
@@ -140,10 +142,10 @@ export BOWTIE2_INDEXES
 
 
 
-		chmod +w "raw/$bam.bai"
-		rm "raw/$bam.bai"
-		chmod +w "raw/$bam"
-		rm "raw/$bam"
+#		chmod +w "raw/$bam.bai"
+#		rm "raw/$bam.bai"
+#		chmod +w "raw/$bam"
+#		rm "raw/$bam"
 
 	done
 
