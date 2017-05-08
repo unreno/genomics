@@ -38,11 +38,12 @@ export BOWTIE2_INDEXES
 			echo "WGetting bam."
 			if [ -f "$bam" ] ; then
 				echo "Removing existing download."
+				chmod +w "$bam"
 				rm "$bam"
 			fi
 			wget "http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/$bam"
 			mv "$bam" raw/
-			chmod -w "raw/$bam"
+#			chmod -w "raw/$bam"
 		else
 			echo "Already have this bam."
 		fi
@@ -57,13 +58,13 @@ export BOWTIE2_INDEXES
 			echo "Extracting ERG region."
 #			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38367261-38662045"
 			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38366261-38663045"
-			chmod -w "$bam_base.ERG.bam"
+#			chmod -w "$bam_base.ERG.bam"
 		fi
 
 		if [ ! -f "$bam_base.ERG.bam.bai" ] ; then
 			echo "Indexing ERG extraction."
 			samtools index "$bam_base.ERG.bam"
-			chmod -w "$bam_base.ERG.bam.bai"
+#			chmod -w "$bam_base.ERG.bam.bai"
 		fi
 
 		echo "Extracting total read count."
@@ -105,13 +106,13 @@ export BOWTIE2_INDEXES
 			samtools view -b -o "$bam_base.human_unaligned.viral_aligned.bam" \
 				"$bam_base.human_unaligned.viral_aligned.sam"
 
-			chmod -w "$bam_base.human_unaligned.viral_aligned.bam"
+#			chmod -w "$bam_base.human_unaligned.viral_aligned.bam"
 
 			if [ -f "$bam_base.human_unaligned.viral_aligned.bam" ] ; then
 				echo "Removing fastqs."
 				chmod +w "$bam_base.human_unaligned.1.fastq"
-				chmod +w "$bam_base.human_unaligned.2.fastq"
 				rm "$bam_base.human_unaligned.1.fastq"
+				chmod +w "$bam_base.human_unaligned.2.fastq"
 				rm "$bam_base.human_unaligned.2.fastq"
 
 				echo "Removing sam."
