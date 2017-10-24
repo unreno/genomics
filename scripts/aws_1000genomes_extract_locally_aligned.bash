@@ -89,12 +89,18 @@ s2=$(aws s3 ls s3://1000genomes/phase3/data/${subject}/sequence_read/${sample}_2
 
 echo $s1, $s2
 
+#echo $[$[622797752+622797753]/1000000]
+#1245
+
+ebs_size=$[$[$[$s1+$s2]/1000000000]+1]
+echo $ebs_size
+
 #	The will take some testing to determine exact usage
 
 #	The size of the volume, in GiBs.
 
 
-command="aws ec2 create-volume --dry-run --availability-zone=us-west-2a --volume-type gp2 --size 622797752"
+command="aws ec2 create-volume --dry-run --availability-zone=us-west-2a --volume-type gp2 --size ${ebs_size}"
 echo $command
 #response=$( $command )
 #echo "$response"
