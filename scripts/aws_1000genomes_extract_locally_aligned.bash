@@ -56,7 +56,8 @@ sample=$2
 
 #	Try to add some uniqueness to log file name
 date=`date "+%Y%m%d%H%M%S"`
-log=$HOME/$script_name.$date.`hostname`.$1.$2.$$.log
+#log=$HOME/$script_name.$date.`hostname`.$1.$2.$$.log
+log=$HOME/$script_name.$1.$2.$date.log
 
 S3=s3://herv/1000genomes/${reference}
 
@@ -71,7 +72,7 @@ cd $WORK
 set -x
 
 #	Begin logging
-#{
+{
 	echo "Starting ..."
 	date
 
@@ -93,7 +94,7 @@ echo $s1, $s2
 #echo $[$[622797752+622797753]/1000000]
 #1245
 
-ebs_size=$[$[$[$s1+$s2]/1000000000]+1]
+ebs_size=$[$[$[$s1+$s2]/1000000000]+2]
 echo $ebs_size
 
 #	The will take some testing to determine exact usage
@@ -103,10 +104,6 @@ echo $ebs_size
 
 az=$( curl http://169.254.169.254/latest/meta-data/placement/availability-zone/ )
 
-
-
-
-#	need --region ....
 #curl http://169.254.169.254/latest/dynamic/instance-identity/document
 #{
 #  "devpayProductCodes" : null,
@@ -127,7 +124,7 @@ az=$( curl http://169.254.169.254/latest/meta-data/placement/availability-zone/ 
 region=$( curl http://169.254.169.254/latest/dynamic/instance-identity/document | jq '.region' | tr -d '"' )
 
 
-#WHY is region AND availability zone needed? If az is given, region can only be 1 thing!
+#WHY are region AND availability zone needed? If az is given, region can only be 1 thing!
 
 command="aws ec2 create-volume --region ${region} --availability-zone ${az} --volume-type gp2 --size ${ebs_size}"
 echo $command
@@ -147,8 +144,8 @@ instance_id=$( curl http://169.254.169.254/latest/meta-data/instance-id )
 
 command="aws ec2 attach-volume --region ${region} --device xvdf --instance-id ${instance_id} --volume-id ${volume_id}"
 echo $command
-#response=$( $command )
-#echo "$response"
+response=$( $command )
+echo "$response"
 
 
 
@@ -210,10 +207,9 @@ aws s3 cp s3://1000genomes/phase3/data/${subject}/sequence_read/${sample}_2.filt
 #
 #
 
-#	 -s file True if file exists and has a size greater than zero.
-#	[ -s ${sample}_1.${reference}.fastq.gz ] && aws s3 cp ${sample}_1.${reference}.fastq.gz ${S3}/
-#	[ -s ${sample}_2.${reference}.fastq.gz ] && aws s3 cp ${sample}_2.${reference}.fastq.gz ${S3}/
-
+	#	 -s file True if file exists and has a size greater than zero.
+	[ -s ${sample}_1.${reference}.fastq.gz ] && aws s3 cp ${sample}_1.${reference}.fastq.gz ${S3}/
+	[ -s ${sample}_2.${reference}.fastq.gz ] && aws s3 cp ${sample}_2.${reference}.fastq.gz ${S3}/
 
 
 	#	Apparently MUST be unmounted before will detach
@@ -232,32 +228,6 @@ aws s3 cp s3://1000genomes/phase3/data/${subject}/sequence_read/${sample}_2.filt
 	done
 
 
-#	$ aws ec2 describe-volumes --region $region --volume-id $volume_id | jq '.Volumes[0].Attachments'
-#	[
-#	  {
-#	    "AttachTime": "2017-10-25T21:13:30.000Z",
-#	    "InstanceId": "i-0905ad558e681257c",
-#	    "VolumeId": "vol-07aaa8e75de768da3",
-#	    "State": "attached",
-#	    "DeleteOnTermination": false,
-#	    "Device": "xvdf"
-#	  }
-#	]
-#	$ aws ec2 describe-volumes --region $region --volume-id $volume_id | jq '.Volumes[0].Attachments'
-#	[
-#	  {
-#	    "AttachTime": "2017-10-25T21:13:30.000Z",
-#	    "InstanceId": "i-0905ad558e681257c",
-#	    "VolumeId": "vol-07aaa8e75de768da3",
-#	    "State": "detaching",
-#	    "DeleteOnTermination": false,
-#	    "Device": "xvdf"
-#	  }
-#	]
-#	$ aws ec2 describe-volumes --region $region --volume-id $volume_id | jq '.Volumes[0].Attachments'
-#	[]
-
-#	or look at the volume state (not the attachment state)
 #{
 #    "Volumes": [
 #        {
@@ -284,7 +254,6 @@ aws s3 cp s3://1000genomes/phase3/data/${subject}/sequence_read/${sample}_2.filt
 #    ]
 #}
 
-#	can only delete once "available"
 
 	command="aws ec2 delete-volume --region ${region} --volume-id ${volume_id}"
 	echo $command
@@ -294,15 +263,15 @@ aws s3 cp s3://1000genomes/phase3/data/${subject}/sequence_read/${sample}_2.filt
 	echo "Ending ..."
 	date
 
-#} > ${log} 2>&1
+} > ${log} 2>&1
 
 #	Must stop logging at some point so can upload file.
 
-#	aws s3 cp ${log} ${S3}/
+aws s3 cp ${log} ${S3}/
 
 #rm ${log}
 
-#	
+cd ~
 
 
 
