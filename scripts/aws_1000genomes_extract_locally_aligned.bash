@@ -310,7 +310,7 @@ exit
 #      1 INSTRUMENT_PLATFORM
 #   3432 LS454
 
-tail -n +2 ~/s3/1000genomes/sequence.index | awk -F"\t" '( $20 ~ /2.filt.fastq.gz$/ && $26 != "exome" && $13 == "ILLUMINA" ){ print $10, $3, $25 }' | sort -n -k3 -r
+tail -n +2 ~/s3/1000genomes/sequence.index | awk -F"\t" '( $20 ~ /2.filt.fastq.gz$/ && $26 != "exome" && $13 == "ILLUMINA" ){ print $10, $3, $25 }' | sort -n -k3 -r | awk '{print "aws_1000genomes_extract_locally_aligned.bash",$1,$2 }'
 
 #	-> 37065
 
