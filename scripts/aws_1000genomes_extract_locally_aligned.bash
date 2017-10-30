@@ -52,6 +52,11 @@ done
 
 [ $# -ne 2 ] && usage
 
+#	check if jq exists
+#	response=$(which jq)
+#	status=$?
+#	If 0, ok. If 1, not found.
+
 sample_name=$1
 run_id=$2
 
@@ -103,6 +108,8 @@ set -x
 		#1245
 
 		#	At least 1GB with a 1GB buffer (+2)
+		#	I would've preferred to give about 6% buffer, but decimal math doesn't work here.
+		#	Could you bc -l or expr but we'll see how this goes. Trying the big files first.
 		ebs_size=$[$[$[$s1+$s2]/1000000000]+2]
 		echo $ebs_size
 
