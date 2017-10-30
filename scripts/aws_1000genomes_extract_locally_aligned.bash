@@ -151,7 +151,7 @@ set -x
 		#	device names ... /dev/sd[f-p]
 
 		state="creating"
-		echo "Waiting for state to become 'available'"
+		echo "Waiting for state to become 'available' ..."
 		until [ "$state" == "available" ] ; do
 			state=$( aws ec2 describe-volumes --region ${region} --volume-id ${volume_id} | jq '.Volumes[0].State' | tr -d '"' )
 		done
@@ -163,12 +163,16 @@ set -x
 		echo "$response"
 
 		state="attaching"
-		echo "Waiting for state to become 'in-use'"
+		echo "Waiting for state to become 'in-use' ..."
 		until [ "$state" == "in-use" ] ; do
 			state=$( aws ec2 describe-volumes --region ${region} --volume-id ${volume_id} | jq '.Volumes[0].State' | tr -d '"' )
 		done
 
 
+		echo "Waiting for mount point to be created ..."
+		until [ -a /dev/xvdf ] ; do
+			sleep 2
+		done
 
 
 		#	as it is possible that some mount points may linger, check ?
@@ -232,6 +236,8 @@ set -x
 #
 #
 
+	ls -ali $sr1 $sr2
+
 	#	 -s file True if file exists and has a size greater than zero.
 	[ -s $sr1 ] && aws s3 cp $sr1 ${S3}/
 	[ -s $sr2 ] && aws s3 cp $sr2 ${S3}/
@@ -248,7 +254,7 @@ set -x
 		echo $response
 
 		state="in-use"
-		echo "Waiting for state to become 'available'"
+		echo "Waiting for state to become 'available' ..."
 		until [ "$state" == "available" ] ; do
 			state=$( aws ec2 describe-volumes --region ${region} --volume-id ${volume_id} | jq '.Volumes[0].State' | tr -d '"' )
 		done
