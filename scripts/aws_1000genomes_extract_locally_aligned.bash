@@ -163,8 +163,8 @@ set -x
 		echo "$response"
 
 		state="attaching"
-		echo "Waiting for state to become 'attached'"
-		until [ "$state" == "attached" ] ; do
+		echo "Waiting for state to become 'in-use'"
+		until [ "$state" == "in-use" ] ; do
 			state=$( aws ec2 describe-volumes --region ${region} --volume-id ${volume_id} | jq '.Volumes[0].State' | tr -d '"' )
 		done
 
