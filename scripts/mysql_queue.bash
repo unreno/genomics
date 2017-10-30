@@ -116,12 +116,14 @@ file_push(){
 	var="LOCK TABLES $table_name WRITE;"
 	while [ $# -ne 0 ] ; do
 		echo "Pushing the contents of "$1
-		var="${var}"$'\n'"LOAD DATA INFILE '$1' INTO TABLE $table_name (command);"
+#		var="${var}"$'\n'"LOAD DATA INFILE '$1' INTO TABLE $table_name (command);"
+		var="${var}"$'\n'"LOAD DATA LOCAL INFILE '$1' INTO TABLE $table_name (command);"
 		shift
 	done
 	var="${var}"$'\n'"UNLOCK TABLES;"
 	log "$var"
-	echo "$var" | $mysql
+#	echo "$var" | $mysql
+	echo "$var" | $mysql --local-infile
 }
 
 #file_push1(){
