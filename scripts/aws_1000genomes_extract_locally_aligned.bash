@@ -150,6 +150,12 @@ set -x
 
 		#	device names ... /dev/sd[f-p]
 
+		state="creating"
+		echo "Waiting for state to become 'available'"
+		until [ "$state" == "available" ] ; do
+			state=$( aws ec2 describe-volumes --region ${region} --volume-id ${volume_id} | jq '.Volumes[0].State' | tr -d '"' )
+		done
+
 		command="aws ec2 attach-volume --region ${region} --device xvdf --instance-id ${instance_id} --volume-id ${volume_id}"
 		echo $command
 		response=$( $command )
