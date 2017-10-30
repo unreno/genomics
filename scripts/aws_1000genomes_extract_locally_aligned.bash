@@ -201,7 +201,7 @@ set -x
 	export BOWTIE2_INDEXES
 
 	sr1=${sample_name}.${run_id}_1.${reference}.fasta.gz
-	sr1=${sample_name}.${run_id}_2.${reference}.fasta.gz
+	sr2=${sample_name}.${run_id}_2.${reference}.fasta.gz
 	bowtie2 --very-sensitive-local --threads $threads -x $reference \
 		-q -1 $TMP/${run_id}_1.filt.fastq.gz -2 $TMP/${run_id}_2.filt.fastq.gz \
 		| gawk -F"\t" '
@@ -301,10 +301,16 @@ exit
 #	WITHDRAWN	WITHDRAWN_DATE	COMMENT	READ_COUNT	BASE_COUNT	ANALYSIS_GROUP
 
 #	data/HG03679/sequence_read/SRR824936_1.filt.fastq.gz
-#
 
-tail -n +2 ~/s3/1000genomes/sequence.index | \
-awk -F"\t" '( $20 ~ /2.filt.fastq.gz$/ && $26 != "exome" ){ print $10, $3 }'
+
+#	awk -F"\t" '{print $13}' ~/s3/1000genomes/sequence.index | sort | uniq -c
+#	$13
+#  10103 ABI_SOLID	( has sequences like T13032221311013301003131010001102030 )
+# 174185 ILLUMINA
+#      1 INSTRUMENT_PLATFORM
+#   3432 LS454
+
+tail -n +2 ~/s3/1000genomes/sequence.index | awk -F"\t" '( $20 ~ /2.filt.fastq.gz$/ && $26 != "exome" && $13 == "ILLUMINA" ){ print $10, $3, $25 }' | sort -n -k3 -r
 
 #	-> 37065
 
