@@ -110,6 +110,37 @@ log(){
 #	fi
 #}
 
+
+#	This is FAST!
+file_push(){
+	var="LOCK TABLES $table_name WRITE;"
+	while [ $# -ne 0 ] ; do
+		echo "Pushing the contents of "$1
+		var="${var}"$'\n'"LOAD DATA INFILE '$1' INTO TABLE $table_name (command);"
+		shift
+	done
+	var="${var}"$'\n'"UNLOCK TABLES;"
+	log "$var"
+	echo "$var" | $mysql
+}
+
+#file_push1(){
+#	var="LOCK TABLES $table_name WRITE;"
+#	while [ $# -ne 0 ] ; do
+#		echo "Pushing the contents of "$1
+#
+#		while read -r line; do
+#			echo "$line"
+#			var="${var}"$'\n'"INSERT INTO $table_name (command) VALUES ( '$line' ),"
+#		done < $1
+#
+#		shift
+#	done
+#	var="${var}"$'\n'"UNLOCK TABLES;"
+#	log "$var"
+#	echo "$var" | $mysql
+#}
+
 push(){
 	#	The $* in a function MUST BE PASSED.  IT IS NOT THE $* from the command line.
 	#	Unless, of course, that's what you pass it.
@@ -167,7 +198,7 @@ start_next(){
 	EOF
 	#	using echo to "return" a value
 	#	DON'T FORGET THE DOUBLE QUOTES!
-	#	Without the double quotes, the id and command will be on the 
+	#	Without the double quotes, the id and command will be on the
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
@@ -240,7 +271,7 @@ create(){
 	#CONNECT $database_name;
 	read -d '' var <<- EOF
 		CREATE TABLE $table_name (
-			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+			id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 			queued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			started_at TIMESTAMP,
 			completed_at TIMESTAMP,
@@ -251,7 +282,7 @@ create(){
 	EOF
 	#	using echo to "return" a value
 	#	DON'T FORGET THE DOUBLE QUOTES to preserve newlines!
-	#	Without the double quotes, the id and command will be on the 
+	#	Without the double quotes, the id and command will be on the
 	#	same line in the variable and then won't work as expected.
 	log
 	log "$var"
@@ -270,6 +301,8 @@ case "$1" in
 	push | queue )
 		#	Using $@ and wrapping in double quotes passes quotes correctly!
 		shift; push "$@";;	
+	file_push )
+		shift; file_push "$@";;
 	size | count | length )
 		count;;
 	list )
@@ -301,4 +334,4 @@ x="set"
 [[ -n $x ]] && echo "$x:and" || echo "$x:or"
 [ -n "$x" ] && echo "$x:and" || echo "$x:or"
 
-#	Why all the HEREDOCs? Why not just var="blah blah newline blah blah"? It does work.
+#	Why all the HEREDOCs? Why not just var="blah blah newline blah blah"? It does work. Clarity I suppose.
