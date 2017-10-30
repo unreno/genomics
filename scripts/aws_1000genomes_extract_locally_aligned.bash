@@ -102,6 +102,7 @@ set -x
 		#echo $[$[622797752+622797753]/1000000]
 		#1245
 
+		#	At least 1GB with a 1GB buffer (+2)
 		ebs_size=$[$[$[$s1+$s2]/1000000000]+2]
 		echo $ebs_size
 
