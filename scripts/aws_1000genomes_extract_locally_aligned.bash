@@ -107,6 +107,8 @@ set -x
 		#echo $[$[622797752+622797753]/1000000]
 		#1245
 
+#	ebs_size=$( echo "1 + ( 1.02 * ( $s1 + $s2 ) / 1000000000 )" | bc )
+
 		#	At least 1GB with a 1GB buffer (+2)
 		#	I would've preferred to give about 6% buffer, but decimal math doesn't work here.
 		#	Could you bc -l or expr but we'll see how this goes. Trying the big files first.
