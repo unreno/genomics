@@ -108,6 +108,7 @@ set -x
 		#1245
 
 #	ebs_size=$( echo "1 + ( 1.02 * ( $s1 + $s2 ) / 1000000000 )" | bc )
+#	ebs_size=$( echo "1 + ( 1.04 * ( $s1 + $s2 ) / 1024000000 )" | bc )
 
 		#	At least 1GB with a 1GB buffer (+2)
 		#	I would've preferred to give about 6% buffer, but decimal math doesn't work here.
@@ -221,6 +222,8 @@ set -x
 	aws s3 cp s3://1000genomes/phase3/data/${sample_name}/sequence_read/${run_id}_1.filt.fastq.gz  $TMP
 	aws s3 cp s3://1000genomes/phase3/data/${sample_name}/sequence_read/${run_id}_2.filt.fastq.gz  $TMP
 
+	df -h $TMP
+	ls -ali $TMP
 
 	: ${BOWTIE2_INDEXES:="$HOME/BOWTIE2_INDEXES"}
 	#       they MUST be exported, apparently, to be picked up by bowtie2
@@ -228,6 +231,7 @@ set -x
 
 	sr1=${sample_name}.${run_id}_1.${reference}.fasta.gz
 	sr2=${sample_name}.${run_id}_2.${reference}.fasta.gz
+	date
 	bowtie2 --very-sensitive-local --threads $threads -x $reference \
 		-q -1 $TMP/${run_id}_1.filt.fastq.gz -2 $TMP/${run_id}_2.filt.fastq.gz \
 		| gawk -F"\t" '
@@ -245,6 +249,8 @@ set -x
 #			FASTQ or FASTA?
 #
 #
+
+	date
 
 	ls -ali $sr1 $sr2
 
