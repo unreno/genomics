@@ -86,6 +86,7 @@ set -x
 	echo "Starting ..."
 	date
 
+	hostname
 
 
 	if [ $do_aws_stuff == 'true' ] ; then
