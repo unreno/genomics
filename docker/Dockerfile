@@ -67,3 +67,10 @@ RUN cd ~ \
 	&& cd ~ \
 	&& /bin/rm -rf chimera
 
+
+
+#	Create with ...
+#
+#		docker build -t chimera .
+#		docker run -ti chimera
+#
