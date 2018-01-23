@@ -18,6 +18,14 @@
 #	Can run multiple instances, just need to be different so they don't overwrite one another.
 #	There is little error checking.
 
+#	20180122.plink.bash --genome unknown --population eur --pheno phenoY
+#	20180122.plink.bash --genome unknown --population amr --pheno phenoY
+#	20180122.plink.bash --genome unknown --population afr --pheno phenoY
+#	20180122.plink.bash --genome unknown --population eas --pheno phenoY
+#	20180122.plink.bash --genome unknown --population sas --pheno phenoY
+
+
+
 
 
 script=$(basename $0)
@@ -147,6 +155,8 @@ cd $WORK
 #							--linear 
 #							--hide-covar \
 
+#	Using 1 thread (no multithreaded calculations invoked).
+
 					plink --threads 8 \
 							--snps-only \
 							--allow-no-sex \
@@ -166,7 +176,8 @@ cd $WORK
 					mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
 
 					#	Try to manage disk space as could be tight.
-					rm ${bedfile_core}.no.covar.assoc.logistic
+#					rm ${bedfile_core}.no.covar.assoc.logistic
+					rm ${bedfile_core}.no.covar.assoc.linear
 					rm ${bedfile_core}.no.covar.nosex
 
 				done	#	for bedfile
