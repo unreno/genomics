@@ -42,6 +42,7 @@ export BOWTIE2_INDEXES
 				rm "$bam"
 			fi
 			wget "http://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/processed/$bam"
+			mkdir -p raw
 			mv "$bam" raw/
 #			chmod -w "raw/$bam"
 		else
@@ -54,10 +55,34 @@ export BOWTIE2_INDEXES
 			samtools index "raw/$bam"
 		fi
 
+
+#
+#	https://www.ncbi.nlm.nih.gov/gene?term=NM_001243432
+#	
+#		Assembly	Chr	Location
+#		GRCh38.p7 (GCF_000001405.33)	21	NC_000021.9 (38367261..38662045, complement)
+#		GRCh37.p13 (GCF_000001405.25)	21	NC_000021.8 (39739183..40033704, complement)
+#		
+#
+#	How did we devise that they are aligned to GRCh38(hg38) and not GRCh37(hg19)???
+#	This was incorrect.
+#	https://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/E-GEUV-1.idf.txt
+#	... "The reads were mapped to the human hg19 reference genome" ...
+#
+#
+#
+
+
 		if [ ! -f "$bam_base.ERG.bam" ] ; then
 			echo "Extracting ERG region."
+#	hg38 gene
 #			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38367261-38662045"
-			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38366261-38663045"
+#	hg38 gene with 1000 base pair extension
+#			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:38366261-38663045"
+
+#	hg19 gene with 1000 base pair extension
+			samtools view -h -b -o "$bam_base.ERG.bam" "raw/$bam" "chr21:39738183-40034704"
+
 #			chmod -w "$bam_base.ERG.bam"
 		fi
 
