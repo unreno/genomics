@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+
+
+#	create_ec2_instance.bash --profile herv --key ~/.aws/JakeHuman.pem --instance-type c4.2xlarge --volume-size 100 --NOT-DRY-RUN
+#	ssh ...
+#	cd .github/ccls/sequencing/
+#	git pull
+#	make install
+#	cd .github/unreno/genomics/
+#	git pull
+#	make install
+#	cd
+#	sudo yum update
+#	20180122.plink.bash
+
+
 set -x
 
 script=$(basename $0)
