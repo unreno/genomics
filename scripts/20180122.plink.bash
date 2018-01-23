@@ -6,13 +6,11 @@ script=$(basename $0)
 BASE=~/snpprocessing
 REFS=$BASE/references
 WORK=$BASE/working
-S3=s3://herv/snp-20180123
+S3_SOURCE=s3://herv/snp-20160701
+S3_TARGET=s3://herv/snp-20180123
 
-/bin/rm -rf $WORK
 
 mkdir -p $REFS
-mkdir -p $WORK
-cd $WORK
 
 #	Begin logging
 {
@@ -29,30 +27,42 @@ cd $WORK
 
 			#		for pheno_name in `ls -1d ${basedir}/pheno_files/${genome}/${population}/* | xargs -n 1 basename` ; do
 
-			for pheno_name in phenoY.txt ; do
+			for pheno_name in phenoY ; do
+
+
+
+
+/bin/rm -rf $WORK
+mkdir -p $WORK
+cd $WORK
+
+
+
 
 				[ -f ${REFS}/1kg_all_chroms_pruned_mds.mds ] ||
-					aws s3 cp ${S3}/1kg_all_chroms_pruned_mds.mds ${REFS}/
+					aws s3 cp ${S3_SOURCE}/1kg_all_chroms_pruned_mds.mds ${REFS}/
 
-				#	The pheno files are small, but once run, no need to keep them.
-				/bin/rm -rf ${REFS}/pheno_files/
+#				#	The pheno files are small, but once run, no need to keep them.
+#				/bin/rm -rf ${REFS}/pheno_files/
+#
+#				mkdir -p ${REFS}/pheno_files/${genome}/${population}
+#
+#				[ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
+#					aws s3 cp ${S3_SOURCE}/pheno_files/${genome}/${population}/${pheno_name} \
+#						${REFS}/pheno_files/${genome}/${population}/
 
-				mkdir -p ${REFS}/pheno_files/${genome}/${population}
+				[ -f ${REFS}/${pheno_name} ] ||
+					aws s3 cp ${S3_TARGET}/${pheno_name} ${REFS}/
 
-				[ -f ${REFS}/pheno_files/${genome}/${population}/${pheno_name} ] ||
-					aws s3 cp ${S3}/pheno_files/${genome}/${population}/${pheno_name} \
-						${REFS}/pheno_files/${genome}/${population}/
-
-
-				#	Pruned vcfs are large. Delete entire tree if current population doesn't exist?
-				#	This way, if population is same as previous run, already got it.
-				[ -d ${REFS}/pruned_vcfs/${population} ] ||
-					rm -rf ${REFS}/pruned_vcfs/
+#				#	Pruned vcfs are large. Delete entire tree if current population doesn't exist?
+#				#	This way, if population is same as previous run, already got it.
+#				[ -d ${REFS}/pruned_vcfs/${population} ] ||
+#					rm -rf ${REFS}/pruned_vcfs/
 
 				mkdir -p ${REFS}/pruned_vcfs/
 
 				[ -d ${REFS}/pruned_vcfs/${population} ] ||
-					aws s3 cp ${S3}/pruned_vcfs/${population}.tar.gz \
+					aws s3 cp ${S3_SOURCE}/pruned_vcfs/${population}.tar.gz \
 						${REFS}/pruned_vcfs/
 
 				[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
@@ -62,7 +72,7 @@ cd $WORK
 				[ -f ${REFS}/pruned_vcfs/${population}.tar.gz ] &&
 					rm -f ${REFS}/pruned_vcfs/${population}.tar.gz
 
-				for bedfile in `ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed` ; do
+				for bedfile in $( ls ${REFS}/pruned_vcfs/${population}/ALL.chr*.bed ) ; do
 
 					bedfile_noext=${bedfile%.*} # drop the shortest suffix match to ".*" (the .bed extension)
 					bedfile_core=${bedfile_noext##*/}	#	drop the longest prefix match to "*/" (the path)
@@ -75,9 +85,11 @@ cd $WORK
 							--hide-covar \
 							--covar-name C1,C2,C3,C4,C5,C6 \
 							--bfile ${bedfile_noext} \
-							--pheno ${REFS}/pheno_files/${genome}/${population}/${pheno_name} \
+							--pheno ${REFS}/${pheno_name} \
 							--out ${bedfile_core}.no.covar \
 							--covar ${REFS}/1kg_all_chroms_pruned_mds.mds
+
+#							--pheno ${REFS}/pheno_files/${genome}/${population}/${pheno_name} \
 
 					awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
 
@@ -109,37 +121,44 @@ cd $WORK
 
 				gzip --best ${pheno_name}.NA.txt
 				aws s3 cp ${pheno_name}.NA.txt.gz \
-						${S3}/output/${genome}/${population}/
+						${S3_TARGET}/output/${genome}/${population}/
 
 				gzip --best ${pheno_name}.log
 				aws s3 cp ${pheno_name}.log.gz \
-						${S3}/output/${genome}/${population}/
+						${S3_TARGET}/output/${genome}/${population}/
 
 				gzip --best --keep ${pheno_name}.for.qq.plot
 				aws s3 cp ${pheno_name}.for.qq.plot.gz \
-						${S3}/output/${genome}/${population}/
+						${S3_TARGET}/output/${genome}/${population}/
 
 				gzip --best --keep ${pheno_name}.for.manhattan.plot
 				aws s3 cp ${pheno_name}.for.manhattan.plot.gz \
-						${S3}/output/${genome}/${population}/
+						${S3_TARGET}/output/${genome}/${population}/
 
 				tar cvf - ${pheno_name}.*.no.covar.log | gzip --best > ${pheno_name}.no.covar.logs.tar.gz
 				aws s3 cp ${pheno_name}.no.covar.logs.tar.gz \
-					${S3}/output/${genome}/${population}/
+					${S3_TARGET}/output/${genome}/${population}/
 
 
 
 				manhattan_qq_plot.r \
 					-m ${pheno_name}.for.manhattan.plot \
-					-q ${pheno_name}.for.qq.plot \
-					> ${pheno_name}.for.manhattan.plot.log
+					-q ${pheno_name}.for.qq.plot
+
+#					-q ${pheno_name}.for.qq.plot > ${pheno_name}.for.manhattan.plot.log
+
 
 				[ -f ${pheno_name}.for.manhattan.plot.png ] &&
 					aws s3 cp ${pheno_name}.for.manhattan.plot.png \
-						${S3}/output/${genome}/${population}/
+						${S3_TARGET}/output/${genome}/${population}/
 
-				aws s3 cp ${pheno_name}.for.manhattan.plot.log \
-					${S3}/output/${genome}/${population}/
+#				[ -f ${pheno_name}.for.manhattan.plot.log ] &&
+#					aws s3 cp ${pheno_name}.for.manhattan.plot.log \
+#						${S3_TARGET}/output/${genome}/${population}/
+
+
+
+
 
 			done	#	for pheno_name in phenoY.txt ; do
 
@@ -164,3 +183,9 @@ cd $WORK
 	date
 } > ${script}.log 2>&1
 #} > ${pheno_name}.log 2>&1
+
+gzip --best ${script}.log
+
+[ -f ${script}.log.gz ] &&
+	aws s3 cp ${script}.log.gz ${S3_TARGET}/
+
