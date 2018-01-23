@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 
+#	Use [client] instead of [mysql] so mysqldump also works.
+
 #cat ~/.localqueue.cnf
-#[mysql]
+#[client]
 #user=root
 #password=
+#[mysql]
 #database=queue
 
 #cat ~/.awsqueue.cnf
 #[mysql]
+#database=QueueDbName
+#[client]
 #user=*******
 #password=*******
-#database=QueueDbName
 #port=3306
 #host=******.******.rds.amazonaws.com
 
