@@ -14,8 +14,11 @@
 #	sudo yum update
 #	20180122.plink.bash
 
+#	Making semi-parallel.
+#	Can run multiple instances, just need to be different so they don't overwrite one another.
+#	There is little error checking.
 
-set -x
+
 
 script=$(basename $0)
 BASE=~/snpprocessing
@@ -24,17 +27,62 @@ WORK=$BASE/working
 S3_SOURCE=s3://herv/snp-20160701
 S3_TARGET=s3://herv/snp-20180123
 
+function usage(){
+	echo
+	echo "Usage:"
+	echo
+	echo "`basename $0` [--genome hg19_alt] [--population population] [--pheno pheno_name]"
+	echo
+	echo "Default:"
+	echo "  genome ...... ${genome}"
+	echo "  population .. ${population}"
+	echo "  pheno ....... ${pheno_name}"
+	echo
+	echo "`basename $0` --genome hg19_alt --population eur --pheno chr17_ctg5_hap1_504028_F_PRE"
+	echo
+	exit 1
+}
+
+genome="hg19_alt"
+population="eur"
+pheno_name="testing"
+
+while [ $# -ne 0 ] ; do
+	#	Options MUST start with - or --.
+	case $1 in
+		-g*|--g*)
+			shift; genome=$1; shift ;;
+		-po*|--po*)
+			shift; population=$1; shift ;;
+		-ph*|--ph*)
+			shift; pheno_name=$1; shift ;;
+		--)	#	just -- is a common and explicit "stop parsing options" option
+			shift; break ;;
+		-*)
+			echo ; echo "Unexpected args from: ${*}"; usage ;;
+		*)
+			break;;
+	esac
+done
+
+#[ -z ${pheno_name} ] && usage
+
+[ $# -ne 0 ] && usage
+
+set -x
 
 mkdir -p $REFS
+
+log=${script}.${population}.${genome}.${pheno_name}.log
 
 #	Begin logging
 {
 	echo "Starting ..."
 	date
 
-	for population in eur amr afr eas sas ; do	#	5
+#	for population in eur amr afr eas sas ; do	#	5
 
-		for genome in unknown ; do
+#		for genome in unknown ; do
 
 			#	Given file sizes and such, it'd be better if genome were in population dir
 			#		rather than population in genome dir.
@@ -42,12 +90,12 @@ mkdir -p $REFS
 
 			#		for pheno_name in `ls -1d ${basedir}/pheno_files/${genome}/${population}/* | xargs -n 1 basename` ; do
 
-			for pheno_name in phenoY ; do
+#			for pheno_name in phenoY ; do
 
 
 
 
-/bin/rm -rf $WORK
+#/bin/rm -rf $WORK
 mkdir -p $WORK
 cd $WORK
 
@@ -111,7 +159,9 @@ cd $WORK
 
 #							--pheno ${REFS}/pheno_files/${genome}/${population}/${pheno_name} \
 
-					awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
+#					awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.logistic > ${bedfile_core}.for.plot.txt
+
+					awk '{print $1,$2,$3,$9,$4,$7}' ${bedfile_core}.no.covar.assoc.linear > ${bedfile_core}.for.plot.txt
 
 					mv ${bedfile_core}.no.covar.log ${pheno_name}.${bedfile_core}.no.covar.log
 
@@ -180,7 +230,7 @@ cd $WORK
 
 
 
-			done	#	for pheno_name in phenoY.txt ; do
+#			done	#	for pheno_name in phenoY.txt ; do
 
 			#
 			#	tar cvf - ${pheno_name}.for.plot.all.txt \
@@ -192,20 +242,20 @@ cd $WORK
 			#	aws s3 cp ${pheno_name}.tar.gz \
 			#		${S3}/output/${genome}/${population}/
 			#
-			cd ~/
+#			cd ~/
 			#/bin/rm -rf $WORK
 
-		done	#	for genome in unknown ; do
+#		done	#	for genome in unknown ; do
 
-	done	#	for population in eur amr afr eas sas ; do	#	5
+#	done	#	for population in eur amr afr eas sas ; do	#	5
 
 	echo "Ending ..."
 	date
-} > ${script}.log 2>&1
+} > ${log} 2>&1
 #} > ${pheno_name}.log 2>&1
 
-gzip --best ${script}.log
+gzip --best ${log}
 
-[ -f ${script}.log.gz ] &&
-	aws s3 cp ${script}.log.gz ${S3_TARGET}/
+[ -f ${log}.gz ] &&
+	aws s3 cp ${log}.gz ${S3_TARGET}/
 
