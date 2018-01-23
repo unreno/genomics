@@ -104,8 +104,8 @@ log=${script}.${population}.${genome}.${pheno_name}.log
 
 
 #/bin/rm -rf $WORK
-mkdir -p $WORK
-cd $WORK
+mkdir -p $WORK/$population/$genome/$pheno_name
+cd $WORK/$population/$genome/$pheno_name
 
 
 
