@@ -92,12 +92,17 @@ cd $WORK
 					bedfile_noext=${bedfile%.*} # drop the shortest suffix match to ".*" (the .bed extension)
 					bedfile_core=${bedfile_noext##*/}	#	drop the longest prefix match to "*/" (the path)
 
+#Note: --hide-covar flag deprecated.  Use e.g. '--linear hide-covar'.
+#Note: --standard-beta flag deprecated.  Use e.g. '--linear standard-beta'.
+
+#							--standard-beta \
+#							--linear 
+#							--hide-covar \
+
 					plink --threads 8 \
 							--snps-only \
 							--allow-no-sex \
-							--standard-beta \
-							--linear \
-							--hide-covar \
+							--linear standard-beta hide-covar \
 							--covar-name C1,C2,C3,C4,C5,C6 \
 							--bfile ${bedfile_noext} \
 							--pheno ${REFS}/${pheno_name} \
