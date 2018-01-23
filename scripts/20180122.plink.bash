@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CALLING_DIR=$PWD
+
 
 
 #	create_ec2_instance.bash --profile herv --key ~/.aws/JakeHuman.pem --instance-type c4.2xlarge --volume-size 100 --NOT-DRY-RUN
@@ -24,6 +26,7 @@
 #	20180122.plink.bash --genome unknown --population eas --pheno phenoY
 #	20180122.plink.bash --genome unknown --population sas --pheno phenoY
 
+#	Only needed about 40GB
 
 
 
@@ -204,15 +207,17 @@ cd $WORK/$population/$genome/$pheno_name
 				aws s3 cp ${pheno_name}.NA.txt.gz \
 						${S3_TARGET}/output/${genome}/${population}/
 
-				gzip --best ${pheno_name}.log
-				aws s3 cp ${pheno_name}.log.gz \
-						${S3_TARGET}/output/${genome}/${population}/
+#				gzip --best ${pheno_name}.log
+#				aws s3 cp ${pheno_name}.log.gz \
+#						${S3_TARGET}/output/${genome}/${population}/
 
-				gzip --best --keep ${pheno_name}.for.qq.plot
+#				gzip --best --keep ${pheno_name}.for.qq.plot
+				gzip --best < ${pheno_name}.for.qq.plot > ${pheno_name}.for.qq.plot.gz
 				aws s3 cp ${pheno_name}.for.qq.plot.gz \
 						${S3_TARGET}/output/${genome}/${population}/
 
-				gzip --best --keep ${pheno_name}.for.manhattan.plot
+#				gzip --best --keep ${pheno_name}.for.manhattan.plot
+				gzip --best < ${pheno_name}.for.manhattan.plot > ${pheno_name}.for.manhattan.plot.gz
 				aws s3 cp ${pheno_name}.for.manhattan.plot.gz \
 						${S3_TARGET}/output/${genome}/${population}/
 
@@ -264,6 +269,8 @@ cd $WORK/$population/$genome/$pheno_name
 	date
 } > ${log} 2>&1
 #} > ${pheno_name}.log 2>&1
+
+cd $CALLING_DIR
 
 gzip --best ${log}
 
