@@ -21,6 +21,7 @@ length(qfiles)
 
 somePNGPath = "plots"
 
+#	install.packages('qqman')
 library("qqman")
 
 #	Disable all the warnings

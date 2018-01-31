@@ -2,6 +2,7 @@
 
 #	manhattan_plot.r -m for_plots/chr10_127658643_R_PRE.for.manhattan.plot -q for_plots/chr10_127658643_R_PRE.for.qq.plot -o ~/Desktop/
 
+#	install.packages('optparse')
 #	http://tuxette.nathalievilla.org/?p=1696
 library("optparse")
  
