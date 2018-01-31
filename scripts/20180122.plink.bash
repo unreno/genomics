@@ -189,7 +189,9 @@ cd $WORK/$population/$genome/$pheno_name
 				#echo "CHR SNP BP P A1 OR" > ${pheno_name}.for.plot.all.txt
 				#grep -v "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
 				#grep --invert-match --no-filename "CHR" *.for.plot.txt >> ${pheno_name}.for.plot.all.txt
-				grep --invert-match --no-filename "CHR" *.for.plot.txt > ${pheno_name}.for.plot.all.txt
+				#grep --invert-match --no-filename "CHR" *.for.plot.txt > ${pheno_name}.for.plot.all.txt
+				#	using tail is faster and clearer.
+				tail --silent --lines +2 *.for.plot.txt > ${pheno_name}.for.plot.all.txt
 
 				#	No wildcards, so don't need to specify --no-filename
 				grep --invert-match "NA" ${pheno_name}.for.plot.all.txt | shuf -n 200000 > ${pheno_name}.for.qq.plot
