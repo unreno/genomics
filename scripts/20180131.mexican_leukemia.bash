@@ -103,7 +103,9 @@ chmod -w 24_S10_L001.nonhg38.fasta.gz
 
 #blastn -query <( zcat 24_S10_L001.nonhg38.fasta.gz ) -db viral -num_threads 8 -out 24_S10_L001.nonhg38.blastn.txt
 
-time blastn -query <( zcat 24_S10_L001.nonhg38.fasta.gz ) -db viral -num_threads 8 2> 24_S10_L001.nonhg38.blastn.STDERR.txt | gzip --best > 24_S10_L001.nonhg38.blastn.txt.gz
+#blastn -query <( zcat 24_S10_L001.nonhg38.fasta.gz ) -db viral -num_threads 8 2> 24_S10_L001.nonhg38.blastn.STDERR.txt | gzip --best > 24_S10_L001.nonhg38.blastn.txt.gz
+
+blastn -query <( zcat 24_S10_L001.nonhg38.fasta.gz ) -db viral -num_threads 8 2> /dev/null | gzip --best > 24_S10_L001.nonhg38.blastn.txt.gz
 
 #blastn -query 24_S10_L001.nonhg38.fasta -db viral -num_threads 8 -out 24_S10_L001.nonhg38.blastn.txt
 
@@ -128,7 +130,9 @@ time blastn -query <( zcat 24_S10_L001.nonhg38.fasta.gz ) -db viral -num_threads
 
 #diamond blastx --db ~/DIAMOND/viral --query <( zcat 24_S10_L001.nonhg38.fasta.gz ) --out 24_S10_L001.nonhg38.diamond.txt
 
-time diamond blastx --db ~/DIAMOND/viral --query <( zcat 24_S10_L001.nonhg38.fasta.gz ) 2> 24_S10_L001.nonhg38.diamond.STDERR.txt | gzip --best > 24_S10_L001.nonhg38.diamond.txt.gz
+#diamond blastx --db ~/DIAMOND/viral --query <( zcat 24_S10_L001.nonhg38.fasta.gz ) 2> 24_S10_L001.nonhg38.diamond.STDERR.txt | gzip --best > 24_S10_L001.nonhg38.diamond.txt.gz
+
+diamond blastx --db ~/DIAMOND/viral --query <( zcat 24_S10_L001.nonhg38.fasta.gz ) 2> /dev/null | gzip --best > 24_S10_L001.nonhg38.diamond.txt.gz
 
 
 
