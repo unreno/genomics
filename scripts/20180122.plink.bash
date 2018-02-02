@@ -36,7 +36,7 @@ BASE=~/snpprocessing
 REFS=$BASE/references
 WORK=$BASE/working
 S3_SOURCE=s3://herv/snp-20160701
-S3_TARGET=s3://herv/snp-20180123
+S3_TARGET=s3://herv/snp-20180202
 
 function usage(){
 	echo
