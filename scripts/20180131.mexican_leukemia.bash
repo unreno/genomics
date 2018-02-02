@@ -17,6 +17,8 @@ date
 base=$1
 
 
+{
+
 #	Minimize pipes to save memory
 
 
@@ -170,3 +172,4 @@ chmod -w ${base}.nonhg38.diamond.txt.gz
 
 date
 
+} > ${base}.log 2>&1
