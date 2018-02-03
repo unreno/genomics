@@ -19,7 +19,8 @@ base=$1
 
 {
 
-#	Minimize pipes to save memory
+#	Minimize pipes to save memory?
+#	Or use pipes to save disk space?
 
 
 #	1- Upload raw data to amazon
@@ -107,20 +108,6 @@ chmod -w ${base}.nonhg38.fasta.gz
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export BLASTDB=/Users/jakewendt/BLAST_DBS
 
 
@@ -150,6 +137,20 @@ chmod -w ${base}.nonhg38.blastn.txt.gz
 
 
 
+time tblastx -query ${base}.nonhg38.fasta -db viral -num_threads 8 2> /dev/null > ${base}.nonhg38.tblastx.txt
+chmod -w ${base}.nonhg38.tblastx.txt
+gzip --best < ${base}.nonhg38.tblastx.txt > ${base}.nonhg38.tblastx.txt.gz
+chmod -w ${base}.nonhg38.tblastx.txt.gz
+
+
+
+#	MAKE SURE THAT THE SOURCE FASTA IS A PROTEIN FASTA AND NOT NUCEOTIDES
+#	I used EMBOSS's transeq
+#	transeq viral.fasta viral.protein.fasta
+#	diamond makedb --in viral.protein.fasta --db viral
+
+
+
 #	diamond makedb --in nt.fasta --db nt --threads 8 
 
 #	diamond blastx --threads 8 --db nt --query reads.fna --out matches.m8
@@ -164,7 +165,7 @@ chmod -w ${base}.nonhg38.blastn.txt.gz
 
 #diamond blastx --db ~/DIAMOND/viral --query <( zcat ${base}.nonhg38.fasta.gz ) 2> /dev/null | gzip --best > ${base}.nonhg38.diamond.txt.gz
 
-time diamond blastx --db ~/DIAMOND/viral --query ${base}.nonhg38.fasta 2> /dev/null > ${base}.nonhg38.diamond.txt
+time diamond blastx --outfmt 0 --threads 8  --db ~/DIAMOND/viral --query ${base}.nonhg38.fasta 2> /dev/null > ${base}.nonhg38.diamond.txt
 chmod -w ${base}.nonhg38.diamond.txt
 gzip --best < ${base}.nonhg38.diamond.txt > ${base}.nonhg38.diamond.txt.gz
 chmod -w ${base}.nonhg38.diamond.txt.gz
