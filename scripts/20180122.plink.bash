@@ -36,7 +36,7 @@ BASE=~/snpprocessing
 REFS=$BASE/references
 WORK=$BASE/working
 S3_SOURCE=s3://herv/snp-20160701
-S3_TARGET=s3://herv/snp-20180202
+S3_TARGET=s3://herv/snp-20180208
 
 function usage(){
 	echo
@@ -161,6 +161,7 @@ cd $WORK/$population/$genome/$pheno_name
 #	Using 1 thread (no multithreaded calculations invoked).
 
 					plink --threads 8 \
+							--vif 500 \
 							--snps-only \
 							--allow-no-sex \
 							--linear standard-beta hide-covar \
