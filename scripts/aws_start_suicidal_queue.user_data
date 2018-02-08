@@ -1,9 +1,29 @@
 #!/usr/bin/env bash
+#
+#	This script runs as root in /
+#
 #	Why su -l USER -c 'command' and not sudo -u USER 'command'?
+#		su always requires a password?
+#
 #su -l ec2-user -c 'nohup aws_start_suicidal_queue.bash --shutdown &'
 #	I think that this should be better and allow for multiple commands.
-sudo -i -u ec2-user sh <<-EOF
+#sudo -i -u ec2-user sh <<-EOF
+sudo -i -u ec2-user bash <<-EOF
 	env > initial_env
 	echo \$PWD > testing_PWD
 	nohup aws_start_suicidal_queue.bash --shutdown &
 EOF
+
+
+
+#	Create completely new or sed in-place?
+
+#	cat > ~/.awsqueue.cnf << EOF
+#	[mysql]
+#	database=QueueDbName
+#	[client]
+#	user=******
+#	password******
+#	port=3306
+#	host=queuedbinstanceid.cawdxh1rrx1p.us-east-1.rds.amazonaws.com
+
