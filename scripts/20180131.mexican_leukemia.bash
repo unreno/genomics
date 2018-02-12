@@ -49,6 +49,7 @@ base=$1
 #	single threaded bowtie2 took 110 minutes
 
 
+#	--un-conc IS THE SAME AS NOT PROPER_PAIR
 
 
 #	While the above works, if we are going to select a sub region
