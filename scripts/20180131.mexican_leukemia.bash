@@ -108,6 +108,24 @@ chmod -w ${base}.nonhg38.fasta.gz
 
 
 
+#	APOBEC
+
+samtools view -h -f 2 --threads 3 ${base}.by_position.bam > ${base}.hg38.bam
+chmod -w ${base}.hg38.bam
+#samtools mpileup -uf ~/s3/herv/indexes/hg38.fa ${base}.hg38.bam | bcftools call -mv > ${base}.hg38.vcf
+bcftools mpileup -Ou -f ~/s3/herv/indexes/hg38.fa ${base}.hg38.bam | bcftools call -mvO z -o ${base}.hg38.vcf.gz
+#	Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+chmod -w ${base}.hg38.vcf.gz
+
+zcat ${base}.hg38.vcf.gz | awk -F"\t" '($4 == "C" && $5 == "T"){print "samtools faidx ~/s3/herv/indexes/hg38.fa "$1":"$2-1"-"$2+1}' | bash > ${base}.hg38.trinucelotides.fasta
+chmod -w ${base}.hg38.trinucelotides.fasta
+grep -vs "^>" ${base}.hg38.trinucelotides.fasta | sort -f | uniq -ci > ${base}.hg38.trinucelotides.counts
+chmod -w ${base}.hg38.trinucelotides.counts
+
+
+
+
+
 
 export BLASTDB=/Users/jakewendt/BLAST_DBS
 
