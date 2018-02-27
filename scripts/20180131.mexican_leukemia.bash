@@ -106,6 +106,8 @@ chmod -w ${base}.ERG.bam
 
 samtools fasta -F 2 --threads 3 -N ${base}.by_name.bam > ${base}.nonhg38.fasta
 
+samtools fastq -F 2 --threads 3 -N -1 ${base}.nonhg38.1.fastq.gz -2 ${base}.nonhg38.2.fastq.gz ${base}.by_name.bam
+
 gzip --best < ${base}.nonhg38.fasta > ${base}.nonhg38.fasta.gz
 chmod -w ${base}.nonhg38.fasta.gz
 
