@@ -19,6 +19,8 @@ base=$1
 
 {
 
+date
+
 #	Minimize pipes to save memory?
 #	Or use pipes to save disk space?
 
@@ -60,12 +62,12 @@ time bowtie2 --threads 4 --very-sensitive -x hg38 \
 	-1 ${base}_R1_001.fastq.gz \
 	-2 ${base}_R2_001.fastq.gz \
 	-S ${base}.sam
-chmod -w ${base}.sam
+#chmod -w ${base}.sam
 samtools view --threads 3 -o ${base}.bam ${base}.sam
-chmod -w ${base}.bam
-#	rm ${base}.sam
+#chmod -w ${base}.bam
+rm ${base}.sam
 
-#	This took a couple hours.
+
 
 
 #	Note, bowtie's threads is the actual count. Samtools is "in addition to 1". Stupid.
@@ -76,7 +78,9 @@ samtools sort --threads 3 -o ${base}.by_position.bam ${base}.bam
 chmod -w ${base}.by_position.bam
 
 samtools sort --threads 3 -n -o ${base}.by_name.bam ${base}.bam
-chmod -w ${base}.by_name.bam
+#chmod -w ${base}.by_name.bam
+
+rm ${base}.bam
 
 #	These sorts take only a few minutes.
 
@@ -101,26 +105,38 @@ chmod -w ${base}.ERG.bam
 #cat ${base}.nonhg38.1.fasta ${base}.nonhg38.2.fasta | gzip --best > ${base}.nonhg38.fasta.gz
 
 samtools fasta -F 2 --threads 3 -N ${base}.by_name.bam > ${base}.nonhg38.fasta
-chmod -w ${base}.nonhg38.fasta
+
 gzip --best < ${base}.nonhg38.fasta > ${base}.nonhg38.fasta.gz
 chmod -w ${base}.nonhg38.fasta.gz
 
+rm ${base}.by_name.bam
 
 
 
 #	APOBEC
 
-samtools view -h -f 2 --threads 3 ${base}.by_position.bam > ${base}.hg38.bam
+samtools view -h -f 2 --threads 3 -b ${base}.by_position.bam > ${base}.hg38.bam
 chmod -w ${base}.hg38.bam
+
+#	Sadly, bcftools only multithreaded in compression
+#	      --threads INT       number of extra output compression threads [0]
+
 #samtools mpileup -uf ~/s3/herv/indexes/hg38.fa ${base}.hg38.bam | bcftools call -mv > ${base}.hg38.vcf
-bcftools mpileup -Ou -f ~/s3/herv/indexes/hg38.fa ${base}.hg38.bam | bcftools call -mvO z -o ${base}.hg38.vcf.gz
+time bcftools mpileup -Ou -f ~/s3/herv/indexes/hg38.fa ${base}.hg38.bam | bcftools call -mvO z --threads 3 -o ${base}.hg38.vcf.gz
 #	Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
 chmod -w ${base}.hg38.vcf.gz
 
-zcat ${base}.hg38.vcf.gz | awk -F"\t" '($4 == "C" && $5 == "T"){print "samtools faidx ~/s3/herv/indexes/hg38.fa "$1":"$2-1"-"$2+1}' | bash > ${base}.hg38.trinucelotides.fasta
-chmod -w ${base}.hg38.trinucelotides.fasta
-grep -vs "^>" ${base}.hg38.trinucelotides.fasta | sort -f | uniq -ci > ${base}.hg38.trinucelotides.counts
-chmod -w ${base}.hg38.trinucelotides.counts
+time zcat ${base}.hg38.vcf.gz | awk -F"\t" '($4 == "C" && $5 == "T"){print "samtools faidx ~/s3/herv/indexes/hg38.fa "$1":"$2-1"-"$2+1}' | bash > ${base}.hg38.C-T.trinucelotides.fasta
+chmod -w ${base}.hg38.C-T.trinucelotides.fasta
+grep -vs "^>" ${base}.hg38.C-T.trinucelotides.fasta | sort -f | uniq -ci > ${base}.hg38.C-T.trinucelotides.counts
+chmod -w ${base}.hg38.C-T.trinucelotides.counts
+gzip ${base}.hg38.C-T.trinucelotides.fasta
+
+time zcat ${base}.hg38.vcf.gz | awk -F"\t" '($4 == "G" && $5 == "A"){print "samtools faidx ~/s3/herv/indexes/hg38.fa "$1":"$2-1"-"$2+1}' | bash > ${base}.hg38.G-A.trinucelotides.fasta
+chmod -w ${base}.hg38.G-A.trinucelotides.fasta
+grep -vs "^>" ${base}.hg38.G-A.trinucelotides.fasta | sort -f | uniq -ci > ${base}.hg38.G-A.trinucelotides.counts
+chmod -w ${base}.hg38.G-A.trinucelotides.counts
+gzip ${base}.hg38.G-A.trinucelotides.fasta
 
 
 
@@ -139,8 +155,9 @@ export BLASTDB=/Users/jakewendt/BLAST_DBS
 #blastn -query <( zcat ${base}.nonhg38.fasta.gz ) -db viral -num_threads 8 2> /dev/null | gzip --best > ${base}.nonhg38.blastn.txt.gz
 
 time blastn -query ${base}.nonhg38.fasta -db viral -num_threads 8 2> /dev/null > ${base}.nonhg38.blastn.txt
-chmod -w ${base}.nonhg38.blastn.txt
-gzip --best < ${base}.nonhg38.blastn.txt > ${base}.nonhg38.blastn.txt.gz
+#chmod -w ${base}.nonhg38.blastn.txt
+#gzip --best < ${base}.nonhg38.blastn.txt > ${base}.nonhg38.blastn.txt.gz
+gzip --best ${base}.nonhg38.blastn.txt
 chmod -w ${base}.nonhg38.blastn.txt.gz
 
 #blastn -query ${base}.nonhg38.fasta -db viral -num_threads 8 -out ${base}.nonhg38.blastn.txt
@@ -156,10 +173,10 @@ chmod -w ${base}.nonhg38.blastn.txt.gz
 
 
 
-time tblastx -query ${base}.nonhg38.fasta -db viral -num_threads 8 2> /dev/null > ${base}.nonhg38.tblastx.txt
-chmod -w ${base}.nonhg38.tblastx.txt
-gzip --best < ${base}.nonhg38.tblastx.txt > ${base}.nonhg38.tblastx.txt.gz
-chmod -w ${base}.nonhg38.tblastx.txt.gz
+#	time tblastx -query ${base}.nonhg38.fasta -db viral -num_threads 8 2> /dev/null > ${base}.nonhg38.tblastx.txt
+#	chmod -w ${base}.nonhg38.tblastx.txt
+#	gzip --best < ${base}.nonhg38.tblastx.txt > ${base}.nonhg38.tblastx.txt.gz
+#	chmod -w ${base}.nonhg38.tblastx.txt.gz
 
 
 
@@ -185,9 +202,15 @@ chmod -w ${base}.nonhg38.tblastx.txt.gz
 #diamond blastx --db ~/DIAMOND/viral --query <( zcat ${base}.nonhg38.fasta.gz ) 2> /dev/null | gzip --best > ${base}.nonhg38.diamond.txt.gz
 
 time diamond blastx --outfmt 0 --threads 8  --db ~/DIAMOND/viral --query ${base}.nonhg38.fasta 2> /dev/null > ${base}.nonhg38.diamond.txt
-chmod -w ${base}.nonhg38.diamond.txt
-gzip --best < ${base}.nonhg38.diamond.txt > ${base}.nonhg38.diamond.txt.gz
+#chmod -w ${base}.nonhg38.diamond.txt
+#gzip --best < ${base}.nonhg38.diamond.txt > ${base}.nonhg38.diamond.txt.gz
+gzip --best ${base}.nonhg38.diamond.txt
 chmod -w ${base}.nonhg38.diamond.txt.gz
+
+
+
+rm ${base}.nonhg38.fasta
+
 
 
 date
