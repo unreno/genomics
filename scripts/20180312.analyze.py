@@ -31,7 +31,8 @@ for o in 'c','m':
 		
 		chromosomes=set(list(tumor['chr']) + list(normal['chr']))
 		
-		pp = PdfPages(pair_base_name + '.' + o + '.' + t + '.pdf')
+		pp100 = PdfPages(pair_base_name + '.' + o + '.' + t + '.100.pdf')
+		pp_dyn = PdfPages(pair_base_name + '.' + o + '.' + t + '.dynamic.pdf')
 		
 		for c in sorted(chromosomes):
 			total_length=len(tumor.loc[tumor['chr']==c]['position'])+len(normal.loc[normal['chr']==c]['position'])
@@ -39,6 +40,7 @@ for o in 'c','m':
 				tumor_array=np.array(tumor.loc[tumor['chr']==c]['position'])
 				normal_array=np.array(normal.loc[normal['chr']==c]['position'])
 				max=np.array(tumor_array.max(), normal_array.max()).max()
+
 				tumor_hist, tumor_bin_edges = np.histogram(tumor_array, bins=100, range=(0,max))
 				normal_hist, normal_bin_edges = np.histogram(normal_array, bins=100, range=(0,max))
 				hist = tumor_hist - normal_hist
@@ -49,8 +51,22 @@ for o in 'c','m':
 				plt.bar(center, tumor_hist, align='center', width=width, color='#FFAAAA')
 				plt.bar(center, -normal_hist, align='center', width=width, color='#AAAAFF')
 				plt.bar(center, hist, align='center', width=width*0.5, color='black')
-				pp.savefig( fig )
+				pp100.savefig( fig )
 				plt.close()
-		
-		pp.close()
+
+				tumor_hist, tumor_bin_edges = np.histogram(tumor_array, bins=int(max/1000000), range=(0,max))
+				normal_hist, normal_bin_edges = np.histogram(normal_array, bins=int(max/1000000), range=(0,max))
+				hist = tumor_hist - normal_hist
+				width = 0.7 * (tumor_bin_edges[1] - tumor_bin_edges[0])
+				center = (tumor_bin_edges[:-1] + tumor_bin_edges[1:]) / 2
+				fig = plt.figure()	#	FIRST. Basically sets up a background plot
+				plt.title(c)
+				plt.bar(center, tumor_hist, align='center', width=width, color='#FFAAAA')
+				plt.bar(center, -normal_hist, align='center', width=width, color='#AAAAFF')
+				plt.bar(center, hist, align='center', width=width*0.5, color='black')
+				pp_dyn.savefig( fig )
+				plt.close()
+
+		pp100.close()
+		pp_dyn.close()
 
