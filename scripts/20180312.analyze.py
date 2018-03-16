@@ -51,11 +51,16 @@ for o in 'c','m':
 				plt.bar(center, tumor_hist, align='center', width=width, color='#FFAAAA')
 				plt.bar(center, -normal_hist, align='center', width=width, color='#AAAAFF')
 				plt.bar(center, hist, align='center', width=width*0.5, color='black')
+				#	fig.text( horizontal portion, vertical portion, text)
+				fig.subplots_adjust(bottom=0.3)
+				fig.text(.1,.1, "Tumor count : "+str(len(tumor_array))+ ". Normal count : "+str(len(normal_array))+".")
 				pp100.savefig( fig )
 				plt.close()
 
 				tumor_hist, tumor_bin_edges = np.histogram(tumor_array, bins=int(max/1000000), range=(0,max))
 				normal_hist, normal_bin_edges = np.histogram(normal_array, bins=int(max/1000000), range=(0,max))
+#				tumor_hist, tumor_bin_edges = np.histogram(tumor_array, bins=int(max/100000), range=(0,max))
+#				normal_hist, normal_bin_edges = np.histogram(normal_array, bins=int(max/100000), range=(0,max))
 				hist = tumor_hist - normal_hist
 				width = 0.7 * (tumor_bin_edges[1] - tumor_bin_edges[0])
 				center = (tumor_bin_edges[:-1] + tumor_bin_edges[1:]) / 2
@@ -64,6 +69,8 @@ for o in 'c','m':
 				plt.bar(center, tumor_hist, align='center', width=width, color='#FFAAAA')
 				plt.bar(center, -normal_hist, align='center', width=width, color='#AAAAFF')
 				plt.bar(center, hist, align='center', width=width*0.5, color='black')
+				rig.subplots_adjust(bottom=0.3)
+				fig.text(.1,.1, "Tumor count : "+str(len(tumor_array))+ ". Normal count : "+str(len(normal_array))+".")
 				pp_dyn.savefig( fig )
 				plt.close()
 
