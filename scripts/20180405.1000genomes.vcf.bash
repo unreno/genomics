@@ -50,21 +50,45 @@ for vcf in $( find ~/s3/1000genomes/phase3/ -name \*vcf.gz ) ; do
 	fi
 
 	#	There are limits as to the number of open files or pipes.
-	#	the samtools call from within awk MUST be closed otherwise errors like ...
-	#		awk: cmd. line:3: (FILENAME=- FNR=289293) fatal: cannot open pipe `samtools faidx /Users/jakewendt/s3/herv/indexes/build37.fa chr1:79714090-79714092 ' (Too many open files)
+	#	the samtools call from within awk MUST be explicitly closed otherwise errors like ...
+	#		awk: cmd. line:3: (FILENAME=- FNR=289293) fatal: cannot open pipe 
+	#			`samtools faidx /Users/jakewendt/s3/herv/indexes/build37.fa chr1:79714090-79714092 ' (Too many open files)
+	#	Changed style from ...
+	#		while("samtools faidx '${index}'.fa chr"$1":"$2-1"-"$2+1" " | getline x ){}; \
+	#	... to ...
+	#		samtools = "samtools faidx '${index}'.fa chr"$1":"$2-1"-"$2+1" "
+	#		while(samtools | getline x ){}; \
+	#		close(samtools);
 
-	if [ ! -f ${base}.tri.txt ] ; then
+#	if [ ! -f ${base}.tri.txt ] ; then
 
-#				while("samtools faidx '${index}'.fa chr"$1":"$2-1"-"$2+1" " | getline x ){}; \
-		#	This version takes a few minutes per file
-		zcat $vcf | awk -F"\t" '\
-			( !/^#/ && ( ( $4 == "C" && $5 == "T" ) || ( $4 == "G" && $5 == "A" ) ) ){ \
-				samtools = "samtools faidx '${index}'.fa chr"$1":"$2-1"-"$2+1" "
-				while(samtools | getline x ){}; \
-				close(samtools);
-				print $1"\t"$2"\t"$4"\t"$5"\t"toupper(x) \
-			}' > ${base}.tri.txt
+		#samtools faidx /Users/jakewendt/s3/herv/indexes/build37.fa chr1:79714090-79714092
 
-	fi
+#			mkdir -p faidx
+##			for transition in $( cat ${base}.txt ) ; do #	 no
+#				c=${transition%%	*}
+#				p=${transition#*	}
+#				p=${p%%	*}
+#				if [ ! -f "${c}:${p}" ] ; then
+#				#samtools faidx /Users/jakewendt/s3/herv/indexes/build37.fa chr1:79714090-79714092 > asdfasf
+#				fi
+#			done
+
+#awk -F\| 'system("test -f " $2)==0 { print $2 }'
+
+
+
+
+
+#		#	This version takes a few hours per file ( about 0.05 sec per position )
+#		zcat $vcf | awk -F"\t" '\
+#			( !/^#/ && ( ( $4 == "C" && $5 == "T" ) || ( $4 == "G" && $5 == "A" ) ) ){ \
+#				samtools = "samtools faidx '${index}'.fa chr"$1":"$2-1"-"$2+1" "
+#				while(samtools | getline x ){}; \
+#				close(samtools);
+#				print $1"\t"$2"\t"$4"\t"$5"\t"toupper(x) \
+#			}' > ${base}.tri.txt
+
+#	fi
 
 done
