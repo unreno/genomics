@@ -40,7 +40,7 @@ while [ $# -ne 0 ] ; do
 		samtools sort --threads 3 -o ${base}.bam ${base}.PP.bam
 		\rm ${base}.PP.bam
 	
-	#	\rm ${base}.1.fastq.gz ${base}.2.fastq.gz
+		\rm ${base}.1.fastq.gz ${base}.2.fastq.gz
 		\rm ${base}.sam
 	fi
 	
