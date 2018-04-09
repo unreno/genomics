@@ -74,11 +74,14 @@ while [ $# -ne 0 ] ; do
 					print $1"\t"$2
 				}' > ${base}.${o}.${t}.txt
 	
+
 			#	collect chromosome, position and the upcased trinucleotide centered about that position
 			#	using the while(){} loop in awk is to return the last line from samtools faidx
 			zcat ${base}.${o}.vcf.gz | awk -F"\t" '\
 				( !/^#/ && $4 == "'${from}'" && $5 == "'${to}'"){ \
-					while("samtools faidx '${index}'.fa "$1":"$2-1"-"$2+1" " | getline x ){}; \
+					samtools = "samtools faidx '${index}'.fa "$1":"$2-1"-"$2+1" "
+					while(samtools | getline x ){}; \
+					close(samtools);
 					print $1"\t"$2"\t"toupper(x) \
 				}' > ${base}.${o}.${t}.tri.txt
 	
