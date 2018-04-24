@@ -7,14 +7,14 @@
 
 gawk 'BEGIN{ OFS=FS=","; print "transition,minimum,maximum,median,mean" }
 ( $1 ~ /^.....-./ ){
-	minimum=9999999
-	maximum=sum=0
+#	minimum=9999999
+#	maximum=sum=0
 	split("",counts)
 	for(i=2;i<=NF;i++){
 		counts[i-1]=$i
 		sum+=$i
-		if( $i < minimum ) minimum=$i
-		if( $i > maximum ) maximum=$i
+#		if( $i < minimum ) minimum=$i
+#		if( $i > maximum ) maximum=$i
 	}
 	asort(counts)
 	c=length(counts)
@@ -24,7 +24,7 @@ gawk 'BEGIN{ OFS=FS=","; print "transition,minimum,maximum,median,mean" }
 		median = ( counts[c/2] + counts[c/2-1] ) / 2;
 	}
 	mean=sum/(NF-1)
-	print $1,minimum,maximum,median,mean
+	print $1,counts[1],counts[c],median,mean
 }
 ' <( zcat tumor_only.summary_table.pent.with_sums.csv.gz ) | gzip > tumor_only.summary_table.pent.with_sums.aggregates.gz
 
