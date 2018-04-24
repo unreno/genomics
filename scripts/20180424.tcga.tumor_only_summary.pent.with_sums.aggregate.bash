@@ -8,7 +8,8 @@
 gawk 'BEGIN{ OFS=FS=","; print "transition,minimum,maximum,median,mean" }
 ( $1 ~ /^.....-./ ){
 #	minimum=9999999
-#	maximum=sum=0
+#	maximum=0
+	sum=0
 	split("",counts)
 	for(i=2;i<=NF;i++){
 		counts[i-1]=$i
@@ -19,9 +20,9 @@ gawk 'BEGIN{ OFS=FS=","; print "transition,minimum,maximum,median,mean" }
 	asort(counts)
 	c=length(counts)
 	if( (c % 2) == 1 ) {
-		median = counts[ int(c/2) ];
+		median = counts[c/2];
 	} else {
-		median = ( counts[c/2] + counts[c/2-1] ) / 2;
+		median = ( counts[c/2] + counts[(c/2)-1] ) / 2;
 	}
 	mean=sum/(NF-1)
 	print $1,counts[1],counts[c],median,mean
