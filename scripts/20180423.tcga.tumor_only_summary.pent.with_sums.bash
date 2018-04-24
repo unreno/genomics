@@ -23,7 +23,7 @@ BEGIN{ FS="\t"; FN=0; split("ACGT",b,""); split("", pent);
 ( FNR ==  1 && length(filename) > 0 ){ print_record(); delete(pos); delete(sums) }
 ( FNR ==  1 ){ split(FILENAME,f,"."); filename=f[1]; delete(f) }
 { pos[$1":"$2":"$3":"$4]++; sums[ref[$1":"$2":"$3":"$4]"-"$4]++ }
-END{ print_record() }' <( zcat tumor_only.sorted.uniq.pent.txt.gz ) TCGA-*.snps.txt > tumor_only.summary_table.pent.raw.with_sums.csv
+END{ print_record() }' <( zcat tumor_only.sorted.uniq.pent.txt.gz ) TCGA-*.snps.txt | gzip > tumor_only.summary_table.pent.raw.with_sums.csv.gz
 
 datamash transpose -t, < <( zcat tumor_only.summary_table.pent.raw.with_sums.csv.gz ) | gzip > tumor_only.summary_table.pent.with_sums.csv.gz
 
