@@ -7,15 +7,11 @@
 
 gawk 'BEGIN{ OFS=FS=","; print "transition,minimum,maximum,median,mean" }
 ( $1 ~ /^.....-./ ){
-#	minimum=9999999
-#	maximum=0
 	sum=0
 	split("",counts)
 	for(i=2;i<=NF;i++){
 		counts[i-1]=$i
 		sum+=$i
-#		if( $i < minimum ) minimum=$i
-#		if( $i > maximum ) maximum=$i
 	}
 	asort(counts)
 	c=length(counts)
