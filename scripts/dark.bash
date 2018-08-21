@@ -3,7 +3,7 @@
 script=$( basename $0 )
 
 human="hg38"
-blastn_viral=""	#/Users/jakewendt/BLAST_DBS/viral"
+blastn_viral="viral"	#/Users/jakewendt/BLAST_DBS/viral"
 diamond_viral=""	#	/Users/jakewendt/DIAMOND/viral"
 threads=8
 
@@ -82,6 +82,8 @@ while [ $# -ne 0 ] ; do
 
 	base=$1
 
+	local_base=$( basename $base )
+
 	{
 		date
 
@@ -91,8 +93,8 @@ while [ $# -ne 0 ] ; do
 		bowtie2 --threads ${threads} --very-fast -x ${human} \
 			-U $(ls ${base}*fastq.gz | paste -sd ',' ) \
 			| samtools fasta -f 4 --threads $[threads-1] -N -	\
-			| gzip --best > ${base}.non${human}.fasta.gz
-		chmod -w ${base}.non${human}.fasta.gz
+			| gzip --best > ${local_base}.non${human}.fasta.gz
+		chmod -w ${local_base}.non${human}.fasta.gz
 
 		#		-S ${base}.sam
 			#chmod -w ${base}.sam
@@ -105,12 +107,12 @@ while [ $# -ne 0 ] ; do
 
 		if [[ ! -z "${blastn_viral}" ]]; then
 
-			blastn -query <( zcat ${base}.non${human}.fasta.gz ) \
+			blastn -query <( zcat ${local_base}.non${human}.fasta.gz ) \
 				-db "${blastn_viral}" \
 				-num_threads ${threads} \
-				2> /dev/null | gzip --best > ${base}.non${human}.blastn.txt.gz
+				2> /dev/null | gzip --best > ${local_base}.non${human}.blastn.txt.gz
 
-			chmod -w ${base}.non${human}.blastn.txt.gz
+			chmod -w ${local_base}.non${human}.blastn.txt.gz
 
 		fi
 
@@ -130,16 +132,16 @@ while [ $# -ne 0 ] ; do
 				--outfmt 0 \
 				--threads ${threads} \
 				--db "${diamond_viral}" \
-				--query <( zcat ${base}.non${human}.fasta.gz ) \
-				2> /dev/null | gzip --best > ${base}.non${human}.diamond.txt.gz
+				--query <( zcat ${local_base}.non${human}.fasta.gz ) \
+				2> /dev/null | gzip --best > ${local_base}.non${human}.diamond.txt.gz
 
-			chmod -w ${base}.non${human}.diamond.txt.gz
+			chmod -w ${local_base}.non${human}.diamond.txt.gz
 
 		fi
 
 		date
-	} > ${base}.log 2>&1
-	chmod -w ${base}.log
+	} > ${local_base}.log 2>&1
+	chmod -w ${local_base}.log
 
 	#	mkdir -p ../20180228.dark/
 	#	mv ${base}.non${human}.* ${base}.log ../20180228.dark/
