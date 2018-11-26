@@ -1,0 +1,40 @@
+
+nohup ./run_varient_recalibrator.bash > run_varient_recalibrator.out 2>&1 &
+
+nohup ./run_apply_vqsr.bash > run_apply_vqsr.out 2>&1 &
+
+#	[89G]* ( 811386 was incomplete so will need to run that again )
+nohup ./run_apply_vqsr.bash > run_apply_vqsr.2.out 2>&1 &
+
+#	just 811386
+nohup ./run_varient_recalibrator.bash > run_varient_recalibrator.2.out 2>&1 &
+
+#	just 811386
+nohup ./run_apply_vqsr.bash > run_apply_vqsr.3.out 2>&1 &
+
+
+
+811386 fails Varient Recalibration?
+
+
+
+
+missing 2017 samples
+
+nohup ./run_varient_recalibrator.bash > run_varient_recalibrator.3.out 2>&1 &
+
+
+
+
+
+
+
+
+
+
+
+
+nohup ./run_apply_vqsr.bash > run_apply_vqsr.4.out 2>&1 &
+
+
+

@@ -1,0 +1,53 @@
+
+
+https://scilifelab.github.io/courses/rnaseq/labs/kallisto
+
+https://github.com/griffithlab/rnaseq_tutorial/wiki/Kallisto
+
+https://pachterlab.github.io/sleuth_walkthroughs/pval_agg/analysis.html
+
+
+nohup ./kallisto.bash &
+
+
+
+
+#	I think some will be multiplicated. Not sure how to deal with this.
+
+for d in *Homo_sapiens.GRCh38.rna ; do
+l=${d%.?.Homo_sapiens.GRCh38.rna}
+echo $l
+done | sort | uniq -d
+
+#	Irrelevant now. Using all samples, duplicate subject or not.
+#	
+#	for d in *Homo_sapiens.GRCh38.rna ; do
+#	l=${d%.?.Homo_sapiens.GRCh38.rna}
+#	rm -f $l
+#	ln -s $d $l
+#	done
+#	
+#	ls -d1 ??????? > select_subjects.txt
+
+
+
+for d in *Homo_sapiens.GRCh38.rna ; do
+l=${d%.Homo_sapiens.GRCh38.rna}
+rm -f $l
+ln -s $d $l
+done
+
+
+./merge_all_subjects_info.py 
+
+ls -d1 ???????.? | awk '{split($0,a,".");print a[1]","$0}' > select_subjects.txt
+
+./subjects_info.bash
+
+
+nohup ./sleuth.Rscript &
+
+rsync -avz herv:/raid/data/working/gEUVADIS/20181002-kallisto/ ~/20181002-gEUVADIS-kallisto/
+
+
+

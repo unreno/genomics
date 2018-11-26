@@ -1,0 +1,212 @@
+
+
+Acquire the unmapped bam files for all 1000 genomes subjects.
+
+aws s3 sync s3://1000genomes/phase3/ /raid/data/raw/1000genomes/phase3/ --exclude "*" --include "*/alignment/*.unmapped.ILLUMINA.bwa.*.*.*.bam"
+
+
+
+Extract fastq from bams
+
+
+Downloaded complete genome HHV6a and HHV6b 
+https://www.ncbi.nlm.nih.gov/nuccore/NC_001664
+https://www.ncbi.nlm.nih.gov/nuccore/NC_000898
+
+
+
+
+
+
+
+
+Created bowtie2 index from fasta sequence
+
+Align fastq to HHV6
+
+
+
+Given the variability of the number of samples and reads for each, we need to try to normalize the results.
+
+
+Compare aligned reads to ...
+* number of unmapped reads.
+* number of total reads. (rather than download mapped bam, get mapped bam.bai and use bamReadDepther)
+
+https://github.com/chmille4/bamReadDepther
+bamReadDepther returns way more info than needed so need to parse correctly.
+A line that begins with a \# is followed by a reference id, mapped and placed-unmapped read counts.
+The reference id is relatively useless without the bam file itself.
+I believe that it corresponds to the order of @SQ SN number, but need bam files to check.
+
+"Placed-unmapped" reads are unmapped mates of mapped reads.
+These should also show in unmapped bam file.
+I think that they are only kept in the mapped bam to preserve pairedness.
+
+
+
+Let's examine bam counts and bai counts from a mapped file.
+
+
+The total reads in a bam file ...
+samtools view -c NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam
+172724240
+
+The mapped reads in a bai file ...
+cat NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^#" | awk -F"\t" '{ s+=$2 }END{print s}'
+171503169
+
+The placed-unmapped reads in a bai file ...
+cat NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^#" | awk -F"\t" '{ s+=$3 }END{print s}'
+1221071
+
+The total reads in a bai file ...
+echo "171503169 + 1221071" | bc
+172724240
+
+
+Are placed-unmapped also in the unmapped file? It does not appear so.
+
+
+These datasets include both paired and unpaired data.
+
+
+
+This doesn't seem to be working for the unmapped bam files?
+Ahh. Unmapped is a bit different. Sad face.
+This line begins with a \* and only one number. Super sad.
+Inconsistancy. Perhaps I should edit code.
+
+
+Not sure what "placed-unmapped" means in the unmapped file.
+Confused.
+Viewing unmapped file, but the columns contain positions and good CIGAR strings, but flag says unmapped.
+Apparently, this is/was a bwa bug. Data not cleared from previous alignment. Ignoring.
+
+
+cat NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^*\|^#"
+#23	0	2
+#24	0	25
+#84	0	2
+*		8272866
+
+So 
+
+cat NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^*\|^#" | awk -F"\t" '{s+=$NF}END{print s}'
+8272895
+samtools view -c NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam
+8272895
+
+
+
+
+nohup ./process.bash &
+
+
+I want some more info so ...
+
+
+
+https://www.ncbi.nlm.nih.gov/pubmed/17678724
+
+
+zcat ~/s3/1000genomes/release/20130502/ALL.chr16.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz  | grep CHROM | head -1 > HHV6.vcf
+zcat ~/s3/1000genomes/release/20130502/ALL.chr16.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz  | grep rs4774 >> HHV6.vcf
+zcat ~/s3/1000genomes/release/20130502/ALL.chr16.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz  | grep rs3087456 >> HHV6.vcf
+
+
+
+
+ls -1 *.HHV6a.bowtie2.mapped_center.ratio_unmapped.txt | wc -l
+for f in *.HHV6a.bowtie2.mapped_center.ratio_unmapped.txt ; do
+c=$( cat $f )
+if [ $c != 0 ] ; then
+echo $f
+fi
+done
+
+
+
+
+for f in *.HHV6a.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ $c != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2
+HG02537.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000003
+HG01092.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000004
+HG02017.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000006
+NA18749.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000006
+HG02019.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000007
+HG03478.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000008
+NA18635.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000008
+NA18952.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000009
+NA20845.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000009
+NA18747.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000010
+NA20853.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000010
+NA18910.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000012
+NA20869.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000012
+HG01595.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000013
+NA19003.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000015
+NA18992.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000017
+HG00155.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000023
+HG00119.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000024
+HG01598.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000027
+HG00364.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000060
+NA18627.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000097
+HG01058.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000014576
+HG00245.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000014583
+HG01162.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000014814
+HG00362.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000015105
+HG00657.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000016253
+HG02301.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000017260
+HG01277.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000017406
+HG02016.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000017962
+NA18999.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000018851
+
+[jake@system76-server /raid/data/working/1000genomes/20181010-unmapped-hhv6]$ for f in *.HHV6b.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ $c != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2
+HG02537.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000003
+  01092.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000004
+HG02017.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
+NA18747.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
+NA18749.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
+HG03478.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000008
+NA18635.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000008
+NA18952.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000009
+NA20845.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000009
+NA20853.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000010
+NA18910.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000012
+NA19003.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000012
+NA20869.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000012
+HG01595.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000013
+HG02019.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000014
+HG00155.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000023
+NA18992.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000023
+HG01598.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000027
+HG00119.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000028
+HG00364.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000072
+NA18627.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000101
+HG00657.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000014337
+NA18999.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000015601
+HG01277.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000015860
+HG01058.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000016529
+HG01162.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000016566
+HG00362.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000016806
+HG00245.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000016843
+HG02301.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000019037
+HG02016.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000019980
+
+
+HG00245
+HG00362
+HG00657
+HG01058
+HG01162
+HG01277
+HG02016
+HG02301
+NA18999
+
+
+
+for dir in /raid/data/raw/1000genomes/phase3/data/* ; do basename $dir; done > subjects.txt
+for virus in /raid/refs/fasta/virii/*fasta ; do basename $virus .fasta; done > virii_versions.txt
+head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
+
+

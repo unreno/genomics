@@ -1,0 +1,52 @@
+
+
+cp ~/.github/adamewing/discord-retro/human_sample.cfg ./
+cp ~/.github/adamewing/discord-retro/samplelist_example.txt ./samplelist.txt
+
+
+vi samplelist.txt
+NORMAL_268325.bam GM_268325 hg19 268325_pair
+CANCER_268325.bam 268325 hg19 268325_pair
+NORMAL_439338.bam GM_439338 hg19 439338_pair
+CANCER_439338.bam 439338 hg19 439338_pair
+NORMAL_63185.bam GM_63185 hg19 63185_pair
+CANCER_63185.bam 63185 hg19 63185_pair
+NORMAL_634370.bam GM_634370 hg19 634370_pair
+CANCER_634370.bam 634370 hg19 634370_pair
+NORMAL_983899.bam GM_983899 hg19 983899_pair
+CANCER_983899.bam 983899 hg19 983899_pair
+
+
+ln -s /raid/data/raw/CCLS/bam/GM_983899.recaled.bam NORMAL_983899.bam
+ln -s /raid/data/raw/CCLS/bam/GM_983899.recaled.bam.bai NORMAL_983899.bam.bai
+ln -s /raid/data/raw/CCLS/bam/983899.recaled.bam CANCER_983899.bam
+ln -s /raid/data/raw/CCLS/bam/983899.recaled.bam.bai CANCER_983899.bam.bai
+
+ln -s /raid/data/raw/CCLS/bam/GM_268325.recaled.bam NORMAL_268325.bam
+ln -s /raid/data/raw/CCLS/bam/GM_268325.recaled.bam.bai NORMAL_268325.bam.bai
+ln -s /raid/data/raw/CCLS/bam/268325.recaled.bam CANCER_268325.bam
+ln -s /raid/data/raw/CCLS/bam/268325.recaled.bam.bai CANCER_268325.bam.bai
+
+ln -s /raid/data/raw/CCLS/bam/GM_439338.recaled.bam NORMAL_439338.bam
+ln -s /raid/data/raw/CCLS/bam/GM_439338.recaled.bam.bai NORMAL_439338.bam.bai
+ln -s /raid/data/raw/CCLS/bam/439338.recaled.bam CANCER_439338.bam
+ln -s /raid/data/raw/CCLS/bam/439338.recaled.bam.bai CANCER_439338.bam.bai
+
+ln -s /raid/data/raw/CCLS/bam/GM_63185.recaled.bam NORMAL_63185.bam
+ln -s /raid/data/raw/CCLS/bam/GM_63185.recaled.bam.bai NORMAL_63185.bam.bai
+ln -s /raid/data/raw/CCLS/bam/63185.recaled.bam CANCER_63185.bam
+ln -s /raid/data/raw/CCLS/bam/63185.recaled.bam.bai CANCER_63185.bam.bai
+
+ln -s /raid/data/raw/CCLS/bam/GM_634370.recaled.bam NORMAL_634370.bam
+ln -s /raid/data/raw/CCLS/bam/GM_634370.recaled.bam.bai NORMAL_634370.bam.bai
+ln -s /raid/data/raw/CCLS/bam/634370.recaled.bam CANCER_634370.bam
+ln -s /raid/data/raw/CCLS/bam/634370.recaled.bam.bai CANCER_634370.bam.bai
+
+
+nohup /home/jake/.github/adamewing/discord-retro/discord-retro.py -s samplelist.txt -c human_sample.cfg -o out -p 40 --grouped &
+
+
+ll -dtr out/GM_*/* out/GM_*/*/*
+
+
+

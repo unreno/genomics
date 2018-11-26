@@ -1,0 +1,26 @@
+
+
+
+nohup ./dark_wrapper.bash > dark_wrapper.1.out 2>&1 &
+nohup ./dark_wrapper.bash > dark_wrapper.2.out 2>&1 &
+nohup ./dark_wrapper.bash > dark_wrapper.3.out 2>&1 &
+nohup ./dark_wrapper.bash > dark_wrapper.4.out 2>&1 &
+
+
+Generate some reports?
+Compile counts
+
+
+nohup ./count_fasta_reads.bash > count_fasta_reads.out 2>&1 &
+
+nohup ./count_viral_hits.bash > count_viral_hits.out 2>&1 &
+
+
+
+head -q -n 25 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.25.txt
+head -q -n 10 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.10.txt
+
+
+./report.bash > report.csv
+
+

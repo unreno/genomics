@@ -1,0 +1,62 @@
+
+strelka 2.9.6
+
+
+nohup ./run_strelka.bash > run_strelka.out 2>&1 &
+
+
+
+This version doesn't do specific aligners.
+
+
+
+Rename results sample names and merge into single set of vcfs
+
+mkdir results
+for d in 268325  439338  63185  634370  983899 ; do
+echo $d
+for f in $d/results/variants/*vcf.gz ; do
+echo $f
+base=$(basename $f)
+base=${base%.gz}
+echo $base
+zcat $f | sed -e "s/NORMAL/$d.NORMAL/" -e "s/TUMOR/$d.TUMOR/" > results/$d.$base 
+bgzip results/$d.$base
+bcftools index results/$d.$base.gz
+done
+done
+
+
+
+for f in results/*somatic.snvs.vcf.gz results/*somatic.indels.vcf.gz ; do
+base=${f%.vcf.gz}
+echo $f $base
+bcftools view -o $base.PASSED.vcf.gz -O z -f PASS $f
+bcftools index $base.PASSED.vcf.gz
+done
+
+
+for f in results/*.vcf.gz ; do
+echo -e $(basename $f) "\t\t" $( zcat $f | wc -l )
+done
+
+
+Merging these files DOES NOT UPDATE any data in the INFO column
+Probably pointless
+
+mkdir results/merged
+for suffix in somatic.indels.vcf.gz somatic.snvs.vcf.gz ; do
+echo $suffix
+bcftools merge --output results/merged/$suffix --output-type z results/*.$suffix
+bcftools index results/merged/$suffix
+done
+
+
+mkdir results/merged
+for suffix in somatic.indels.PASSED.vcf.gz somatic.snvs.PASSED.vcf.gz ; do
+echo $suffix
+bcftools merge --output results/merged/$suffix --output-type z results/*.$suffix
+bcftools index results/merged/$suffix
+done
+
+

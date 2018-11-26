@@ -1,0 +1,79 @@
+
+
+chr	position	reference_base	sample_base
+
+
+
+vcfs reference hg38
+
+for vcf in $( ls /raid/data/raw/20170804-Adam/VCF/*vcf ) ; do
+  b=$( basename $vcf )
+  b=${b%.?.vcf}
+  echo $b
+  cat $vcf | awk 'BEGIN{FS=OFS="\t"}( !/^#/ && length($4) == 1 && length($5) == 1 ){ print $1,$2,$4,$5 }' > ${b}.snps.txt
+done
+
+
+
+
+
+Filter out snps that are in the database. (Which? For the moment, all. Likely wrong.)
+
+Really need to fix the chr1/1 and chrM/chrMT inconsistency.
+
+Since there is only 6 samples and this server has 40 CPUs, run them all at the same time in the background
+Still takes several hours.
+
+for f in *.snps.txt; do
+  n=${f%.txt}
+  echo "Filtering $f to $n"
+awk 'BEGIN{FS=OFS="\t"}{
+  x="";
+  if( $1 == "MT" ) $1="M";
+  cmd = "mysql --user root --skip-auto-rehash --skip-column-names --batch --execute \"SELECT refNCBI, observed FROM snp150 WHERE class = '"'"'single'"'"' AND locType = '"'"'exact'"'"' AND chrom = '"'"'chr"$1"'"'"' AND chromEnd = "$2"\" hg38";
+  while(cmd | getline x ){};	#	assuming only 1 match. true?
+  close(cmd);
+  split(x,a);
+  if( !( ( $3 == a[1] ) && ( match( a[2], $4 ) > 0 ) ))
+    print $1,$2,$3,$4,a[1],a[2];
+}' $f > $n.filtered.txt &
+done
+
+
+
+
+
+
+20180425.penta-snps.awk ?
+
+https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
+
+for i in *.snps.txt; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.fa $i; done
+
+
+
+
+
+awk 'BEGIN{FS=OFS="\t"}( FNR == 1 ){ split(FILENAME,b,".");base=b[1];}{ print $1,$2,$3,$4,base }' *.output-hc.vcf.snps.filtered.txt > cosmic_mut.txt
+
+#	count.txt files have trailing tab, so don't add another.
+awk 'BEGIN{FS=OFS="\t"}( NR == 1 && FNR == 1 ){ print }( FNR == 1 ){ split(FILENAME,b,".");base=b[1];next;}{ print $0""base }' *.output-hc.vcf.snps.txt.*.count.txt > cosmic_mut_all_sort.txt
+
+
+
+wget https://github.com/raerose01/deconstructSigs/raw/master/data/signatures.nature2013.rda
+
+
+
+
+cosmic_mut = read.table("/raid/data/working/20170804-Adam/cosmic_mut.txt",header = FALSE, col.names = c("chr","pos","ref","alt","sample"))
+
+#	The first line is commented out and R skips comment lines?!?!
+
+cosmic_mut_all_sort <- read.table(file = "/raid/data/working/20170804-Adam/cosmic_mut_all_sort.txt", header = FALSE, sep = "\t", stringsAsFactors = T )
+
+colnames(cosmic_mut_all_sort) <- c("chr", "pos", "5_tetnuc", "3_tetnuc", "trinuc", "mut", "trinuc_mut", "strand", "context", "C_count", "TC_count", "TCA_count", "TCT_count", "YTCA_count", "RTCA_count", "sample")
+
+
+
+

@@ -1,0 +1,42 @@
+
+This is run with Strelka 1.0.15 from the illumina site
+( ftp://strelka@ftp.illumina.com/ )
+I have just now found the github has 2.9.6
+
+./run_strelka.bwa.bash > run_strelka.bwa.out 2>&1 &
+
+./run_strelka.eland.bash > run_strelka.eland.out 2>&1 &
+
+./run_strelka.isaac.bash > run_strelka.isaac.out 2>&1 &
+
+
+
+
+
+
+Rename results sample names and merge into single set of vcfs
+
+mkdir results
+for d in *bwa *isaac *eland ; do
+echo $d
+for f in $d/results/*vcf ; do
+echo $f
+base=$(basename $f)
+sed -e "s/NORMAL/$d.NORMAL/" -e "s/TUMOR/$d.TUMOR/" $f > results/$d.$base 
+bgzip results/$d.$base
+bcftools index results/$d.$base.gz
+done
+done
+
+
+mkdir results/merged
+for suffix in all.somatic.indels.vcf.gz all.somatic.snvs.vcf.gz passed.somatic.indels.vcf.gz passed.somatic.snvs.vcf.gz ; do
+echo $suffix
+#bcftools merge --output results/merged/$suffix --output-type z results/*.$suffix
+bcftools index results/merged/$suffix
+done
+
+
+
+
+

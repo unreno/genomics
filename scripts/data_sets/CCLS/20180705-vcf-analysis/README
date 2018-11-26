@@ -1,0 +1,29 @@
+
+./create_indel_tsv.bash
+./create_snp_tsv.bash
+
+./extract_ReadPosRankSum_lt_neg8.py 186069.snp.tsv &
+./extract_ReadPosRankSum_lt_neg8.py 341203.snp.tsv &
+./extract_ReadPosRankSum_lt_neg8.py 439338.snp.tsv &
+./extract_ReadPosRankSum_lt_neg8.py 506458.snp.tsv &
+./extract_ReadPosRankSum_lt_neg8.py 530196.snp.tsv &
+./extract_ReadPosRankSum_lt_neg8.py 634370.snp.tsv &
+
+
+for i in *.ReadPosRankSum_lt_neg8.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.fa $i & done
+
+
+Be advised ...
+Possible precedence issue with control flow operator at /usr/local/share/perl/5.22.1/Bio/DB/IndexedBase.pm line 845.
+creating fasta db... complete!
+Subroutine Bio::DB::IndexedBase::_strip_crnl redefined at /usr/lib/x86_64-linux-gnu/perl/5.22/DynaLoader.pm line 210.
+
+
+
+rename 's/.tsv.1530816764//' *1530816764*
+chmod 444 *txt
+
+
+
+
+

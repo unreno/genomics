@@ -1,0 +1,437 @@
+
+Important ... These VCFs reference hg38
+
+
+
+Extract SNPS ...
+
+for vcf in $( ls /raid/data/raw/20170804-Adam/VCF/*.output-hc.vcf ) ; do
+  b=$( basename $vcf )
+  b=${b%.output-hc.vcf}
+  echo $b
+  cat $vcf | awk 'BEGIN{FS=OFS="\t"}( !/^#/ && length($4) == 1 && length($5) == 1 ){ print $1,$2,$4,$5 }' > ${b}.snps.txt
+  chmod 444 ${b}.snps.txt
+done
+
+
+Format ...
+
+chr	position	reference_base	sample_base
+
+
+
+
+
+
+Create dbsnp database
+
+wget http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/snp150.txt.gz
+wget http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/snp150.sql
+
+sudo apt install mariadb-server
+sudo mysql_secure_installation
+sudo service mysql start
+sudo mysql -u root -e "create database hg38"
+sudo mysql -u root hg38 < snp150.sql
+
+This database has NO indexes so searching can be slow.
+Create a bunch here, which will be slow if data already exists,
+or will be slow to load data. You choose.
+
+sudo mysql -u root hg38
+CREATE INDEX class_index ON snp150 ( class );
+CREATE INDEX observed_index ON snp150 ( observed );
+CREATE INDEX locType_index ON snp150 ( locType );
+CREATE INDEX chrom_index ON snp150 ( chrom );
+CREATE INDEX chromStart_index ON snp150 ( chromStart );
+CREATE INDEX chromEnd_index ON snp150 ( chromEnd );
+CREATE INDEX refNCBI_single_index ON snp150 ( refNCBI(1) );
+CREATE INDEX refUCSC_single_index ON snp150 ( refUCSC(1) );
+
+zcat snp150.txt.gz | sudo mysql -u root hg38 --local-infile=1 \
+	-e 'LOAD DATA LOCAL INFILE "/dev/stdin" INTO TABLE snp150;'
+
+
+
+
+
+
+
+mysql --user root --skip-auto-rehash --skip-column-names --batch --execute "SELECT refNCBI, alleles, alleleFreqs FROM snp150 WHERE class = 'single' AND locType = 'exact' AND chrom = 'chr1' AND chromEnd = 1234 hg38";
+
+
+
+Filter out snps that are in the dbsnp database
+
+Filter out ONLY allelles with alleleFreq > 0.0001
+Keep those without allelleFreq data
+Keep those with allelleFreq <= 0.0001
+
+There is an inconsistency with chromosome naming ... chr1/1 and chrM/chrMT
+
+Since there is only 6 samples and this server has 40 CPUs, run them all at the same time in the background
+Still takes several hours.
+
+for f in *.snps.txt; do
+  n=${f%.txt}
+  echo "Filtering $f to $n.filtered.txt"
+awk 'BEGIN{FS=OFS="\t"}{
+  x="";
+  if( $1 == "MT" ) $1="M";
+  cmd = "mysql --user root --skip-auto-rehash --skip-column-names --batch --execute \"SELECT alleles, alleleFreqs FROM snp150 WHERE class = '"'"'single'"'"' AND locType = '"'"'exact'"'"' AND chrom = '"'"'chr"$1"'"'"' AND chromEnd = "$2" AND refNCBI = '"'"'"$3"'"'"' AND alleles LIKE '"'"'%"$4"%'"'"'\" hg38";
+  while(cmd | getline x ){};	#	assuming only 1 match. true?
+  close(cmd);
+  split(x,a,"\t");
+
+  if( x == "" ){
+    print; #no match in database
+  }else{
+    # observed contains this allele
+    split(a[1],allele,",")
+    split(a[2],freqs,",")
+
+    freq = 0
+    for( i=1; i<= length(allele); i++ )
+      if( allele[i] == $4 )
+        freq = freqs[i]
+    if( freq < 0.0001 )
+      print $1,$2,$3,$4; #,a[1],a[2];
+  }
+}' $f > $n.filtered.txt &
+done
+
+
+
+
+
+Perl script
+
+
+This requires some perl libs
+
+???
+
+cpan install Data::Dumper
+cpan install Bio::DB::Fasta
+
+https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
+
+Run all at the same time in background
+
+for i in *.snps.filtered.txt; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.fa $i & done
+
+Be advised ...
+Possible precedence issue with control flow operator at /usr/local/share/perl/5.22.1/Bio/DB/IndexedBase.pm line 845.
+creating fasta db... complete!
+Subroutine Bio::DB::IndexedBase::_strip_crnl redefined at /usr/lib/x86_64-linux-gnu/perl/5.22/DynaLoader.pm line 210.
+
+
+
+
+
+#  Add a "x" prefix to sample name so R doesn't have a hissy
+
+awk 'BEGIN{FS=OFS="\t"}( FNR == 1 ){ split(FILENAME,b,".");base="x"b[1];}{ print $1,$2,$3,$4,base }' *.snps.filtered.txt > cosmic_mut.txt
+
+#  count.txt files have trailing tab, so don't add another.
+awk 'BEGIN{FS=OFS="\t"}( NR == 1 && FNR == 1 ){ print }( FNR == 1 ){ split(FILENAME,b,".");base=b[1];next;}{ print $0"x"base }' *.count.txt > cosmic_mut_all_sort.txt
+
+
+
+
+wget https://github.com/raerose01/deconstructSigs/raw/master/data/signatures.nature2013.rda
+
+
+
+#  R setup
+
+
+
+source("https://bioconductor.org/biocLite.R")
+biocLite('deconstructSigs')
+biocLite("BSgenome.Hsapiens.UCSC.hg38")
+install.packages('ggplot2')
+
+
+
+
+
+#  R analysis
+
+
+require(deconstructSigs)
+require(ggplot2)
+require(BSgenome.Hsapiens.UCSC.hg38)
+hg38 <- BSgenome.Hsapiens.UCSC.hg38
+
+cosmic_mut = read.table("cosmic_mut.txt",header = FALSE, col.names = c("chr","pos","ref","alt","sample"))
+
+
+# The first line is commented out and R skips comment lines?!?!
+
+
+cosmic_mut_all_sort <- read.table(file = "cosmic_mut_all_sort.txt", header = FALSE, sep = "\t", stringsAsFactors = T )
+
+
+colnames(cosmic_mut_all_sort) <- c("chr", "pos", "5_tetnuc", "3_tetnuc", "trinuc", "mut", "trinuc_mut", "strand", "context", "C_count", "TC_count", "TCA_count", "TCT_count", "YTCA_count", "RTCA_count", "sample")
+
+
+cosmic_mut_sort <- with(cosmic_mut, cosmic_mut[order(cosmic_mut[,"sample"]),])
+rownames(cosmic_mut_sort) <- NULL
+cosmic_mut_sort$sample <- as.factor(cosmic_mut_sort$sample)
+
+deconstructSigs_input <- cosmic_mut_all_sort[,c(1:2,6,16)]
+deconstructSigs_input$ref <- substr(deconstructSigs_input$mut, 1, 1) 
+deconstructSigs_input$alt <- substr(deconstructSigs_input$mut, 3, 3) 
+deconstructSigs_input <- subset(deconstructSigs_input, select = c("chr", "pos", "ref", "alt", "sample"))
+
+
+mut.counts <- mut.to.sigs.input(mut.ref = deconstructSigs_input, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+
+signatures.nature2013 <- load("signatures.nature2013.rda") 
+
+
+context <- getTriContextFraction(mut.counts.ref = mut.counts, trimer.counts.method = "default")
+context$tca_tct <- context[,"T[C>T]A"] + context[,"T[C>T]T"] + context[,"T[C>G]A"] + context[,"T[C>G]T"]
+context$sample <- rownames(context)
+tca_tct <- subset(context, select = c("sample", "tca_tct"))
+rownames(tca_tct) <- NULL
+context$sample <- NULL
+context$tca_tct <- NULL
+
+
+
+output.sigs.final <- as.data.frame(whichSignatures(context,
+    sample.id = 'x186069',
+    signatures.cosmic,
+    contexts.needed = F))
+
+#for(i in (1:nrow(context))) {
+for(i in (2:nrow(context))) {
+  output.sigs <- as.data.frame(whichSignatures(context,
+      sample.id = rownames(context[i,]),
+      signatures.cosmic,
+      contexts.needed = F))
+  output.sigs.final <- rbind(output.sigs.final, output.sigs)
+}
+
+
+output.sigs.final <- output.sigs.final[-c(1021),]
+output.sigs.final$zAPOBEC.Sig <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
+
+output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
+output.sigs.final$sample <- rownames(output.sigs.final)
+rownames(output.sigs.final) <- NULL
+
+
+
+#  Ok. Now what?
+
+write.table(mut.counts,file='mut.counts.tsv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+See /raid/data/working/TCGA_Glioma_HERV52/20180330.apobec/README 
+
+/raid/data/working/TCGA_Glioma_HERV52/20180330.apobec/TCGA.summary_table.m.tumor_only.tri.csv
+position,TCGA-02-2483,TCGA-02-2485,TCGA-06-0124,TCGA-06-0125,TCGA-06-0128,TCGA-06-0145,TCGA-06-0152,TCGA-06-0155,TCGA-06-0157,TCGA-06-0171,TCGA-06-0185,TCGA-06-0190,TCGA-06-0208,TCGA-06-0210,TCGA-06-0211,TCGA-06-0214,TCGA-06-0221,TCGA-06-0648,TCGA-06-0686,TCGA-06-0744,TCGA-06-0745,TCGA-06-0877,TCGA-06-0881,TCGA-06-1086,TCGA-06-2557,TCGA-06-2570,TCGA-06-5411,TCGA-06-5415,TCGA-14-0786,TCGA-14-1034,TCGA-14-1401,TCGA-14-1402,TCGA-14-1454,TCGA-14-1459,TCGA-14-1823,TCGA-14-2554,TCGA-15-1444,TCGA-16-1063,TCGA-16-1460,TCGA-19-1389,TCGA-19-2620,TCGA-19-2624,TCGA-19-2629,TCGA-19-5960,TCGA-26-1438,TCGA-26-5132,TCGA-26-5135,TCGA-27-1831,TCGA-27-2523,TCGA-27-2528,TCGA-32-1970,TCGA-41-5651
+chr10:100005512:TGG,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+chr10:10000678:CCA,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,1,1,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1,0,0,0,0,1,0,1,0
+...
+
+
+/raid/data/working/TCGA_Glioma_HERV52/20180330.apobec/hg38.20180412.positions.txt 
+HERVH,HERVH,chr1,104597176
+HERVH,HERVH,chr1,108473397
+LTR,HERVK113LTR,chr1,108517445
+SVA,SVA_F,chr7,28838221
+...
+#  split($1,a,":")	#chr10:100005512:TGG
+#  c=a[1]
+#  p=a[2]
+
+
+
+count files use tab-separator so need to create positions list with tab-separator
+
+
+class	name	chromo	position
+
+
+https://herv.img.cas.cz/entities.tar.gz
+
+grep HERV /raid/refs/hervd.hg38.v2.2.entities/entities.tsv | awk 'BEGIN{FS=OFS="\t"}{ print "HERV-BEGIN",$2","$10,$11,$12; print "HERV-END",$2","$10,$11,$13; }' > hg38.hervd.20180605.AND.positions.txt
+
+or 
+
+grep HERV /raid/refs/hervd.hg38.v2.2.entities/entities.tsv | awk 'BEGIN{FS=OFS="\t"}{ print "HERV","BEGIN_"$2","$10,$11,$12; print "HERV","END_"$2","$10,$11,$13; }' > hg38.hervd.20180605.OR.positions.txt
+
+
+
+
+or
+
+grep HERV /raid/refs/hervd.hg38.v2.2.entities/entities.tsv | awk 'BEGIN{FS=OFS="\t"}{ 
+class="HERVOther";
+if( $10 ~ /^HERVK/ )
+  class="HERVK"
+else if( $10 ~ /^HERVE/ )
+  class="HERVE"
+else if( $10 ~ /^HERVH/ )
+  class="HERVH"
+else if( $10 ~ /^HERVL/ )
+  class="HERVL"
+print class,"BEGIN_"$2","$10,$11,$12; 
+print class,"END_"$2","$10,$11,$13; }' > hg38.hervd.20180614.OR.class.positions.txt
+
+
+for f in *.snps.filtered*count.txt ; do
+gawk 'BEGIN{FS=OFS="\t"}
+( FNR == NR ){ positions[$1][$2][$3][$4]++; next }
+( FNR == 1  ){ 
+  printf $0
+  for( class in positions ){
+    printf "\tnearest %1$s\tnearest %1$s position\tnearest %1$s dist", class
+  }
+  printf "\tnearest HERVAny\tnearest HERVAny position\tnearest HERVAny dist"
+  printf "\n"
+}
+( FNR > 1   ){
+  c=$1
+  p=$2
+  printf $0
+  nearest_name_any=nearest_pos_any=nearest_dist_any=abs_nearest_dist_any=""
+  for( class in positions ){
+    nearest_name=nearest_pos=nearest_dist=abs_nearest_dist=""
+    for( name in positions[class] ){
+      if( length(positions[class][name][c]) > 0 ){
+        for( pos in positions[class][name][c] ){
+          dist=pos-p
+          abs_dist=( dist < 0.0 )?-dist:dist
+          if( nearest_dist == "" || abs_dist < abs_nearest_dist ){
+            nearest_name=name; nearest_pos=pos; nearest_dist=dist; abs_nearest_dist=abs_dist;
+          }
+          if( nearest_dist_any == "" || abs_dist < abs_nearest_dist_any ){
+            nearest_name_any=name; nearest_pos_any=pos; nearest_dist_any=dist; abs_nearest_dist_any=abs_dist;
+          }
+        }
+      }
+    }
+    printf "\t%s\t%s\t%s", nearest_name, nearest_pos, nearest_dist
+  }
+  printf "\t%s\t%s\t%s", nearest_name_any, nearest_pos_any, nearest_dist_any
+  printf "\n"
+}
+' hg38.hervd.20180614.OR.class.positions.txt $f > $f.with_nearests_OR.class.and_any.txt &
+done
+
+
+
+Rerun the above loop again with a different positions file...
+
+' hg38.FAKE.20180615.positions.txt $f > $f.with_nearests_OR.FAKE.txt &
+' hg38.hervd.20180614.OR.class.positions.txt $f > $f.with_nearests_OR.class.txt &
+' hg38.hervd.20180605.OR.positions.txt $f > $f.with_nearests_OR.txt &
+' hg38.hervd.20180605.AND.positions.txt $f > $f.with_nearests_AND.txt &
+
+
+#orig
+#          diff=( diff < 0.0 )?-diff:diff
+#          if( nearest_dist == "" || diff < nearest_dist ){
+
+
+
+
+
+
+Cleanup
+
+rename 's/.1527895200//' *1527895200*
+rename 's/txt.//g' *txt
+chmod 444 *txt
+
+
+./compare_trinuc_mut.py 634370.snps.filtered.count.with_nearests_OR.class.txt &
+./compare_trinuc_mut.py 530196.snps.filtered.count.with_nearests_OR.class.txt &
+./compare_trinuc_mut.py 506458.snps.filtered.count.with_nearests_OR.class.txt &
+./compare_trinuc_mut.py 439338.snps.filtered.count.with_nearests_OR.class.txt &
+./compare_trinuc_mut.py 341203.snps.filtered.count.with_nearests_OR.class.txt &
+./compare_trinuc_mut.py 186069.snps.filtered.count.with_nearests_OR.class.txt &
+
+for f in *.snps.filtered.count.with_nearests_OR.class.txt ; do
+./compare_trinuc_mut.py $f &
+done
+
+
+
+
+for f in *.snps.filtered.count.with_nearests_OR.FAKE.txt ; do
+./compare_trinuc_mut.py $f &
+done
+
+rename 's/.csv/.FAKE.csv/g' *.HERV.*csv
+
+
+for f in *.snps.filtered.count.with_nearests_OR.class.and_any.txt ; do
+./compare_trinuc_mut.py $f &
+done
+
+/home/jake/.local/lib/python3.5/site-packages/numpy/core/fromnumeric.py:3194: RuntimeWarning: Degrees of freedom <= 0 for slice
+  **kwargs)
+/home/jake/.local/lib/python3.5/site-packages/numpy/core/_methods.py:127: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+
+
+
+
+

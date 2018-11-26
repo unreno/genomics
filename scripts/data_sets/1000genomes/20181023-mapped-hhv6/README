@@ -1,0 +1,30 @@
+
+
+Exploring the possibility of HHV6 in human sample?
+
+
+
+nohup bowtie2 --threads 40 --xeq -x HHV6a --very-sensitive -1 /raid/data/raw/1000genomes/phase3/data/NA12878/sequence_read/SRR622457_1.filt.fastq.gz -2 /raid/data/raw/1000genomes/phase3/data/NA12878/sequence_read/SRR622457_2.filt.fastq.gz | samtools view -o SRR622457.HHV6a.bam - &
+
+nohup samtools view -c SRR622457.HHV6a.bam > SRR622457.HHV6a.count.txt &
+nohup samtools view -c -f 2 SRR622457.HHV6a.bam > SRR622457.HHV6a.proper_pair.count.txt &
+
+nohup bowtie2 --threads 40 --xeq -x HHV6b --very-sensitive -1 /raid/data/raw/1000genomes/phase3/data/NA12878/sequence_read/SRR622457_1.filt.fastq.gz -2 /raid/data/raw/1000genomes/phase3/data/NA12878/sequence_read/SRR622457_2.filt.fastq.gz | samtools view -o SRR622457.HHV6b.bam - &
+
+
+nohup samtools view -c SRR622457.HHV6b.bam > SRR622457.HHV6b.count.txt &
+
+nohup samtools view -c -f 2 SRR622457.HHV6b.bam > SRR622457.HHV6b.proper_pair.count.txt &
+
+
+
+Those AREN'T necessarily MAPPED data. That's the RAW data.
+
+
+
+Trying the "mapped" data. Of course, some of it is actually "unmapped"
+
+nohup ./process.bash &
+
+
+

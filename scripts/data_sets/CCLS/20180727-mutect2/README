@@ -1,0 +1,108 @@
+ 
+
+Testing tumor / normal comparison.
+
+
+Reference needs a dictionary ...
+
+gatk --list
+gatk CreateSequenceDictionary
+gatk CreateSequenceDictionary --REFERENCE /raid/refs/fasta/hg38.num.fa
+
+
+Sadly these files don't consistently have read group sample names which are needed by GATK
+
+/raid/data/raw/20180718-Adam/bam/983899.recaled.bam
+/raid/data/raw/20180718-Adam/bam/GM_983899.recaled.bam
+
+
+Bam files need sample names ... (this will take HOURS as these files are about 250GB each)
+
+gatk AddOrReplaceReadGroups --INPUT /raid/data/raw/20180718-Adam/bam/983899.recaled.bam --OUTPUT 983899.tumor.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM 983899_tumor &
+
+gatk AddOrReplaceReadGroups --INPUT /raid/data/raw/20180718-Adam/bam/GM_983899.recaled.bam --OUTPUT 983899.normal.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM 983899_normal &
+
+
+
+And indexes ...
+
+samtools index -@ 20 983899.tumor.bam &
+samtools index -@ 20 983899.normal.bam &
+
+
+
+This works 
+
+
+gatk Mutect2 --reference /raid/refs/fasta/hg38.num.fa \
+--input 983899.tumor.bam --tumor-sample 983899_tumor \
+--input 983899.normal.bam --normal-sample 983899_normal \
+-A MappingQuality -A MappingQualityRankSumTest -A ReadPosRankSumTest -A FisherStrand -A StrandOddsRatio -A DepthPerSampleHC -A InbreedingCoeff -A QualByDepth -A RMSMappingQuality -A Coverage \
+--output 983899.mutect2.vcf.gz > 983899.mutect2.txt 2>&1 &
+
+
+
+
+
+
+
+
+
+
+normal is $10, tumor is $11
+
+
+zcat 983899.mutect2.vcf.gz | awk 'BEGIN{FS="\t"}( !/^#/ ){ split($10,a,":"); print a[1],$10,$11 }' | head
+
+zcat 983899.mutect2.vcf.gz | awk 'BEGIN{FS="\t"}( !/^#/ ){ split($10,a,":"); if( a[1] == "0/0" ) print $10,$11 }' | head
+
+
+
+
+NEED SOME REFERENCE FILES FOR VariantRecalibrator
+
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/hapmap_3.3.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/hapmap_3.3.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_omni2.5.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_omni2.5.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi &
+
+
+My data is just "numeric" referenced, while these references are "chr". Problem? YES!!!!
+
+bcftools annotate --rename-chrs /raid/refs/vcf/num_to_chr.txt --output-type z --output 983899.mutect2.chr.vcf.gz 983899.mutect2.vcf.gz
+gatk IndexFeatureFile -F 983899.mutect2.chr.vcf.gz 
+
+
+FILE NAMES in resources strings CANNOT BEGIN WITH NUMBERS even though they do in the examples?!?!
+
+
+
+With the changes, the following runs. HOWEVER, IS IT WHAT WE WANT???
+
+
+-resource omni,known=false,training=true,truth=false,prior=12.0:omni2.5.hg38.vcf.gz \
+-resource 1000G,known=false,training=true,truth=false,prior=10.0:kg_phase1.snps.high_confidence.hg38.vcf.gz \
+
+
+gatk VariantRecalibrator --variant 983899.mutect2.chr.vcf.gz \
+-resource hapmap,known=false,training=true,truth=true,prior=15.0:hapmap_3.3.hg38.vcf.gz \
+-resource omni,known=false,training=true,truth=false,prior=12.0:1000G_omni2.5.hg38.vcf.gz \
+-resource 1000G,known=false,training=true,truth=false,prior=10.0:1000G_phase1.snps.high_confidence.hg38.vcf.gz \
+-resource dbsnp,known=true,training=false,truth=false,prior=2.0:dbsnp_146.hg38.vcf.gz \
+-an QD -an MQ -an MQRankSum -an ReadPosRankSum -an FS -an SOR -an DP -an InbreedingCoeff \
+-mode SNP \
+--rscript-file recal.plots.R \
+--output 983899.mutect2.chr.recal.vcf.gz \
+--tranches-file output.tranches.txt > VariantRecalibrator.txt 2>&1 &
+
+1       14932   .       G       T       .       .       DP=45;ECNT=3;FS=6.335;MQRankSum=-2.392;NLOD=5.12;N_ART_LOD=-1.275e+00;POP_AF=5.000e-08;ReadPosRankSum=1.559;SOR=2.278;TLOD=5.06 GT:AD:AF:DP:F1R2:F2R1:MBQ:MFRL:MMQ:MPOS:PGT:PID:SA_MAP_AF:SA_POST_PROB  0/0:17,0:0.053:17:9,0:8,0:0:414,0:0:0:0|1:14932_G_T     0/1:24,2:0.077:26:15,1:9,1:26:393,357:23:45:0|1:14932_G_T:0.081,0.00,0.077:8.402e-03,0.034,0.958
+
+ 
+
+
+
+

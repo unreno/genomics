@@ -1,0 +1,17 @@
+
+nohup ./run_mutect2.bash >> run_mutect2.out 2>&1 &
+
+
+
+
+Takes FOREVER! Seriously. 3-4 days each! Can't seem to multithread
+
+
+
+
+After done, move bam and bai files to raw dir 
+Create RG or read_groups subdir?
+
+/raid/data/raw/20180718-Adam/bam/rg
+
+

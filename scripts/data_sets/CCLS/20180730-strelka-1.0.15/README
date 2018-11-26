@@ -1,0 +1,24 @@
+
+With the latest version available
+
+
+
+cp ~/.local/etc/strelka_config_*.ini ./
+chmod 444 strelka_config_*
+
+
+configureStrelkaWorkflow.pl --normal=/raid/data/working/20180718-Adam/20180727-mutect2/983899.normal.bam --tumor=/raid/data/working/20180718-Adam/20180727-mutect2/983899.tumor.bam --ref=/raid/refs/fasta/hg38.num.fa --config=./strelka_config_bwa_default.ini --output-dir=./output_bwa
+
+configureStrelkaWorkflow.pl --normal=/raid/data/working/20180718-Adam/20180727-mutect2/983899.normal.bam --tumor=/raid/data/working/20180718-Adam/20180727-mutect2/983899.tumor.bam --ref=/raid/refs/fasta/hg38.num.fa --config=./strelka_config_eland_default.ini --output-dir=./output_eland
+
+configureStrelkaWorkflow.pl --normal=/raid/data/working/20180718-Adam/20180727-mutect2/983899.normal.bam --tumor=/raid/data/working/20180718-Adam/20180727-mutect2/983899.tumor.bam --ref=/raid/refs/fasta/hg38.num.fa --config=./strelka_config_isaac_default.ini --output-dir=./output_isaac
+
+
+Seems that each option NEEDS an explicit path
+
+
+nohup make -C /raid/data/working/20180718-Adam/20180730-strelka-1.0.15/output_bwa -j 12 &
+nohup make -C /raid/data/working/20180718-Adam/20180730-strelka-1.0.15/output_eland -j 12 &
+nohup make -C /raid/data/working/20180718-Adam/20180730-strelka-1.0.15/output_isaac -j 12 &
+
+

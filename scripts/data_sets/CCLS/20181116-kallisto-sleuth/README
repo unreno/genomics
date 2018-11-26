@@ -1,0 +1,27 @@
+
+Trying kallisto / sleuth on DNA
+
+
+Simply no where near enough space to do this now
+
+
+
+
+------
+
+Tumor / Normal RNA Seq data set
+
+Trying kallisto / sleuth analysis
+
+ll -tr /raid/data/raw/ArrayExpress/E-GEOD-81089/ | tail
+ls -1 /raid/data/raw/ArrayExpress/E-GEOD-81089/*1.fastq.gz | wc -l
+ls -1d /raid/data/working/E-GEOD-81089/20181008-kallisto/*rna | wc -l
+ll -tr /raid/data/working/E-GEOD-81089/20181008-kallisto/ | tail
+
+nohup ./kallisto.bash &
+
+nohup ./sleuth.Rscript &
+
+rsync -avz --progress herv:/raid/data/working/CCLS/20181116-kallisto-sleuth/ ~/20181116-kallisto-sleuth/
+
+

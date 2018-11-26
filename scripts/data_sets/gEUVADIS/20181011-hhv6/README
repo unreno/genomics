@@ -1,0 +1,29 @@
+
+
+Align these RNA data to the HHV6a and HHV6b references
+
+
+
+nohup ./process.bash &
+
+
+ll -tr /raid/data/raw/gEUVADIS/ | tail
+
+ll -tr | tail
+
+
+grep error *log
+
+grep terminate *log
+
+
+
+
+ll /raid/data/raw/gEUVADIS/*gz | awk -F"/" '{print $NF}' | awk -F"." '{print $1"."$2}' | uniq -c | awk '($1 != 2){print}'
+      4 HG00117.1
+      4 HG00355.1
+      4 NA06986.1
+      4 NA19095.1
+
+
+

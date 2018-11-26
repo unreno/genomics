@@ -1,0 +1,89 @@
+
+
+How to do tumor normal subtraction on vcf files?
+
+
+bcftools isec --complement 
+
+
+    -C, --complement              output positions present only in the first file but missing in the others
+
+
+bcftools isec --complement --output-type z --output TESTING.vcf.gz TUMOR.vcf NORMAL.vcf
+
+
+Input vcfs MUST be compressed with BGZIP! Stupid.
+
+cp /raid/data/raw/20180718-Adam/vcf/983899.output-HC.vcf . &
+cp /raid/data/raw/20180718-Adam/vcf/GM_983899.output-HC.vcf . &
+
+bgzip 983899.output-HC.vcf &
+bgzip GM_983899.output-HC.vcf &
+
+
+gatk IndexFeatureFile -F 983899.output-HC.vcf.gz &
+gatk IndexFeatureFile -F GM_983899.output-HC.vcf.gz &
+#	-- OR --
+bcftools index 983899.output-HC.vcf.gz &
+bcftools index GM_983899.output-HC.vcf.gz &
+
+
+
+
+Not sure if merged file is useful
+bcftools merge --output-type z --output merged.vcf.gz 983899.output-HC.vcf.gz GM_983899.output-HC.vcf.gz
+
+gatk merge tool doesn't work
+
+
+This does NOT produce a VCF file.
+-C, --complement ( output positions present only in the first file but missing in the others )
+
+bcftools isec --complement 983899.output-HC.vcf.gz GM_983899.output-HC.vcf.gz
+
+
+bcftools isec --complement --output-type z --output TESTING.vcf.gz 983899.output-HC.vcf.gz GM_983899.output-HC.vcf.gz
+
+Output isn't in VCF format or compressed???
+
+
+
+
+Hmmm
+
+
+
+
+gatk IndexFeatureFile -F merged.vcf.gz &
+
+-select 'vc.getGenotype("GM_983899").equals("./.")' \
+-select '!vc.getGenotype("983899").equals("./.")' \
+-select 'vc.getGenotype("GM_983899") == "./."' \
+-select 'vc.getGenotype("983899") != "./."' \
+
+gatk SelectVariants \
+-R /raid/refs/fasta/hg38.num.fa \
+-V merged.vcf.gz \
+-select 'vc.getGenotype("GM_983899") == "./."' \
+-O selected.vcf.gz
+
+Doesn't work!!!!!!!!!!
+
+
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	983899	GM_983899
+
+
+
+zcat merged.vcf.gz | awk 'BEGIN{FS=OFS="\t"}(/^#/){print;next}( $10 == "./.:.:.:.:." ){print}'
+
+$ zcat merged.vcf.gz | awk 'BEGIN{FS=OFS="\t"}(/^#/){print;next}( $10 == "./.:.:.:.:." ){print}' | wc -l
+149723
+$ zcat merged.vcf.gz | awk 'BEGIN{FS=OFS="\t"}(/^#/){print;next}( $11 == "./.:.:.:.:." ){print}' | wc -l
+209211
+
+$ zcat merged.vcf.gz | wc -l
+5373173
+
+
+
+
