@@ -1,0 +1,237 @@
+#!/usr/bin/env Rscript
+
+#	https://pachterlab.github.io/sleuth_walkthroughs/pval_agg/analysis.html
+#	https://github.com/griffithlab/rnaseq_tutorial/wiki/Kallisto
+#	http://chagall.med.cornell.edu/RNASEQcourse/Intro2RNAseq.pdf	
+
+
+#	source("https://bioconductor.org/biocLite.R")	
+#	biocLite( 'pheatmap' )
+
+#	biocLite("devtools")    # only if devtools not yet installed
+#	biocLite("pachterlab/sleuth")
+
+suppressMessages({
+	library('cowplot')
+	library('sleuth')
+})
+
+
+message("Reading E-GEOD-81089.sdrf.txt")
+metadata <- read.table('E-GEOD-81089.sdrf.txt', sep='\t', header=TRUE, stringsAsFactors = FALSE)
+#metadata <- dplyr::select(metadata, c( 'Source.Name', 'Characteristics.individual.', 'Characteristics..sex.', 'Characteristics..age.', 'Characteristics.organism.part.', 'Characteristics.disease.', 'Characteristics.sampling.site.', 'Characteristics..clinical.information.', 'Comment..Sample_title.', 'Comment..Sample_source_name.','Comment..ENA_SAMPLE.', 'Scan.Name', 'Comment..ENA_RUN.', 'Comment..FASTQ_URI.' ))
+metadata <- dplyr::select(metadata, c( 'Characteristics..sex.', 'Characteristics..age.', 'Characteristics.sampling.site.', 'Characteristics..clinical.information.', 'Scan.Name', 'Comment..ENA_RUN.' ))
+
+#	Source Name	Characteristics [organism]	Characteristics[individual]	Characteristics [sex]	Characteristics [age]	Unit[time unit]	Characteristics[organism part]	Characteristics[disease]	Characteristics[sampling site]Characteristics [clinical information]	Comment [dead]	Comment [histology]	Comment [ps who]	Comment [stage tnm]	Comment [surgery date]	Comment [vital date]	Comment [Sample_title]	Comment [Sample_source_name]	Comment [ENA_SAMPLE]	Protocol REF	Term Source REF	Protocol REF	Term Source REF	Extract Name	Comment [INSTRUMENT_MODEL]	Comment [LIBRARY_LAYOUT]	Comment[LIBRARY_STRAND]	Comment [LIBRARY_SELECTION]	Comment [LIBRARY_SOURCE]	Comment [LIBRARY_STRATEGY]	Material Type	Assay Name	Comment[technical replicate group]	Comment [ENA_EXPERIMENT]	Comment [Platform_title]	Technology Type	Protocol REF	Term Source REF	Scan Name	Comment [ENA_RUN]	Comment [FASTQ_URI]	FactorValue [sampling site]
+#	GSM2142443 1	Homo sapiens	L400	male	78	year	lung	non-small cell lung carcinoma	tumor tissue	non-smoker	1	2	1	3	2006-10-05	2010-02-19	L400T	Human NSCLC tissue	SRS1421351	P-GSE81089-1	ArrayExpress	P-GSE81089-2	ArrayExpress	GSM2142443 extract 1	Illumina HiSeq 2500	PAIRED	first strand	cDNA	transcriptomic	RNA-Seq	total RNA	GSM2142443	  	SRX1741868	Illumina HiSeq 2500 (Homo sapiens)	sequencing assay	P-GSE81089-3	ArrayExpress	SRR3474721_2	SRR3474721	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR347/001/SRR3474721/SRR3474721_2.fastq.gz	tumor tissue
+
+
+#awk -F"\t" '{print $9}' E-GEOD-81089.sdrf.txt | sort | uniq -c 
+#      1 Characteristics[sampling site]
+#    140 non-malignant tissue
+#   1200 tumor tissue
+
+#awk -F"\t" '{print $10}' E-GEOD-81089.sdrf.txt | sort | uniq -c 
+#      1 Characteristics [clinical information]
+#    518 ex-smoker 
+#    310 non-smoker
+#    512 smoker
+
+#awk -F"\t" '{print $4}' E-GEOD-81089.sdrf.txt | sort | uniq -c 
+#      1 Characteristics [sex]
+#    702 female
+#    638 male
+
+
+
+metadata[is.na(metadata)] <- 0
+
+metadata <- dplyr::rename(metadata, tissue = Characteristics.sampling.site. )
+metadata <- dplyr::rename(metadata, smoke = Characteristics..clinical.information. )
+metadata <- dplyr::rename(metadata, gender = Characteristics..sex. )
+metadata <- dplyr::rename(metadata, age = Characteristics..age. )
+#metadata <- dplyr::rename(metadata, uri = Comment..FASTQ_URI. )
+metadata <- dplyr::rename(metadata, run_with_lane = Scan.Name )
+metadata <- dplyr::rename(metadata, run = Comment..ENA_RUN. )
+#metadata <- dplyr::rename(metadata, sample = Comment..ENA_SAMPLE. )	#	multiple runs of same sample
+head(metadata)
+
+
+#  'metadata' (sample_to_covariates) must contain a column named 'sample'
+#	Changing "run" to "sample", although not entirely accurate
+metadata <- dplyr::rename(metadata, sample = run )
+
+
+message("Selecting only present datasets.")
+#	
+metadata <- dplyr::filter(metadata, file.exists(file.path( paste0(sample,".Homo_sapiens.GRCh38.rna"))))
+head(metadata)
+
+
+message("Selecting only lane 1 so 1 sample per line.")
+#	Select only the _1 so 1 run per line 
+metadata <- dplyr::filter( metadata, grepl('_1$', run_with_lane ))
+head(metadata)
+
+
+#	'metadata' (sample_to_covariates) must contain a column named 'path'
+metadata <- dplyr::mutate(metadata, path = file.path( paste0(sample,".Homo_sapiens.GRCh38.rna"), 'abundance.h5'))
+head(metadata)
+
+
+#	Select only the _1 so 1 run per line 
+metadata <- dplyr::filter( metadata, grepl('_1$', run_with_lane ))
+head(metadata)
+
+
+
+message(paste("Using existing",nrow(metadata),"datasets"))
+
+
+metadata
+
+
+
+
+#> library("biomaRt")
+#> listMarts()
+#> ensembl=useMart("ensembl")
+#> listDatasets(ensembl)
+
+message("Setting biomart")
+mart <- biomaRt::useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl", host = "www.ensembl.org", ensemblRedirect = FALSE)
+#	Sometimes, the next step fails due to default host being down or being redirected
+#	to so include the host and stop the redirection. (redirection seems to be the problem at the moment)
+
+message("Getting biomart")
+ttg <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id", "external_gene_name"), mart = mart)
+
+message("Modifying biomart")
+ttg <- dplyr::rename(ttg, target_id = ensembl_transcript_id, ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
+
+message("Subselecting biomart")
+ttg <- dplyr::select(ttg, c('target_id', 'ens_gene', 'ext_gene'))
+head(ttg)
+
+
+so <- sleuth_prep(metadata, target_mapping = ttg,
+	aggregation_column = 'ens_gene', extra_bootstrap_summary = TRUE)
+
+head(so)
+
+
+
+#	https://pachterlab.github.io/sleuth/docs/sleuth_fit.html
+
+#	Need multiple values for each of the offered factors so this doesn't run until enough data exists.
+#	  contrasts can be applied only to factors with 2 or more levels
+message("Fitting full")
+so <- sleuth_fit(so, ~gender+smoke+tissue, 'full')
+
+message("Fitting reduced")
+so <- sleuth_fit(so, ~gender+smoke, 'reduced')
+
+#	sleuth_fit does not like NAs, so need to replace them with 0s or something as I've done above
+#Error in dimnames(x) <- dn : 
+#  length of 'dimnames' [1] not equal to array extent
+
+#	https://pachterlab.github.io/sleuth/docs/sleuth_wt.html
+#so <- sleuth_wt(so, 'gender_smale')
+
+message("Performing likelihood ratio test")
+so <- sleuth_lrt(so, 'reduced', 'full')
+
+
+message("models(so)")
+models(so)
+
+
+message("tests(so)")
+tests(so)
+
+
+#	
+#	#	https://pachterlab.github.io/sleuth/docs/sleuth_results.html
+#	
+#	message("Obtaining gene-level differential expression results")
+#	
+#	#sleuth_table_gene <- sleuth_results(so, 'gender_smale', show_all = FALSE)
+#	sleuth_table_gene <- sleuth_results(so, 'reduced:full', 'lrt', show_all = FALSE)
+#	
+#	sleuth_table_gene <- dplyr::filter(sleuth_table_gene, qval <= 0.05)
+#	
+#	head(sleuth_table_gene)
+#	
+#	
+#	message("Obtaining consistent transcript-level differential expression results")
+#	
+#	#sleuth_table_tx <- sleuth_results(so, 'gender_smale', show_all = FALSE, pval_aggregate = FALSE)
+#	sleuth_table_tx <- sleuth_results(so, 'reduced:full', 'lrt', show_all = FALSE, pval_aggregate = FALSE)
+#	
+#	sleuth_table_tx <- dplyr::filter(sleuth_table_tx, qval <= 0.05)
+#	
+#	head(sleuth_table_tx)
+#	
+#	
+#	So it runs. Not exactly sure what each of these have done.
+#	Perhaps clearer with bigger data set and more metadata to group.
+
+
+message("plot_pca(so, color_by = 'gender')")
+plot_pca(so, color_by = 'gender')
+
+message("plot_pca(so, color_by = 'smoke')")
+plot_pca(so, color_by = 'smoke')
+
+message("plot_pca(so, color_by = 'tissue')")
+plot_pca(so, color_by = 'tissue')
+
+
+
+#	https://www.rdocumentation.org/packages/sleuth/versions/0.30.0/topics/plot_sample_heatmap
+#	https://cran.r-project.org/web/packages/pheatmap/pheatmap.pdf
+
+message("plot_sample_heatmap(so)")
+plot_sample_heatmap(so)
+
+message("plot_sample_heatmap(so) without legend")
+plot_sample_heatmap(so, legend=FALSE)
+
+
+
+
+
+#	plot_group_density(so)	- ???
+
+#	plot_qq(so, TEST?)
+
+#	plot_volcano(so, TEST?)
+
+
+dev.off()
+
+
+
+#	plot_bootstrap
+#	
+#	plot_fld.kallisto
+#	
+#	plot_fld.sleuth
+#	
+#	plot_loadings
+#	
+#	plot_ma
+#	
+#	plot_mean_var
+#	
+#	plot_pc_variance
+#	
+#	plot_sample_density
+#	
+#	plot_sample_heatmap
+#	
+#	plot_scatter
+#	
+#	plot_transcript_heatmap
+#	
+#	plot_vars
