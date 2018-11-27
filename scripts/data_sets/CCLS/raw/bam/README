@@ -116,6 +116,9 @@ cd redo
 nohup samtools fastq --threads 19 -0 GM_983899.0.fastq.gz -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz GM_983899.bam &
 nohup samtools fastq --threads 19 -0 983899.0.fastq.gz -1 983899.1.fastq.gz -2 983899.2.fastq.gz 983899.bam &
 
+nohup samtools fasta --threads 19 -0 GM_983899.0.fasta.gz -1 GM_983899.1.fasta.gz -2 GM_983899.2.fasta.gz GM_983899.bam &
+nohup samtools fasta --threads 19 -0 983899.0.fasta.gz -1 983899.1.fasta.gz -2 983899.2.fasta.gz 983899.bam &
+
 nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.bam - &
 nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.bam - &
 
