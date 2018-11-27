@@ -84,6 +84,13 @@ nohup samtools sort -n --threads 40 -o redo/GM_983899.bam GM_983899.recaled.bam 
 nohup samtools sort -n --threads 40 -o redo/983899.bam 983899.recaled.bam &
 keeps failing?
 nohup samtools sort -n --threads 40 -m 512M -o redo/983899.bam 983899.recaled.bam &
+keeps failing?
+
+Got hung up sorting both
+[jake@system76-server /raid/data/raw/CCLS/bam]$ touch test
+touch: cannot touch 'test': Read-only file system
+
+
 
 
 
@@ -104,11 +111,6 @@ nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 
 
 With compression 9, this is almost exactly the same size as the samtools sorted version.
 
-Got hung up sorting both
-[jake@system76-server /raid/data/raw/CCLS/bam]$ touch test
-touch: cannot touch 'test': Read-only file system
-
-
 
 
 
@@ -116,8 +118,13 @@ cd redo
 nohup samtools fastq --threads 19 -0 GM_983899.0.fastq.gz -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz GM_983899.bam &
 nohup samtools fastq --threads 19 -0 983899.0.fastq.gz -1 983899.1.fastq.gz -2 983899.2.fastq.gz 983899.bam &
 
+
+Does bowtie2 or vcf calling use the initial read qualities, or can I save time and disk space using FASTA instead.
 nohup samtools fasta --threads 19 -0 GM_983899.0.fasta.gz -1 GM_983899.1.fasta.gz -2 GM_983899.2.fasta.gz GM_983899.bam &
 nohup samtools fasta --threads 19 -0 983899.0.fasta.gz -1 983899.1.fasta.gz -2 983899.2.fasta.gz 983899.bam &
+
+
+
 
 nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.bam - &
 nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.bam - &
