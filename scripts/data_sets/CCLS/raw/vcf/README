@@ -1,0 +1,54 @@
+
+
+
+
+--------
+20180718
+
+for f in *output-HC.vcf ; do echo $f; bgzip $f & done
+for f in *output-HC.vcf.gz ; do echo $f; gatk IndexFeatureFile -F $f & bcftools index $f & done
+
+
+for f in /raid/data/raw/20170804-Adam/VCF/*.output-hc.vcf.gz ; do echo $f ; ln -s $f ; done
+
+
+--------
+
+20170804
+
+
+bcftools filter -i 'TYPE="snp"' $f > $b.snp.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0' $f > $b.snp.DB0.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=2.0' $f > $b.snp.DB0.QD2.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=3.0' $f > $b.snp.DB0.QD3.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=4.0' $f > $b.snp.DB0.QD4.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=5.0' $f > $b.snp.DB0.QD5.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=30.0' $f > $b.snp.DB0.QD30.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=2.0 && FMT/DP>30' $f > $b.snp.DB0.QD2.DP30.vcf &
+bcftools filter -i 'TYPE="snp" && DB=0 && QD>=2.0 && FMT/DP>=10 && FMT/GQ>=15' $f > $b.snp.DB0.QD2.DP10.GQ15.vcf &
+
+
+
+bcftools filter -i 'TYPE="snp" && QUAL>=100 && FMT/DP>100 && DB=1' 186069.output-hc.vcf > 186069.output-hc.snp.qual100.dp100.db1.vcf &
+
+
+
+
+for vcf in $( ls /raid/data/raw/20170804-Adam/VCF/*.output-hc.snp.vcf ) ; do
+  b=$( basename $vcf )
+  b=${b%.output-hc.vcf}
+  echo $b
+  cat $vcf | awk 'BEGIN{FS=OFS="\t"}( !/^#/ ){ print $1,$2,$4,$5 }' > ${b}.snps.txt
+  chmod 444 ${b}.snps.txt
+done
+
+
+for f in *output-hc.vcf ; do
+echo $f
+bgzip $f &
+done
+
+for f in *output-hc.vcf ; do echo $f; bgzip $f & done
+for f in *output-hc.vcf.gz ; do echo $f; gatk IndexFeatureFile -F $f & bcftools index $f & done
+
+

@@ -1,0 +1,89 @@
+
+FROM NOW ON ... CHECK CHECKSUMS
+
+
+sudo mkdir /media/usb1
+sudo mkdir /media/usb2
+sudo mkdir /media/usb3
+
+sudo mount /dev/sdc1 /media/usb1
+sudo mount /dev/sdd1 /media/usb2
+sudo mount /dev/sde1 /media/usb3
+
+
+sudo touch /raid/data/raw/20180718-Adam/rsync1.log
+sudo chown jake /raid/data/raw/20180718-Adam/rsync1.log
+sudo touch /raid/data/raw/20180718-Adam/rsync2.log
+sudo chown jake /raid/data/raw/20180718-Adam/rsync2.log
+sudo touch /raid/data/raw/20180718-Adam/rsync3.log
+sudo chown jake /raid/data/raw/20180718-Adam/rsync3.log
+
+sudo rsync -avz --progress /media/usb1/ /raid/data/raw/20180718-Adam/usb1/ > /raid/data/raw/20180718-Adam/rsync1.log 2>&1  &
+sudo rsync -avz --progress /media/usb2/ /raid/data/raw/20180718-Adam/usb2/ > /raid/data/raw/20180718-Adam/rsync2.log 2>&1  &
+sudo rsync -avz --progress /media/usb3/ /raid/data/raw/20180718-Adam/usb3/ > /raid/data/raw/20180718-Adam/rsync3.log 2>&1  &
+
+
+
+Merging BAM and VCF directories.
+Removing FASTQ directories for space.
+
+Not sure what's up the the GM_ prefixed files. (Germline)
+
+
+
+
+
+
+Happy Friday! Here is the list of 33 tumor samples (CCLS subject IDs) with tumor WGS, with a column showing which 5 also have germline data. I must have made a typo for one sample, 634370, which I put in the sample submission to MedGenome as 634371. Hope that doesn't cause too much trouble.
+
+
+
+Seems that the 4 drives from Adam are effectively a single data set.
+
+
+
+The correct ID is 634370. Thanks Jake!
+
+
+
+
+
+
+/raid/data/raw/20180718-Adam/bam/439338.recaled.bam
+
+htsjdk.samtools.SAMFormatException: SAM validation error: ERROR: Record 1049197317, Read name E00521:51:h222cccxy:5:1101:18040:72473, bin field of BAM record does not equal value computed based on alignment start and end, and length of sequence to which read is aligned
+
+
+
+
+
+
+ll *BAM/634370*
+-rw-r--r-- 1 1054 350292697302 Aug 17  2017 recaled_BAM/634370.recaled.bam
+  w-r--r-- 1 1054      9576664 Aug 17  2017 recaled_BAM/634370.recaled.bam.bai
+-rw-r--r-- 1 1054 130799468107 Aug 16  2017 sorted_BAM/634370.sorted.bam
+-rw-r--r-- 1 1054      9256232 Aug 16  2017 sorted_BAM/634370.sorted.bam.bai
+
+samtools view -@ 30 -c recaled_BAM/634370.recaled.bam 
+1847283217
+
+samtools view -@ 30 -c sorted_BAM/634370.sorted.bam
+1847283217
+
+
+Quite surprise that a file nearly 3 times the size has the same number of reads.
+
+The recaled files do include nearly twice as much info with the BI and BD tags.
+
+
+E00521:52:h23kvccxy:7:1209:14712:19065	99	1	10001	0	55M95S	=	10396	441	TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTTAACCTCTACCCCTAACCCTAGACCCCATCCCCACCCCTACCCCTGACCACAACCCTCACCCCCAACCCAACCCCCACCCCTACCCACACCCACA	@>>>??@@?>>>@@?>>>@@?>>=@@?>>=@@?>>=@>>><;@A>9==9/@?=4179>4?/*04)9=)060:5)</+;(96+1-++++,)555<.')5*/*9'*/';7219/(/'*4)*//(2*0/(5*6+>'+&&1/%&'131%',2&2	NM:i:0	MD:Z:55	AS:i:55	XS:i:63	RG:Z:634370	BI:Z:KKKLNKOOKLLHMMJKKHMLHIJGMMJKKHMMJKKHMMJKKHMMJKKHMMJKKHMJLJKKMIKMLKHHMMJKKHMMMLNLIILLLJIILJLIINNMLIINONNLLJIJKKHMIMJLIIJMLMMJMLLLJJJMLNKKPQPOLOMLLOILJJ	BD:Z:IIJKQLPOLLNIMMJJLHLLIJLHLLIJLHLLIJLHLLIJLHLLIJLHLLIJLHLIIIJLLJJLLLHHLLIJLHLLMJLLIILLMKIILHMIIMMMMIIMNMMMLHHJKMIMKLHMIIILJKMILJKMIJJMINJJNOOOKOKLLQILHH
+
+
+E00521:52:h23kvccxy:7:1209:14712:19065	99	1	10001	0	55M95S	=	10396	441	TAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTTAACCTCTACCCCTAACCCTAGACCCCATCCCCACCCCTACCCCTGACCACAACCCTCACCCCCAACCCAACCCCCACCCCTACCCACACCCACA	AAFFFJJJJJJJJJJJJJJJJJJFJJJJJFJJJJJF<FFJFA<JF<FF7-JJF<-77A<J---<-<F--7-A<-7--7-<7---------7777---7---7----77<7<-----7-----7----7-7-<--)))))))-7-))-)))	NM:i:0	MD:Z:55	AS:i:55	XS:i:63	RG:Z:634370
+
+
+
+
+
+
+

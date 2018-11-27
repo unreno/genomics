@@ -1,0 +1,131 @@
+
+
+
+Adding read groups to bams and replacing the originals.
+
+
+
+
+
+
+nohup ./validate.bash > validate.1.out 2>&1 &
+
+nohup ./validate.bash > validate.2.out 2>&1 &
+
+nohup ./validate.bash > validate.3.out 2>&1 &
+
+nohup ./validate.bash > validate.4.out 2>&1 &
+
+nohup ./add_read_group.bash > add_read_group.out 2>&1 &
+
+nohup ./index.bash > index.out 2>&1 &
+
+
+nohup samtools view -h -o 439338.recaled.sam 439338.recaled.bam &
+nohup samtools view -h -o 439338.recaled.2.bam 439338.recaled.sam &
+
+
+Could probably add ...
+--IGNORE MATE_NOT_FOUND
+as every bam has many of these
+
+
+
+
+
+gatk AddOrReplaceReadGroups --INPUT 439338.recaled.bam --OUTPUT 439338.tumor.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM 439338.tumor
+
+htsjdk.samtools.SAMFormatException: SAM validation error: ERROR: Record 1049197317, Read name E00521:51:h222cccxy:5:1101:18040:72473, bin field of BAM record does not equal value computed based on alignment start and end, and length of sequence to which read is aligned
+  at htsjdk.samtools.SAMUtils.processValidationErrors(SAMUtils.java:454)
+  at htsjdk.samtools.BAMFileReader$BAMFileIterator.advance(BAMFileReader.java:812)
+  at htsjdk.samtools.BAMFileReader$BAMFileIterator.next(BAMFileReader.java:797)
+  at htsjdk.samtools.BAMFileReader$BAMFileIterator.next(BAMFileReader.java:765)
+  at htsjdk.samtools.SamReader$AssertingIterator.next(SamReader.java:576)
+  at htsjdk.samtools.SamReader$AssertingIterator.next(SamReader.java:548)
+  at picard.sam.AddOrReplaceReadGroups.doWork(AddOrReplaceReadGroups.java:182)
+  at picard.cmdline.CommandLineProgram.instanceMain(CommandLineProgram.java:282)
+  at org.broadinstitute.hellbender.cmdline.PicardCommandLineProgramExecutor.instanceMain(PicardCommandLineProgramExecutor.java:25)
+  at org.broadinstitute.hellbender.Main.runCommandLineProgram(Main.java:160)
+  at org.broadinstitute.hellbender.Main.mainEntry(Main.java:203)
+  at org.broadinstitute.hellbender.Main.main(Main.java:289)
+
+
+Converting to SAM and then back to BAM seems to fix this error.
+
+
+
+Similar error in ...
+
+868614.recaled.bam
+
+htsjdk.samtools.SAMFormatException: SAM validation error: ERROR: Record 311283192, Read name A00354:16:H37GGDSXX:1:2278:7627:30076, bin field of BAM record does not equal value computed based on alignment start and end, and length of sequence to which read is aligned
+
+
+nohup samtools view -h -o 868614.recaled.sam 868614.recaled.bam &
+
+
+
+
+
+
+
+
+
+
+20181120 - These bam files are aligned locally
+( still not sure if aligners use the quality in fastq )
+Resort by name, extract fastq, align end-to-end, extract PROPER PAIR, use that in Strelka2 )
+
+sudo mkdir redo
+sudo chown jake redo
+nohup samtools sort -n --threads 40 -o redo/GM_983899.bam GM_983899.recaled.bam &
+
+
+nohup samtools sort -n --threads 40 -o redo/983899.bam 983899.recaled.bam &
+keeps failing?
+nohup samtools sort -n --threads 40 -m 512M -o redo/983899.bam 983899.recaled.bam &
+
+
+
+wget https://github.com/biod/sambamba/releases/download/v0.6.8/sambamba-0.6.8-linux-static.gz
+
+
+nohup sambamba sort -n --nthreads 40 -m 60GB --show-progress -o redo/983899.bam 983899.recaled.bam &
+
+Took about 12 hours.
+Output grew quite a bit 337GB -> 450GB !!!
+Perhaps set compression level?
+Will try again. Sometime.
+
+Running through samtools really compresses. ACTUALLY, STILL RUNNING 9 hours later
+samtools view -o 983899.samtools_viewed.bam 983899.bam
+
+nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 --nthreads 40 -m 50GB --show-progress -o redo/GM_983899.bam GM_983899.recaled.bam > redo/GM_983899.sambamba.log 2> redo/GM_983899.sambamba.err &
+
+With compression 9, this is almost exactly the same size as the samtools sorted version.
+
+Got hung up sorting both
+[jake@system76-server /raid/data/raw/CCLS/bam]$ touch test
+touch: cannot touch 'test': Read-only file system
+
+
+
+
+
+cd redo
+nohup samtools fastq --threads 19 -0 GM_983899.0.fastq.gz -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz GM_983899.bam &
+nohup samtools fastq --threads 19 -0 983899.0.fastq.gz -1 983899.1.fastq.gz -2 983899.2.fastq.gz 983899.bam &
+
+nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.bam - &
+nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.bam - &
+
+
+nohup samtools view -f 2 --threads 19 -o GM_983899.PP.bam GM_983899.bam &
+nohup samtools view -f 2 --threads 19 -o 983899.PP.bam 983899.bam &
+
+nohup samtools index -@ 9 GM_983899.PP.bam &
+nohup samtools index -@ 9 GM_983899.bam &
+nohup samtools index -@ 9 983899.PP.bam &
+nohup samtools index -@ 9 983899.bam &
+
+
