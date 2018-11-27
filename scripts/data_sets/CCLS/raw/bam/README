@@ -97,7 +97,7 @@ Output grew quite a bit 337GB -> 450GB !!!
 Perhaps set compression level?
 Will try again. Sometime.
 
-Running through samtools really compresses. ACTUALLY, STILL RUNNING 9 hours later
+Running through samtools really compresses. ACTUALLY, STILL RUNNING 12 hours later
 samtools view -o 983899.samtools_viewed.bam 983899.bam
 
 nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 --nthreads 40 -m 50GB --show-progress -o redo/GM_983899.bam GM_983899.recaled.bam > redo/GM_983899.sambamba.log 2> redo/GM_983899.sambamba.err &
@@ -107,6 +107,8 @@ With compression 9, this is almost exactly the same size as the samtools sorted 
 Got hung up sorting both
 [jake@system76-server /raid/data/raw/CCLS/bam]$ touch test
 touch: cannot touch 'test': Read-only file system
+What!
+
 
 
 
@@ -116,19 +118,63 @@ cd redo
 nohup samtools fastq --threads 19 -0 GM_983899.0.fastq.gz -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz GM_983899.bam &
 nohup samtools fastq --threads 19 -0 983899.0.fastq.gz -1 983899.1.fastq.gz -2 983899.2.fastq.gz 983899.bam &
 
-nohup samtools fasta --threads 19 -0 GM_983899.0.fasta.gz -1 GM_983899.1.fasta.gz -2 GM_983899.2.fasta.gz GM_983899.bam &
-nohup samtools fasta --threads 19 -0 983899.0.fasta.gz -1 983899.1.fasta.gz -2 983899.2.fasta.gz 983899.bam &
 
-nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.bam - &
-nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.bam - &
+The counts don't match!
+-rw-rw-r-- 1 jake           11 Nov 27 15:05 GM_983899.1.fastq.gz.count
+1579662820
+-rw-rw-r-- 1 jake           11 Nov 27 14:49 GM_983899.2.fastq.gz.count
+1580417276
+
+Such a pain. Guessing that not all reads are paired. Trying again with the PAIRED flag.
+
+nohup samtools fastq -f 1 --threads 19 -0 GM_983899.P.0.fastq.gz -1 GM_983899.P.1.fastq.gz -2 GM_983899.P.2.fastq.gz GM_983899.bam &
+nohup samtools fastq -f 1 --threads 19 -0 983899.P.0.fastq.gz -1 983899.P.1.fastq.gz -2 983899.P.2.fastq.gz 983899.bam &
 
 
-nohup samtools view -f 2 --threads 19 -o GM_983899.PP.bam GM_983899.bam &
-nohup samtools view -f 2 --threads 19 -o 983899.PP.bam 983899.bam &
 
-nohup samtools index -@ 9 GM_983899.PP.bam &
-nohup samtools index -@ 9 GM_983899.bam &
-nohup samtools index -@ 9 983899.PP.bam &
-nohup samtools index -@ 9 983899.bam &
+more counts
+
+nohup samtools view -c -F 1 GM_983899.bam > GM_983899.bam.F1.count &
+nohup samtools view -c -f 1 GM_983899.bam > GM_983899.bam.f1.count &
+nohup samtools view -c -f 65 GM_983899.bam > GM_983899.bam.f65.count &
+nohup samtools view -c -f 129 GM_983899.bam > GM_983899.bam.f129.count &
+nohup samtools view -c -f 256 GM_983899.bam > GM_983899.bam.f256.count &
+nohup samtools view -c -f 512 GM_983899.bam > GM_983899.bam.f512.count &
+nohup samtools view -c -f 1024 GM_983899.bam > GM_983899.bam.f1024.count &
+nohup samtools view -c -F 1 983899.bam > 983899.bam.F1.count &
+nohup samtools view -c -f 1 983899.bam > 983899.bam.f1.count &
+nohup samtools view -c -f 65 983899.bam > 983899.bam.f65.count &
+nohup samtools view -c -f 129 983899.bam > 983899.bam.f129.count &
+nohup samtools view -c -f 256 983899.bam > 983899.bam.f256.count &
+nohup samtools view -c -f 512 983899.bam > 983899.bam.f512.count &
+nohup samtools view -c -f 1024 983899.bam > 983899.bam.f1024.count &
+
+
+
+
+
+Disk space is getting low. 1.3TB
+
+
+
+nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38_no_alts.bam - &
+nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.name.hg38_no_alts.bam - &
+
+
+
+
+
+Running out of disk space. Gonna need to remove the sorted bam files.
+
+These will need sorted prior to being indexed.
+
+
+nohup samtools view -f 2 --threads 19 -o GM_983899.hg38_no_alts.PP.bam GM_983899.hg38_no_alts.bam &
+nohup samtools view -f 2 --threads 19 -o 983899.hg38_no_alts.PP.hg38_no_alts.bam 983899.hg38_no_alts.bam &
+
+nohup samtools index -@ 9 GM_983899.hg38_no_alts.PP.bam &
+nohup samtools index -@ 9 GM_983899.hg38_no_alts.bam &
+nohup samtools index -@ 9 983899.hg38_no_alts.PP.bam &
+nohup samtools index -@ 9 983899.hg38_no_alts.bam &
 
 
