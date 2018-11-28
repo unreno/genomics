@@ -51,13 +51,13 @@ BEGIN {
 {
 	if ( $1 == b1 ){
 		if ( length(b10) != length($10) ){
-			print $1 >> base".diff_length_reads"
+			print $1 " " length(b10) " " length($10) >> base".diff_length_reads"
 		}
 		if ( length(b11) != length($11) ){
-			print $1 >> base".diff_length_quality"
+			print $1 " " length(b11) " " length($11) >> base".diff_length_quality"
 		}
 		if ( length($10) != length($11) ){
-			print $1 >> base".diff_length_read_and_quality"
+			print $1 " " length($10) " " length($11) >> base".diff_length_read_and_quality"
 		}
 		print_to_fastq(b1,b2,toupper(b10),b11)
 		print_to_fastq($1,$2,toupper($10),$11)
