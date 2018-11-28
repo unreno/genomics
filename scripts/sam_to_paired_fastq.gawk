@@ -49,6 +49,13 @@ BEGIN {
 	b1=b2=b10=b11=""
 }
 {
+	if( toupper($10) !~ /^[ATCGN]+$/ ){
+		lane=(and($2,64))?"1":"2";
+		print $1"/"lane >> base".unknown_bases.txt"
+		print $10 >> base".unknown_bases.txt"
+	}
+
+	#	ONLY PRINT PAIRED READS WITH SEQUENTIAL READ NAMES
 	if ( $1 == b1 ){
 		if ( length(b10) != length($10) ){
 			print $1 " " length(b10) " " length($10) >> base".diff_length_reads"
@@ -67,7 +74,7 @@ BEGIN {
 		#	Doesn't match buffered read?
 		if( b1 != "" )
 			print b1 > base".missing_mates.txt"
-		
+
 		#	buffer this one
 		b1=$1
 		b2=$2

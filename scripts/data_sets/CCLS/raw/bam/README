@@ -94,6 +94,8 @@ touch: cannot touch 'test': Read-only file system
 
 
 
+
+
 wget https://github.com/biod/sambamba/releases/download/v0.6.8/sambamba-0.6.8-linux-static.gz
 
 
@@ -105,7 +107,12 @@ Perhaps set compression level?
 Will try again. Sometime.
 
 Running through samtools really compresses. ACTUALLY, STILL RUNNING 12 hours later
-samtools view -o 983899.samtools_viewed.bam 983899.bam
+samtools view -o 983899.samtools_view.bam 983899.bam
+
+samtools view does compress it. if running sambamba sort again, set the compression level
+-r--r--r-- 1 jake 450701614138 Nov 26 22:13 983899.bam
+-rw-rw-r-- 1 jake 322638049280 Nov 27 18:18 983899.samtools_view.bam
+-r--r--r-- 1 jake 249764383502 Nov 26 23:48 GM_983899.bam
 
 nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 --nthreads 40 -m 50GB --show-progress -o redo/GM_983899.bam GM_983899.recaled.bam > redo/GM_983899.sambamba.log 2> redo/GM_983899.sambamba.err &
 
@@ -148,11 +155,175 @@ nohup samtools view -c -f 256 983899.bam > 983899.bam.f256.count &
 nohup samtools view -c -f 512 983899.bam > 983899.bam.f512.count &
 nohup samtools view -c -f 1024 983899.bam > 983899.bam.f1024.count &
 
+==> 983899.bam.f1024.count <==
+0
+
+==> 983899.bam.f129.count <==
+687471866
+
+==> 983899.bam.f1.count <==
+1374058911
+
+==> 983899.bam.F1.count <==
+0
+
+==> 983899.bam.f256.count <==
+8964764
+
+==> 983899.bam.f512.count <==
+0
+
+==> 983899.bam.f65.count <==
+686587045
+
+==> GM_983899.1.fastq.gz.count <==
+1579662820
+
+==> GM_983899.2.fastq.gz.count <==
+1580417276
+
+==> GM_983899.bam.count <==
+793788714
+
+==> GM_983899.bam.f1024.count <==
+0
+
+==> GM_983899.bam.f129.count <==
+397080437
+
+==> GM_983899.bam.f1.count <==
+793788714
+
+==> GM_983899.bam.F1.count <==
+0
+
+==> GM_983899.bam.f256.count <==
+3768690
+
+==> GM_983899.bam.f512.count <==
+0
+
+==> GM_983899.bam.f65.count <==
+396708277
+
+==> GM_983899.P.1.fastq.gz.count <==
+1260951945
+
+==> GM_983899.P.2.fastq.gz.count <==
+1261562193
+
+
+WTF
+
+Flags:
+	0x1	PAIRED        .. paired-end (or multiple-segment) sequencing technology
+	0x2	PROPER_PAIR   .. each segment properly aligned according to the aligner
+	0x4	UNMAP         .. segment unmapped
+	0x8	MUNMAP        .. next segment in the template unmapped
+	0x10	REVERSE       .. SEQ is reverse complemented
+	0x20	MREVERSE      .. SEQ of the next segment in the template is reversed
+	0x40	READ1         .. the first segment in the template
+	0x80	READ2         .. the last segment in the template
+	0x100	SECONDARY     .. secondary alignment
+	0x200	QCFAIL        .. not passing quality controls
+	0x400	DUP           .. PCR or optical duplicate
+	0x800	SUPPLEMENTARY .. supplementary alignment
+
+  -f INT   only include reads with all  of the FLAGs in INT present [0]
+  -F INT   only include reads with none of the FLAGS in INT present [0]
+  -G INT   only EXCLUDE reads with all  of the FLAGs in INT present [0]
+
+
+
+
+
+
+
+echo 2048+1024+512+256 | bc
+3840
+
+Paired and laned, but not special
+
+nohup samtools view -@ 19 -c -f 65  -F 3840 983899.bam > 983899.bam.f065-F3840.count &
+nohup samtools view -@ 19 -c -f 129 -F 3840 983899.bam > 983899.bam.f129-F3840.count &
+nohup samtools view -@ 19 -c -f 65  -F 3840 GM_983899.bam > GM_983899.bam.f065-F3840.count &
+nohup samtools view -@ 19 -c -f 129 -F 3840 GM_983899.bam > GM_983899.bam.f129-F3840.count &
+
+
+This is just ridiculous
+
+cat 983899.bam.f129-F3840.count 983899.bam.f065-F3840.count
+682797234
+682296913
+
+cat GM_983899.bam.f129-F3840.count GM_983899.bam.f065-F3840.count
+395104319
+394915705
+
+
+
+I'm gonna just have to get the raw FASTQ data again.
+Or find my old script.
+
+samtools_bam_to_paired_fastq.gawk, samtools_bam_to_paired_fastq.bash
 
 
 
 
 Disk space is getting low. 1.3TB
+
+
+--------------------------------------------------
+
+
+Starting over?
+
+sambamba sort
+
+    not (unmapped or mate_is_unmapped) and first_of_pair
+paired
+proper_pair
+unmapped
+mate_is_unmapped
+reverse_strand
+mate_is_reverse_strand
+first_of_pair
+second_of_pair
+secondary_alignment
+failed_quality_control
+duplicate
+supplementary
+chimeric
+
+-F "paired and first_of_pair and not ( secondary_alignment or failed_quality_control or duplicate or supplementary)"
+-F "paired and second_of_pair and not ( secondary_alignment or failed_quality_control or duplicate or supplementary)"
+
+
+
+
+
+
+
+
+
+
+nohup samtools view -f 1 -F 3840 983899.bam | gawk -v base=983899 -f sam_to_paired_fastq.gawk > 983899.sam_to_paired_fastq.gawk.log 2> 983899.sam_to_paired_fastq.gawk.err &
+
+nohup samtools view -f 1 -F 3840 GM_983899.bam | gawk -v base=GM_983899 -f sam_to_paired_fastq.gawk > GM_983899.sam_to_paired_fastq.gawk.log 2> GM_983899.sam_to_paired_fastq.gawk.err &
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
