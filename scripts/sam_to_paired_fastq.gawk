@@ -19,6 +19,7 @@ function print_to_fastq( name, flags, sequence, quality ){
 	lane=(and(flags,64))?"1":"2";
 	filename=base"."lane".fastq"
 
+	#	unreverse any reverse alignments
 	sequence=(and(flags,16))?reverse_complement(sequence):sequence;
 	quality=(and(flags,16))?reverse(quality):quality;
 
@@ -71,9 +72,10 @@ BEGIN {
 		b1=b2=b10=b11=""
 	} else {
 
-		#	Doesn't match buffered read?
-		if( b1 != "" )
+		if( b1 != "" ){
+			#	Doesn't match buffered read
 			print b1 > base".missing_mates.txt"
+		}
 
 		#	buffer this one
 		b1=$1
@@ -81,4 +83,12 @@ BEGIN {
 		b10=$10
 		b11=$11
 	}
+}
+END {
+	close( base".diff_length_reads" )
+	close( base".diff_length_quality" )
+	close( base".diff_length_read_and_quality" )
+	close( base".missing_mates.txt" )
+	close( base".1.fastq" )
+	close( base".2.fastq" )
 }
