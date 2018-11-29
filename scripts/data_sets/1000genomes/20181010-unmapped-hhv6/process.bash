@@ -9,6 +9,7 @@ set -o pipefail
 
 #for bam in $( find /raid/data/raw/1000genomes/phase3/data/ -name *unmapped*bam ) ; do
 for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
+	echo "------------------------------------------------------------"
 	base=$( basename $bam )
 	subject=${base%.unmapped.ILLUMINA.bwa*}
 	echo $bam
@@ -71,13 +72,13 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 	for hhv in /raid/refs/fasta/virii/*fasta ; do
 		hhv=$( basename $hhv .fasta )
 
-		echo "Processing $hhv"
+		echo "Processing $subject / $hhv"
 
 
 		if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
 			echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
 		else
-			bowtie2 --threads 40 -f --xeq -x virii/${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
+			bowtie2 --threads 35 -f --xeq -x virii/${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
 			chmod a-w ${subject}.${hhv}.unsorted.bam
 		fi
 
@@ -195,7 +196,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 	for hhv in HHV6a HHV6b ; do
 
-		echo "Processing $hhv"
+		echo "Processing $subject / $hhv"
 
 		if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
 			echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
@@ -205,7 +206,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			echo "Bowtie2 aligning fasta reads to ${hhv}"
 
 #	FASTA REQUIRES the -f FLAG!
-			bowtie2 --threads 40 -f --xeq -x ${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
+			bowtie2 --threads 35 -f --xeq -x ${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
 
 
 			chmod a-w ${subject}.${hhv}.unsorted.bam
@@ -397,7 +398,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 	done
 
-	echo "---"
 done
 
+echo "---"
 echo "Done"
