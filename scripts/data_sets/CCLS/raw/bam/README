@@ -304,6 +304,23 @@ nohup samtools view -f 1 -F 3840 983899.bam | gawk -v base=983899 -f sam_to_pair
 
 nohup samtools view -f 1 -F 3840 GM_983899.bam | gawk -v base=GM_983899 -f sam_to_paired_fastq.gawk > GM_983899.sam_to_paired_fastq.gawk.log 2> GM_983899.sam_to_paired_fastq.gawk.err &
 
+That tooks 12-16 hours!
+
+chmod a-w *983899.?.fastq
+
+nohup wc -l 983899.1.fastq > 983899.1.fastq.count &
+nohup wc -l 983899.2.fastq > 983899.2.fastq.count &
+nohup wc -l GM_983899.1.fastq > GM_983899.1.fastq.count &
+nohup wc -l GM_983899.2.fastq > GM_983899.2.fastq.count &
+
+ cat *count
+2728946344 983899.1.fastq
+2728946344 983899.2.fastq
+1579529356 GM_983899.1.fastq
+1579529356 GM_983899.2.fastq
+
+Whew!!!!
+
 
 
 nohup gzip --keep --best 983899.1.fastq > 983899.1.fastq.gz.out 2> 983899.1.fastq.gz.err &
@@ -311,7 +328,28 @@ nohup gzip --keep --best 983899.2.fastq > 983899.2.fastq.gz.out 2> 983899.2.fast
 nohup gzip --keep --best GM_983899.1.fastq > GM_983899.1.fastq.gz.out 2> GM_983899.1.fastq.gz.err &
 nohup gzip --keep --best GM_983899.2.fastq > GM_983899.2.fastq.gz.out 2> GM_983899.2.fastq.gz.err &
 
+[5]   Exit 1                  nohup gzip --keep --best 983899.1.fastq > 983899.1.fastq.gz.out 2> 983899.1.fastq.gz.err
+[6]   Exit 1                  nohup gzip --keep --best 983899.2.fastq > 983899.2.fastq.gz.out 2> 983899.2.fastq.gz.err
+[7]-  Exit 1                  nohup gzip --keep --best GM_983899.1.fastq > GM_983899.1.fastq.gz.out 2> GM_983899.1.fastq.gz.err
+[8]+  Exit 1                  nohup gzip --keep --best GM_983899.2.fastq > GM_983899.2.fastq.gz.out 2> GM_983899.2.fastq.gz.err
 
+???
+
+dmesg
+
+[131343.193499] EXT4-fs error (device sda1): ext4_validate_block_bitmap:391: comm kworker/u82:0: bg 212156: bad block bitmap checksum
+[131343.193779] Aborting journal on device sda1-8.
+[131343.193912] EXT4-fs (sda1): Remounting filesystem read-only
+[131343.194014] EXT4-fs error (device sda1) in ext4_writepages:2897: IO failure
+
+
+
+
+
+nohup zcat 983899.1.fastq | wc -l > 983899.1.fastq.gz.count &
+nohup zcat 983899.2.fastq | wc -l > 983899.2.fastq.gz.count &
+nohup zcat GM_983899.1.fastq | wc -l > GM_983899.1.fastq.gz.count &
+nohup zcat GM_983899.2.fastq | wc -l > GM_983899.2.fastq.gz.count &
 
 
 
