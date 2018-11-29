@@ -1,0 +1,21 @@
+strelka 2.9.10
+
+
+
+Realigned 983899/GM_983899 end-to-end to hg38.no_alts
+
+Trying strelka again
+Also, gonna do a depth coverage analysis too
+
+
+
+nohup ./run_strelka.bash > run_strelka.out 2>&1 &
+
+./create_snp_tsv.bash
+
+
+
+
+
+Try manta too
+https://github.com/Illumina/manta/tree/master/docs/userGuide
