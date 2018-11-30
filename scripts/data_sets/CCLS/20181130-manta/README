@@ -1,0 +1,13 @@
+
+
+Realigned 983899/GM_983899 end-to-end to hg38.no_alts
+
+Trying manta https://github.com/Illumina/manta
+
+nohup ./run_manta.bash > run_manta.out 2>&1 &
+
+
+
+
+
+./create_snp_tsv.bash

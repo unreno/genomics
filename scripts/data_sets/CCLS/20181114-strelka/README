@@ -64,6 +64,8 @@ chimera_to_table.bash all.TCA.TCT.positions_for_table.csv > all.TCA.TCT.table.cs
 Guess gender
 zcat 268325/results/variants/somatic.snvs.vcf.gz | head -100 | grep Depth_[XY] 
 
+zcat 268325/results/variants/somatic.snvs.vcf.gz | grep --max-count 2 Depth_[XY] 
+
 If about the same, Male else Female.
 
 

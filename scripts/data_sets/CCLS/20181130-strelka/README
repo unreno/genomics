@@ -17,5 +17,108 @@ nohup ./run_strelka.bash > run_strelka.out 2>&1 &
 
 
 
+
+
 Try manta too
 https://github.com/Illumina/manta/tree/master/docs/userGuide
+
+
+
+
+
+
+#for d in 268325  439338  63185  634370  983899 ; do
+for d in 983899 ; do
+echo $d
+./extract_ReadPosRankSum_lt_neg8.py ${d}.snp.tsv &
+./extract_ReadPosRankSum_lt_neg5.py ${d}.snp.tsv &
+./extract_ReadPosRankSum_lt_neg3.py ${d}.snp.tsv &
+./extract_ReadPosRankSum_lt_neg1.py ${d}.snp.tsv &
+done
+
+
+
+
+
+https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
+
+#	minor mod to ~/count_trinuc_muts_v8.pl
+#	don't add "chr" prefix
+
+for i in *.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.num.fa $i & done
+
+
+
+
+creating fasta db... complete!
+Subroutine Bio::DB::IndexedBase::_strip_crnl redefined at /usr/lib/x86_64-linux-gnu/perl/5.22/DynaLoader.pm line 210.
+Possible precedence issue with control flow operator at /usr/local/share/perl/5.22.1/Bio/DB/IndexedBase.pm line 845.
+
+
+
+
+rename 's/.tsv.\d+.count/.count/' *tsv.*.count.txt
+rename 's/.tsv.count/.count/' *tsv.count.txt
+chmod 444 *txt
+
+
+
+
+wc -l *.count.txt
+grep -c 'T[C>T]A' *.count.txt
+
+for d in *count.txt ; do
+out=$( basename $d .txt )".TCA.TCT.positions.txt"
+echo $d
+awk 'BEGIN{ FS=OFS="\t"}( $7 == "T[C>T]A" || $7 == "T[C>T]T" ){ print $1,$2 }' $d > $out
+done
+chmod a-w *positions.txt
+
+for d in *count.txt ; do
+out=$( basename $d .txt )".TCA.TCT.positions_for_table.txt"
+s=${d%.count.txt}
+echo $d $s
+awk -v s=$s 'BEGIN{FS="\t";OFS=","}( $7 == "T[C>T]A" || $7 == "T[C>T]T" ){ print $1"|"$2,1,s }' $d > $out
+done
+chmod a-w *positions_for_table.txt
+
+
+cat *snp.count.TCA.TCT.positions_for_table.txt > snp.TCA.TCT.positions_for_table.csv
+chimera_to_table.bash snp.TCA.TCT.positions_for_table.csv > snp.TCA.TCT.table.csv 
+
+cat *ReadPosRankSum_lt_neg1.count.TCA.TCT.positions_for_table.txt > ReadPosRankSum_lt_neg1.TCA.TCT.positions_for_table.csv
+chimera_to_table.bash ReadPosRankSum_lt_neg1.TCA.TCT.positions_for_table.csv > ReadPosRankSum_lt_neg1.TCA.TCT.table.csv 
+
+cat *ReadPosRankSum_lt_neg3.count.TCA.TCT.positions_for_table.txt > ReadPosRankSum_lt_neg3.TCA.TCT.positions_for_table.csv
+chimera_to_table.bash ReadPosRankSum_lt_neg3.TCA.TCT.positions_for_table.csv > ReadPosRankSum_lt_neg3.TCA.TCT.table.csv 
+
+cat *ReadPosRankSum_lt_neg5.count.TCA.TCT.positions_for_table.txt > ReadPosRankSum_lt_neg5.TCA.TCT.positions_for_table.csv
+chimera_to_table.bash ReadPosRankSum_lt_neg5.TCA.TCT.positions_for_table.csv > ReadPosRankSum_lt_neg5.TCA.TCT.table.csv 
+
+cat *.count.TCA.TCT.positions_for_table.txt > all.TCA.TCT.positions_for_table.csv
+chimera_to_table.bash all.TCA.TCT.positions_for_table.csv > all.TCA.TCT.table.csv 
+
+
+
+Guess gender
+zcat 268325/results/variants/somatic.snvs.vcf.gz | head -100 | grep Depth_[XY] 
+
+zcat 268325/results/variants/somatic.snvs.vcf.gz | grep --max-count 2 Depth_[XY] 
+
+If about the same, Male else Female.
+
+
+
+
+
+I really don't understand why the DP is SO MUCH DIFFERENT. Kinda makes it hard to trust
+
+[jake@system76-server /raid/data/working/CCLS/20181114-strelka]$ zcat 983899/results/variants/somatic.snvs.vcf.gz | grep 8230684
+21	8230684	.	C	T	.	LowEVS	SOMATIC;QSS=19;TQSS=1;NT=ref;QSS_NT=19;TQSS_NT=1;SGT=CC->CT;DP=13193;MQ=41.93;MQ0=1055;ReadPosRankSum=-10.25;SNVSB=59.02;SomaticEVS=0.05	DP:FDP:SDP:SUBDP:AU:CU:GU:TU	3566:270:1279:0:1,1:3236,4891:6,20:53,98	5663:530:1782:0:10,22:5019,7954:16,37:88,169
+[jake@system76-server /raid/data/working/CCLS/20181114-strelka]$ zcat 983899/results/variants/somatic.snvs.vcf.gz | grep 8230685
+6	82306857	.	A	C	.	LowEVS	SOMATIC;QSS=1;TQSS=2;NT=conflict;QSS_NT=0;TQSS_NT=2;SGT=AA->AA;DP=67;MQ=47.14;MQ0=3;ReadPosRankSum=0.60;SNVSB=0.00;SomaticEVS=0.00	DP:FDP:SDP:SUBDP:AU:CU:GU:TU	19:3:0:0:14,22:2,5:0,0:0,1	32:7:0:0:23,37:2,2:0,0:0,0
+
+
+These bam files from the provider are LOCALLY aligned opening the door for uneven alignment depth?
+
+
