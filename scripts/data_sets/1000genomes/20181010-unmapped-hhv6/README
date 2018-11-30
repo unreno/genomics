@@ -128,7 +128,9 @@ done
 
 
 
-for f in *.HHV6a.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ $c != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2
+for f in *.HHV6a.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ "$c" != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2 > ALL.HHV6a.bowtie2.mapped_center.ratio_total.txt
+
+cat ALL.HHV6a.bowtie2.mapped_center.ratio_total.txt
 HG02537.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000003
 HG01092.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000004
 HG02017.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000000006
@@ -160,9 +162,11 @@ HG01277.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000017406
 HG02016.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000017962
 NA18999.HHV6a.bowtie2.mapped_center.ratio_total.txt: 0.000018851
 
-[jake@system76-server /raid/data/working/1000genomes/20181010-unmapped-hhv6]$ for f in *.HHV6b.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ $c != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2
+for f in *.HHV6b.bowtie2.mapped_center.ratio_total.txt ; do c=$( cat $f ); if [ "$c" != 0 ] ; then echo -n $f": 0"; cat $f; fi; done | sort -k2n,2 > ALL.HHV6b.bowtie2.mapped_center.ratio_total.txt
+
+cat ALL.HHV6b.bowtie2.mapped_center.ratio_total.txt
 HG02537.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000003
-  01092.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000004
+HG01092.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000004
 HG02017.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
 NA18747.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
 NA18749.HHV6b.bowtie2.mapped_center.ratio_total.txt: 0.000000006
@@ -209,4 +213,6 @@ for dir in /raid/data/raw/1000genomes/phase3/data/* ; do basename $dir; done > s
 for virus in /raid/refs/fasta/virii/*fasta ; do basename $virus .fasta; done > virii_versions.txt
 head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
 
+
+./report.bash > 1kg-HHV6ab-report.csv &
 
