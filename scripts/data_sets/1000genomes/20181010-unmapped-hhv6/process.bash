@@ -75,34 +75,37 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		echo "Processing $subject / $hhv"
 
 
-		if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
-			echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
+		if [ -f ${subject}.${hhv}.bam ] && [ ! -w ${subject}.${hhv}.bam ]  ; then
+			echo "Write-protected ${subject}.${hhv}.bam exists. Skipping step."
 		else
-			bowtie2 --threads 35 -f --xeq -x virii/${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
-			chmod a-w ${subject}.${hhv}.unsorted.bam
-		fi
 
-		if [ -f ${subject}.${hhv}.sorted.bam ] && [ ! -w ${subject}.${hhv}.sorted.bam ]  ; then
-			echo "Write-protected ${subject}.${hhv}.sorted.bam exists. Skipping step."
-		else
+			if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
+				echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
+			else
+				bowtie2 --threads 35 -f --xeq -x virii/${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
+				#chmod a-w ${subject}.${hhv}.unsorted.bam
+			fi
+
 			echo "Sorting"
-			samtools sort -o ${subject}.${hhv}.sorted.bam ${subject}.${hhv}.unsorted.bam
-			chmod a-w ${subject}.${hhv}.sorted.bam
+			samtools sort -o ${subject}.${hhv}.bam ${subject}.${hhv}.unsorted.bam
+			chmod a-w ${subject}.${hhv}.bam
+
+			\rm ${subject}.${hhv}.unsorted.bam
 		fi
 
-		if [ -f ${subject}.${hhv}.sorted.bam.bai ] && [ ! -w ${subject}.${hhv}.sorted.bam.bai ]  ; then
-			echo "Write-protected ${subject}.${hhv}.sorted.bam.bai exists. Skipping step."
+		if [ -f ${subject}.${hhv}.bam.bai ] && [ ! -w ${subject}.${hhv}.bam.bai ]  ; then
+			echo "Write-protected ${subject}.${hhv}.bam.bai exists. Skipping step."
 		else
 			echo "Indexing"
-			samtools index ${subject}.${hhv}.sorted.bam
-			chmod a-w ${subject}.${hhv}.sorted.bam.bai
+			samtools index ${subject}.${hhv}.bam
+			chmod a-w ${subject}.${hhv}.bam.bai
 		fi
 
 		if [ -f ${subject}.${hhv}.depth.csv ] && [ ! -w ${subject}.${hhv}.depth.csv ]  ; then
 			echo "Write-protected ${subject}.${hhv}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
-			samtools depth ${subject}.${hhv}.sorted.bam > ${subject}.${hhv}.depth.csv
+			samtools depth ${subject}.${hhv}.bam > ${subject}.${hhv}.depth.csv
 			chmod a-w ${subject}.${hhv}.depth.csv
 		fi
 
@@ -111,7 +114,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		else
 			echo "Counting reads bowtie2 aligned to ${hhv}"
 			#	-F 4 needless here as filtered with this flag above.
-			samtools view -c -F 4 ${subject}.${hhv}.unsorted.bam > ${subject}.${hhv}.bowtie2.mapped.count.txt
+			samtools view -c -F 4 ${subject}.${hhv}.bam > ${subject}.${hhv}.bowtie2.mapped.count.txt
 			chmod a-w ${subject}.${hhv}.bowtie2.mapped.count.txt
 		fi
 
@@ -137,7 +140,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 #			echo "Counting reads bowtie2 aligned to CENTER of ${hhv} in region ${hhv}:20000-120000"
 #			#	-F 4 needless here as filtered with this flag above.
 #			#	MUST USE SORTED
-#			samtools view -c -F 4 ${subject}.${hhv}.sorted.bam ${hhv}:20000-120000 > ${subject}.${hhv}.bowtie2.mapped_center.count.txt
+#			samtools view -c -F 4 ${subject}.${hhv}.bam ${hhv}:20000-120000 > ${subject}.${hhv}.bowtie2.mapped_center.count.txt
 #			chmod a-w ${subject}.${hhv}.bowtie2.mapped_center.count.txt
 #		fi
 #
@@ -198,36 +201,36 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 		echo "Processing $subject / $hhv"
 
-		if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
-			echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
+		if [ -f ${subject}.${hhv}.bam ] && [ ! -w ${subject}.${hhv}.bam ]  ; then
+			echo "Write-protected ${subject}.${hhv}.bam exists. Skipping step."
 		else
-			#	echo "Bowtie2 aligning fastq reads to ${hhv}"
-			#	bowtie2 --xeq -x ${hhv} --very-sensitive -U ${subject}.fastq.gz | samtools view -F 4 -o ${subject}.${hhv}.bam -
-			echo "Bowtie2 aligning fasta reads to ${hhv}"
 
-#	FASTA REQUIRES the -f FLAG!
-			bowtie2 --threads 35 -f --xeq -x ${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
+			if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
+				echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
+			else
+				#	echo "Bowtie2 aligning fastq reads to ${hhv}"
+				#	bowtie2 --xeq -x ${hhv} --very-sensitive -U ${subject}.fastq.gz | samtools view -F 4 -o ${subject}.${hhv}.bam -
+				echo "Bowtie2 aligning fasta reads to ${hhv}"
 
+				#	FASTA REQUIRES the -f FLAG!
+				bowtie2 --threads 35 -f --xeq -x ${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
 
-			chmod a-w ${subject}.${hhv}.unsorted.bam
-		fi
+				#chmod a-w ${subject}.${hhv}.unsorted.bam
+			fi
 
-
-		if [ -f ${subject}.${hhv}.sorted.bam ] && [ ! -w ${subject}.${hhv}.sorted.bam ]  ; then
-			echo "Write-protected ${subject}.${hhv}.sorted.bam exists. Skipping step."
-		else
 			echo "Sorting"
-			samtools sort -o ${subject}.${hhv}.sorted.bam ${subject}.${hhv}.unsorted.bam
-			chmod a-w ${subject}.${hhv}.sorted.bam
+			samtools sort -o ${subject}.${hhv}.bam ${subject}.${hhv}.unsorted.bam
+			chmod a-w ${subject}.${hhv}.bam
+			\rm ${subject}.${hhv}.unsorted.bam
 		fi
 
 
-		if [ -f ${subject}.${hhv}.sorted.bam.bai ] && [ ! -w ${subject}.${hhv}.sorted.bam.bai ]  ; then
-			echo "Write-protected ${subject}.${hhv}.sorted.bam.bai exists. Skipping step."
+		if [ -f ${subject}.${hhv}.bam.bai ] && [ ! -w ${subject}.${hhv}.bam.bai ]  ; then
+			echo "Write-protected ${subject}.${hhv}.bam.bai exists. Skipping step."
 		else
 			echo "Indexing"
-			samtools index ${subject}.${hhv}.sorted.bam
-			chmod a-w ${subject}.${hhv}.sorted.bam.bai
+			samtools index ${subject}.${hhv}.bam
+			chmod a-w ${subject}.${hhv}.bam.bai
 		fi
 
 
@@ -236,7 +239,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			echo "Write-protected ${subject}.${hhv}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
-			samtools depth ${subject}.${hhv}.sorted.bam > ${subject}.${hhv}.depth.csv
+			samtools depth ${subject}.${hhv}.bam > ${subject}.${hhv}.depth.csv
 			chmod a-w ${subject}.${hhv}.depth.csv
 		fi
 
@@ -250,7 +253,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		else
 			echo "Counting reads bowtie2 aligned to ${hhv}"
 			#	-F 4 needless here as filtered with this flag above.
-			samtools view -c -F 4 ${subject}.${hhv}.unsorted.bam > ${subject}.${hhv}.bowtie2.mapped.count.txt
+			samtools view -c -F 4 ${subject}.${hhv}.bam > ${subject}.${hhv}.bowtie2.mapped.count.txt
 			chmod a-w ${subject}.${hhv}.bowtie2.mapped.count.txt
 		fi
 
@@ -270,10 +273,10 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			chmod a-w ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt
 		fi
 
-#$ samtools view -H NA21144.HHV6b.sorted.bam 
+#$ samtools view -H NA21144.HHV6b.bam 
 #@HD	VN:1.0	SO:coordinate
 #@SQ	SN:NC_000898.1	LN:162114
-#$ samtools view -H NA21144.HHV6a.sorted.bam 
+#$ samtools view -H NA21144.HHV6a.bam 
 #@HD	VN:1.0	SO:coordinate
 #@SQ	SN:NC_001664.4	LN:159378
 
@@ -283,12 +286,12 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		else
 
 			#	either NC_000898.1 or NC_001664.4
-			name=$( samtools view -H ${subject}.${hhv}.sorted.bam | grep "^@SQ" | awk '{print $2}' | awk -F: '{print $2}' )
+			name=$( samtools view -H ${subject}.${hhv}.bam | grep "^@SQ" | awk '{print $2}' | awk -F: '{print $2}' )
 			echo "Counting reads bowtie2 aligned to CENTER of ${hhv} in region ${name}:20000-120000"
 
 			#	-F 4 needless here as filtered with this flag above.
 			#	MUST USE SORTED
-			samtools view -c -F 4 ${subject}.${hhv}.sorted.bam ${name}:20000-120000 > ${subject}.${hhv}.bowtie2.mapped_center.count.txt
+			samtools view -c -F 4 ${subject}.${hhv}.bam ${name}:20000-120000 > ${subject}.${hhv}.bowtie2.mapped_center.count.txt
 			chmod a-w ${subject}.${hhv}.bowtie2.mapped_center.count.txt
 		fi
 
