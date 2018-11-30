@@ -313,11 +313,13 @@ nohup wc -l 983899.2.fastq > 983899.2.fastq.count &
 nohup wc -l GM_983899.1.fastq > GM_983899.1.fastq.count &
 nohup wc -l GM_983899.2.fastq > GM_983899.2.fastq.count &
 
- cat *count
+cat *.fastq.count
 2728946344 983899.1.fastq
 2728946344 983899.2.fastq
 1579529356 GM_983899.1.fastq
 1579529356 GM_983899.2.fastq
+
+chmod a-w *983899.?.fastq.count
 
 Whew!!!!
 
@@ -343,24 +345,31 @@ dmesg
 [131343.194014] EXT4-fs error (device sda1) in ext4_writepages:2897: IO failure
 
 
+\rm 983899.bam GM_983899.bam
+
+Hope this doesn't happen again because it looks like gzipping is going to take about 20 hours.
 
 
 
-nohup zcat 983899.1.fastq | wc -l > 983899.1.fastq.gz.count &
-nohup zcat 983899.2.fastq | wc -l > 983899.2.fastq.gz.count &
-nohup zcat GM_983899.1.fastq | wc -l > GM_983899.1.fastq.gz.count &
-nohup zcat GM_983899.2.fastq | wc -l > GM_983899.2.fastq.gz.count &
+nohup zcat 983899.1.fastq.gz | wc -l > 983899.1.fastq.gz.count &
+nohup zcat 983899.2.fastq.gz | wc -l > 983899.2.fastq.gz.count &
+nohup zcat GM_983899.1.fastq.gz | wc -l > GM_983899.1.fastq.gz.count &
+nohup zcat GM_983899.2.fastq.gz | wc -l > GM_983899.2.fastq.gz.count &
+
+cat *.fastq.gz.count
+2728946344 983899.1.fastq
+2728946344
+2728946344 983899.2.fastq
+2728946344
+1579529356 GM_983899.1.fastq
+1579529356
+1579529356 GM_983899.2.fastq
+1579529356
 
 
+chmod a-w *983899.?.fastq.gz.count
 
-
-
-
-
-
-
-
-
+\rm *983899.?.fastq
 
 
 
@@ -371,19 +380,54 @@ nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --
 
 
 
-Running out of disk space. Gonna need to remove the sorted bam files.
+
+
+
+
+
+
+
+
 
 These will need sorted prior to being indexed.
 
 Does bowtie2 or vcf calling use the initial read qualities, or can I save time and disk space using FASTA instead.
 
 
+nohup samtools view -c GM_983899.name.hg38_no_alts.bam > GM_983899.name.hg38_no_alts.bam.count &
+nohup samtools view -c 983899.name.hg38_no_alts.bam > 983899.name.hg38_no_alts.bam.count &
+
+
+cat *count
+
+
+
+
+
+
+
 
 nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o GM_983899.hg38_no_alts.bam GM_983899.name.hg38_no_alts.bam > GM_983899.sambamba_sort.log 2> GM_983899.sambamba_sort.err &
 nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 983899.hg38_no_alts.bam 983899.name.hg38_no_alts.bam > 983899.sambamba_sort.log 2> 983899.sambamba_sort.err &
 
-nohup samtools index -@ 9 GM_983899.hg38_no_alts.bam &
-nohup samtools index -@ 9 983899.hg38_no_alts.bam &
+
+nohup samtools view -c GM_983899.hg38_no_alts.bam > GM_983899.hg38_no_alts.bam.count &
+nohup samtools view -c 983899.hg38_no_alts.bam > 983899.hg38_no_alts.bam.count &
+
+cat *count
+
+
+
+
+
+
+\rm *983899.name.hg38_no_alts.bam
+
+
+
+
+nohup samtools index -@ 19 GM_983899.hg38_no_alts.bam &
+nohup samtools index -@ 19 983899.hg38_no_alts.bam &
 
 select only PROPER_PAIRs
 
