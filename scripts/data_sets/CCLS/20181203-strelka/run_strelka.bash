@@ -16,26 +16,47 @@
 #for base in 268325 439338 63185 634370 983899 ; do
 for base in 983899 ; do
 
+
+#	configureStrelkaSomaticWorkflow.py \
+#		--normalBam /raid/data/raw/CCLS/bam/GM_${base}.recaled.bam \
+#		--tumorBam /raid/data/raw/CCLS/bam/${base}.recaled.bam \
+#		--ref /raid/refs/fasta/hg38.num.fa \
+#		--runDir ${base}
+#
+#	#Seems that each option NEEDS an explicit path
+#
+#	${base}/runWorkflow.py -m local -j 30
+#
+#
+#	configureStrelkaSomaticWorkflow.py \
+#		--normalBam /raid/data/working/CCLS/20181203-strelka/GM_${base}.hg38_no_alts.bam \
+#		--tumorBam /raid/data/working/CCLS/20181203-strelka/${base}.hg38_no_alts.bam \
+#		--ref /raid/refs/fasta/hg38_no_alts.fa \
+#		--runDir ${base}
+#
+#	#Seems that each option NEEDS an explicit path
+#
+#	${base}/runWorkflow.py -m local -j 30
+
 	configureStrelkaSomaticWorkflow.py \
-		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38_no_alts.RG.bam \
-		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38_no_alts.RG.bam \
-		--ref /raid/refs/fasta/hg38_no_alts.fa \
-		--runDir ${base}
-
-	#Seems that each option NEEDS an explicit path
-
-	${base}/runWorkflow.py -m local -j 40
-
-
-
-	configureStrelkaSomaticWorkflow.py \
-		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38_no_alts.PP.RG.bam \
-		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38_no_alts.PP.RG.bam \
-		--ref /raid/refs/fasta/hg38_no_alts.fa \
+		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.PP.bam \
+		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.PP.bam \
+		--ref /raid/refs/fasta/hg38.num.fa \
 		--runDir ${base}.PP
 
 	#Seems that each option NEEDS an explicit path
 
 	${base}.PP/runWorkflow.py -m local -j 40
+
+
+	configureStrelkaSomaticWorkflow.py \
+		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.bam \
+		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.bam \
+		--ref /raid/refs/fasta/hg38.num.fa \
+		--runDir ${base}
+
+	#Seems that each option NEEDS an explicit path
+
+	${base}/runWorkflow.py -m local -j 40
 
 done

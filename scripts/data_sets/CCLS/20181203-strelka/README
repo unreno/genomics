@@ -8,6 +8,37 @@ Trying strelka again
 Also, gonna do a depth coverage analysis too
 
 
+BE ADVISED: strelka and manta install files in ~/.local/lib/python that are the same name, but different and incompatible!
+
+
+
+
+
+Not working. Investigating
+
+zcat /raid/data/raw/CCLS/bam/redo/GM_983899.1.fastq.gz | head -10000000 > GM_983899.1.fastq
+zcat /raid/data/raw/CCLS/bam/redo/GM_983899.2.fastq.gz | head -10000000 > GM_983899.2.fastq
+zcat /raid/data/raw/CCLS/bam/redo/983899.1.fastq.gz    | head -10000000 > 983899.1.fastq
+zcat /raid/data/raw/CCLS/bam/redo/983899.2.fastq.gz    | head -10000000 > 983899.2.fastq
+
+bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38_no_alts -1 GM_983899.1.fastq -2 GM_983899.2.fastq --very-sensitive --threads 40 | samtools view -o GM_983899.name.hg38_no_alts.bam -
+bowtie2 --rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38_no_alts -1 983899.1.fastq -2 983899.2.fastq --very-sensitive --threads 40 | samtools view -o 983899.name.hg38_no_alts.bam -
+
+samtools sort -@ 39 -o GM_983899.hg38_no_alts.bam GM_983899.name.hg38_no_alts.bam
+samtools sort -@ 39 -o 983899.hg38_no_alts.bam 983899.name.hg38_no_alts.bam
+
+samtools index GM_983899.hg38_no_alts.bam
+samtools index 983899.hg38_no_alts.bam 
+
+
+
+
+
+
+
+
+
+
 
 nohup ./run_strelka.bash > run_strelka.out 2>&1 &
 
