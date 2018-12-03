@@ -110,7 +110,7 @@ samtools view does compress it. if running sambamba sort again, set the compress
 -rw-rw-r-- 1 jake 322638049280 Nov 27 18:18 983899.samtools_view.bam
 -r--r--r-- 1 jake 249764383502 Nov 26 23:48 GM_983899.bam
 
-nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 --nthreads 40 -m 50GB --show-progress -o redo/GM_983899.bam GM_983899.recaled.bam > redo/GM_983899.sambamba.log 2> redo/GM_983899.sambamba.err &
+nohup sambamba sort --uncompressed-chunks --sort-by-name  --compression-level=9 --nthreads 40 -m 50GB --show-progress -o redo/GM_983899.bam GM_983899.recaled.bam > redo/GM_983899.sambamba.out 2> redo/GM_983899.sambamba.err &
 
 With compression 9, this is almost exactly the same size as the samtools sorted version.
 
@@ -300,9 +300,9 @@ Next time.
 Only need the fastq files so once the following is done, if it works, remove these bams.
 
 
-nohup samtools view -f 1 -F 3840 983899.bam | gawk -v base=983899 -f sam_to_paired_fastq.gawk > 983899.sam_to_paired_fastq.gawk.log 2> 983899.sam_to_paired_fastq.gawk.err &
+nohup samtools view -f 1 -F 3840 983899.bam | gawk -v base=983899 -f sam_to_paired_fastq.gawk > 983899.sam_to_paired_fastq.gawk.out 2> 983899.sam_to_paired_fastq.gawk.err &
 
-nohup samtools view -f 1 -F 3840 GM_983899.bam | gawk -v base=GM_983899 -f sam_to_paired_fastq.gawk > GM_983899.sam_to_paired_fastq.gawk.log 2> GM_983899.sam_to_paired_fastq.gawk.err &
+nohup samtools view -f 1 -F 3840 GM_983899.bam | gawk -v base=GM_983899 -f sam_to_paired_fastq.gawk > GM_983899.sam_to_paired_fastq.gawk.out 2> GM_983899.sam_to_paired_fastq.gawk.err &
 
 That tooks 12-16 hours!
 
@@ -372,16 +372,19 @@ chmod a-w *983899.?.fastq.gz.count
 \rm *983899.?.fastq
 
 
+Add a read group next time ...
+--rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU
 
-nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38_no_alts.bam - &
-nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.name.hg38_no_alts.bam - &
+
+nohup bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38_no_alts.bam - > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err &
+nohup bowtie2 --rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.name.hg38_no_alts.bam - > 983899.bowtie2.out 2> 983899.bowtie2.err &
+
 
 This is gonna take about 24 hours
 Crashed with no messages. Gonna go straight to sam and catch stdout and stderr.
 
-
-nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 -S GM_983899.name.hg38_no_alts.sam > GM_983899.bowtie2.log 2> GM_983899.bowtie2.err & 
-nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 -S 983899.name.hg38_no_alts.sam > 983899.bowtie2.log 2> 983899.bowtie2.err &
+nohup bowtie2 --xeq -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 -S GM_983899.name.hg38_no_alts.sam > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err & 
+nohup bowtie2 --xeq -x hg38_no_alts -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 -S 983899.name.hg38_no_alts.sam > 983899.bowtie2.out 2> 983899.bowtie2.err &
 
 
 
@@ -397,7 +400,11 @@ Does bowtie2 or vcf calling use the initial read qualities, or can I save time a
 nohup samtools view -c GM_983899.name.hg38_no_alts.sam > GM_983899.name.hg38_no_alts.sam.count &
 nohup samtools view -c 983899.name.hg38_no_alts.sam > 983899.name.hg38_no_alts.sam.count &
 
+Counts should be half of the fastq line counts
 cat *count
+1364473172
+789764678
+
 
 
 
@@ -407,53 +414,167 @@ Trying gatk SortSam
 
 nohup gatk SortSam --INPUT 983899.name.hg38_no_alts.sam --OUTPUT 983899.hg38_no_alts.bam --SORT_ORDER coordinate > 983899.name.hg38_no_alts.sam.gatk.SortSam.out >> 983899.name.hg38_no_alts.sam.gatk.SortSam.err &
 nohup gatk SortSam --INPUT GM_983899.name.hg38_no_alts.sam --OUTPUT GM_983899.hg38_no_alts.bam --SORT_ORDER coordinate > GM_983899.name.hg38_no_alts.sam.gatk.SortSam.out >> GM_983899.name.hg38_no_alts.sam.gatk.SortSam.err &
-               
 
+
+Filesystem crashed AGAIN. Installed latest fsck and restarted.
+GM_983899 completed. Retrying 983899.
+
+rename 's/bam$/gatk.SortSam.bam/' *bam
+
+nohup samtools view -c GM_983899.hg38_no_alts.gatk.SortSam.bam > GM_983899.hg38_no_alts.bam.gatk.SortSam.count &
+nohup samtools view -c 983899.hg38_no_alts.gatk.SortSam.bam > 983899.hg38_no_alts.bam.gatk.SortSam.count &
+
+#
 #nohup samtools view -@ 19 -o GM_983899.name.hg38_no_alts.bam GM_983899.name.hg38_no_alts.sam > GM_983899.name.hg38_no_alts.bam.out 2> GM_983899.name.hg38_no_alts.bam.err &
 #nohup samtools view -@ 19 -o 983899.name.hg38_no_alts.bam 983899.name.hg38_no_alts.sam > 983899.name.hg38_no_alts.bam.out 2> 983899.name.hg38_no_alts.bam.err &
-
-
-
-
-nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 983899.hg38_no_alts.bam 983899.name.hg38_no_alts.sam > 983899.sambamba_sort.hg38_no_alts.sam.out 2> 983899.sambamba_sort.hg38_no_alts.sam.err &
-
-
-nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o GM_983899.hg38_no_alts.bam GM_983899.name.hg38_no_alts.bam > GM_983899.sambamba_sort.hg38_no_alts.sam.out 2> GM_983899.sambamba_sort.hg38_no_alts.sam.err &
-
+#
+#nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 983899.hg38_no_alts.bam 983899.name.hg38_no_alts.sam > 983899.sambamba_sort.hg38_no_alts.sam.out 2> 983899.sambamba_sort.hg38_no_alts.sam.err &
+#nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o GM_983899.hg38_no_alts.bam GM_983899.name.hg38_no_alts.bam > GM_983899.sambamba_sort.hg38_no_alts.sam.out 2> GM_983899.sambamba_sort.hg38_no_alts.sam.err &
+#
 
 nohup samtools view -c GM_983899.hg38_no_alts.bam > GM_983899.hg38_no_alts.bam.count &
 nohup samtools view -c 983899.hg38_no_alts.bam > 983899.hg38_no_alts.bam.count &
 
+
+ls -1 *count
+983899.1.fastq.count
+983899.1.fastq.gz.count
+983899.2.fastq.count
+983899.2.fastq.gz.count
+983899.hg38_no_alts.bam.count
+983899.name.hg38_no_alts.sam.count
+GM_983899.1.fastq.count
+GM_983899.1.fastq.gz.count
+GM_983899.2.fastq.count
+GM_983899.2.fastq.gz.count
+GM_983899.hg38_no_alts.bam.count
+GM_983899.name.hg38_no_alts.sam.count
+
+
 cat *count
+2728946344 983899.1.fastq
+2728946344
+2728946344 983899.2.fastq
+2728946344
+1364473172
+1364473172
+1579529356 GM_983899.1.fastq
+1579529356
+1579529356 GM_983899.2.fastq
+1579529356
+789764678
+789764678
+
+Perfect!
 
 
 
 
 
+\rm *983899.name.hg38_no_alts.?am
 
 
 
 
-\rm *983899.name.hg38_no_alts.bam
-
-
-
-
-nohup samtools index -@ 19 GM_983899.hg38_no_alts.bam &
-nohup samtools index -@ 19 983899.hg38_no_alts.bam &
+nohup samtools index -@ 19 GM_983899.hg38_no_alts.bam > GM_983899.hg38_no_alts.bam.index.out 2> GM_983899.hg38_no_alts.bam.index.err &
+nohup samtools index -@ 19 983899.hg38_no_alts.bam > 983899.hg38_no_alts.bam.index.out 2> 983899.hg38_no_alts.bam.index.err &
 
 select only PROPER_PAIRs
 
-nohup samtools view -f 2 --threads 19 -o GM_983899.hg38_no_alts.PP.bam GM_983899.hg38_no_alts.bam &
-nohup samtools view -f 2 --threads 19 -o 983899.hg38_no_alts.PP.hg38_no_alts.bam 983899.hg38_no_alts.bam &
-
-nohup samtools index -@ 9 GM_983899.hg38_no_alts.PP.bam &
-nohup samtools index -@ 9 983899.hg38_no_alts.PP.bam &
+nohup samtools view -f 2 --threads 19 -o GM_983899.hg38_no_alts.PP.bam GM_983899.hg38_no_alts.bam > GM_983899.hg38_no_alts.PP.bam.out 2> GM_983899.hg38_no_alts.PP.bam.err &
+nohup samtools view -f 2 --threads 19 -o 983899.hg38_no_alts.PP.bam 983899.hg38_no_alts.bam > 983899.hg38_no_alts.PP.bam.out 2> 983899.hg38_no_alts.PP.bam.err &
 
 
-nohup gatk HaplotypeCaller --input GM_983899.hg38_no_alts.bam --output GM_983899.hg38_no_alts.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa > GM_983899.hg38_no_alts.vcf.gz.out 2> GM_983899.hg38_no_alts.vcf.gz.err &
-nohup gatk HaplotypeCaller --input 983899.hg38_no_alts.bam --output 983899.hg38_no_alts.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa > 983899.hg38_no_alts.vcf.gz.out 2> 983899.hg38_no_alts.vcf.gz.err &
+nohup samtools view -@ 9 -c GM_983899.hg38_no_alts.PP.bam > GM_983899.hg38_no_alts.PP.bam.count &
+nohup samtools view -@ 9 -c 983899.hg38_no_alts.PP.bam > 983899.hg38_no_alts.PP.bam.count &
 
-nohup gatk HaplotypeCaller --input GM_983899.hg38_no_alts.PP.bam --output GM_983899.hg38_no_alts.PP.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa > GM_983899.hg38_no_alts.PP.vcf.gz.out 2> GM_983899.hg38_no_alts.PP.vcf.gz.err &
-nohup gatk HaplotypeCaller --input 983899.hg38_no_alts.PP.bam --output 983899.hg38_no_alts.PP.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa > 983899.hg38_no_alts.PP.vcf.gz.out 2> 983899.hg38_no_alts.PP.vcf.gz.err &
+nohup samtools index -@ 9 GM_983899.hg38_no_alts.PP.bam > GM_983899.hg38_no_alts.PP.bam.index.out 2> GM_983899.hg38_no_alts.PP.bam.index.err &
+nohup samtools index -@ 9 983899.hg38_no_alts.PP.bam > 983899.hg38_no_alts.PP.bam.index.out 2> 983899.hg38_no_alts.PP.bam.index.err &
+
+
+
+$ cat *count
+2728946344 983899.1.fastq
+2728946344 983899.1.fastq.gz
+2728946344 983899.2.fastq
+2728946344 983899.2.fastq.gz
+1364473172 983899.hg38_no_alts.bam
+1276940862 983899.hg38_no_alts.PP.bam
+1364473172 983899.name.hg38_no_alts.sam
+1579529356 GM_983899.1.fastq
+1579529356 GM_983899.1.fastq.gz
+1579529356 GM_983899.2.fastq
+1579529356 GM_983899.2.fastq.gz
+789764678 GM_983899.hg38_no_alts.bam
+683474738 GM_983899.hg38_no_alts.PP.bam
+789764678 GM_983899.name.hg38_no_alts.sam
+
+
+
+cd /raid/refs/fasta
+samtools faidx hg38_no_alts.fa
+gatk CreateSequenceDictionary --REFERENCE hg38_no_alts.fa --OUTPUT hg38_no_alts.dict
+
+
+
+Haplotype caller crashes with ...
+java.lang.IllegalArgumentException: samples cannot be empty
+Likely needs a read group. Stupied requirement.
+It would be nice to figure out how to add this from the beginning.
+
+bowtie2 has these options that should be used if using gatk
+  --rg-id <text>     set read group id, reflected in @RG line and RG:Z: opt field
+  --rg <text>        add <text> ("lab:value") to @RG line of SAM header.
+                     Note: @RG line only printed when --rg-id is set.
+
+@RG     ID:1    LB:unknownLB    PL:unknownPL    SM:983899       PU:unknownPU
+--rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU
+
+nohup gatk AddOrReplaceReadGroups --INPUT 983899.hg38_no_alts.bam --OUTPUT 983899.hg38_no_alts.RG.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM 983899 > 983899.hg38_no_alts.RG.bam.out 2> 983899.hg38_no_alts.RG.bam.err &
+nohup gatk AddOrReplaceReadGroups --INPUT GM_983899.hg38_no_alts.bam --OUTPUT GM_983899.hg38_no_alts.RG.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM GM_983899 > GM_983899.hg38_no_alts.RG.bam.out 2> GM_983899.hg38_no_alts.RG.bam.err &
+nohup gatk AddOrReplaceReadGroups --INPUT 983899.hg38_no_alts.PP.bam --OUTPUT 983899.hg38_no_alts.PP.RG.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM 983899 > 983899.hg38_no_alts.PP.RG.bam.out 2> 983899.hg38_no_alts.PP.RG.bam.err &
+nohup gatk AddOrReplaceReadGroups --INPUT GM_983899.hg38_no_alts.PP.bam --OUTPUT GM_983899.hg38_no_alts.PP.RG.bam --RGLB unknownLB --RGPL unknownPL --RGPU unknownPU --RGSM GM_983899 > GM_983899.hg38_no_alts.PP.RG.bam.out 2> GM_983899.hg38_no_alts.PP.RG.bam.err &
+
+nohup samtools view -@ 9 -c GM_983899.hg38_no_alts.RG.bam > GM_983899.hg38_no_alts.RG.bam.count &
+nohup samtools view -@ 9 -c 983899.hg38_no_alts.RG.bam > 983899.hg38_no_alts.RG.bam.count &
+nohup samtools view -@ 9 -c GM_983899.hg38_no_alts.PP.RG.bam > GM_983899.hg38_no_alts.PP.RG.bam.count &
+nohup samtools view -@ 9 -c 983899.hg38_no_alts.PP.RG.bam > 983899.hg38_no_alts.PP.RG.bam.count &
+
+nohup samtools index -@ 9 GM_983899.hg38_no_alts.RG.bam > GM_983899.hg38_no_alts.RG.bam.index.out 2> GM_983899.hg38_no_alts.RG.bam.index.err &
+nohup samtools index -@ 9 983899.hg38_no_alts.RG.bam > 983899.hg38_no_alts.RG.bam.index.out 2> 983899.hg38_no_alts.RG.bam.index.err &
+nohup samtools index -@ 9 GM_983899.hg38_no_alts.PP.RG.bam > GM_983899.hg38_no_alts.PP.RG.bam.index.out 2> GM_983899.hg38_no_alts.PP.RG.bam.index.err &
+nohup samtools index -@ 9 983899.hg38_no_alts.PP.RG.bam > 983899.hg38_no_alts.PP.RG.bam.index.out 2> 983899.hg38_no_alts.PP.RG.bam.index.err &
+
+
+remove bam's without read group
+ll *983899.hg38_no_alts.bam *983899.hg38_no_alts.PP.bam
+
+
+
+
+
+
+Testing a jobqueue using parallel. Works, but perhaps not the best for this set up
+
+true > jobqueue; tail -n+0 -f jobqueue | parallel --joblog parallel.log -P 1 &
+
+echo "gatk HaplotypeCaller --input GM_983899.hg38_no_alts.RG.bam --output GM_983899.hg38_no_alts.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > GM_983899.hg38_no_alts.RG.vcf.gz.out 2> GM_983899.hg38_no_alts.RG.vcf.gz.err" >> jobqueue
+
+echo "gatk HaplotypeCaller --input 983899.hg38_no_alts.RG.bam --output 983899.hg38_no_alts.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > 983899.hg38_no_alts.RG.vcf.gz.out 2> 983899.hg38_no_alts.RG.vcf.gz.err" >> jobqueue
+
+echo "gatk HaplotypeCaller --input GM_983899.hg38_no_alts.PP.RG.bam --output GM_983899.hg38_no_alts.PP.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > GM_983899.hg38_no_alts.PP.RG.vcf.gz.out 2> GM_983899.hg38_no_alts.PP.RG.vcf.gz.err" >> jobqueue
+
+echo "gatk HaplotypeCaller --input 983899.hg38_no_alts.PP.RG.bam --output 983899.hg38_no_alts.PP.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > 983899.hg38_no_alts.PP.RG.vcf.gz.out 2> 983899.hg38_no_alts.PP.RG.vcf.gz.err" >> jobqueue
+
+
+
+
+
+nohup gatk HaplotypeCaller --input GM_983899.hg38_no_alts.RG.bam --output GM_983899.hg38_no_alts.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > GM_983899.hg38_no_alts.RG.vcf.gz.out 2> GM_983899.hg38_no_alts.RG.vcf.gz.err &
+
+nohup gatk HaplotypeCaller --input 983899.hg38_no_alts.RG.bam --output 983899.hg38_no_alts.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > 983899.hg38_no_alts.RG.vcf.gz.out 2> 983899.hg38_no_alts.RG.vcf.gz.err &
+
+nohup gatk HaplotypeCaller --input GM_983899.hg38_no_alts.PP.RG.bam --output GM_983899.hg38_no_alts.PP.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > GM_983899.hg38_no_alts.PP.RG.vcf.gz.out 2> GM_983899.hg38_no_alts.PP.RG.vcf.gz.err &
+
+nohup gatk HaplotypeCaller --input 983899.hg38_no_alts.PP.RG.bam --output 983899.hg38_no_alts.PP.RG.vcf.gz --reference /raid/refs/fasta/hg38_no_alts.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > 983899.hg38_no_alts.PP.RG.vcf.gz.out 2> 983899.hg38_no_alts.PP.RG.vcf.gz.err &
 
