@@ -2,7 +2,7 @@ strelka 2.9.10
 
 
 
-Realigned 983899/GM_983899 end-to-end to hg38.no_alts
+Realigned 983899/GM_983899 end-to-end to hg38_no_alts
 
 Trying strelka again
 Also, gonna do a depth coverage analysis too
@@ -16,6 +16,7 @@ nohup ./run_strelka.bash > run_strelka.out 2>&1 &
 
 
 
+--------------------------------------------------
 
 
 
@@ -45,7 +46,7 @@ https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-
 #	minor mod to ~/count_trinuc_muts_v8.pl
 #	don't add "chr" prefix
 
-for i in *.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.num.fa $i & done
+for i in *.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38_no_alts.fa $i & done
 
 
 
