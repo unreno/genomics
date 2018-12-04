@@ -17,7 +17,7 @@
 for base in 983899 ; do
 
 
-#	configureStrelkaSomaticWorkflow.py \
+#	~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 #		--normalBam /raid/data/raw/CCLS/bam/GM_${base}.recaled.bam \
 #		--tumorBam /raid/data/raw/CCLS/bam/${base}.recaled.bam \
 #		--ref /raid/refs/fasta/hg38.num.fa \
@@ -28,7 +28,7 @@ for base in 983899 ; do
 #	${base}/runWorkflow.py -m local -j 30
 #
 #
-#	configureStrelkaSomaticWorkflow.py \
+#	~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 #		--normalBam /raid/data/working/CCLS/20181203-strelka/GM_${base}.hg38_no_alts.bam \
 #		--tumorBam /raid/data/working/CCLS/20181203-strelka/${base}.hg38_no_alts.bam \
 #		--ref /raid/refs/fasta/hg38_no_alts.fa \
@@ -38,7 +38,7 @@ for base in 983899 ; do
 #
 #	${base}/runWorkflow.py -m local -j 30
 
-	configureStrelkaSomaticWorkflow.py \
+	~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.PP.bam \
 		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.PP.bam \
 		--ref /raid/refs/fasta/hg38.num.fa \
@@ -49,7 +49,7 @@ for base in 983899 ; do
 	${base}.PP/runWorkflow.py -m local -j 40
 
 
-	configureStrelkaSomaticWorkflow.py \
+	~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.bam \
 		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.bam \
 		--ref /raid/refs/fasta/hg38.num.fa \
