@@ -596,6 +596,8 @@ I put the following commands in a list and will run sequentially with parallel
 
 nohup parallel --no-notice --joblog parallel.log -P 1 < rebuild_commands.txt &
 
+Of course, as I'm just using 1 job slot, this could have been a simple script. Testing concept.
+
 
 
 nohup bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38_no_alts -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38_no_alts.bam - > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err &
