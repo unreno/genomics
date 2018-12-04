@@ -1,6 +1,10 @@
 #	if R2 and seq name is same as buffered, print both
 #	MUST use gawk for the bitwise command "and"
 
+
+#	NOTE: Its possible that if a pair of reads were flagged as being in the same lane, they will pass through here
+
+
 function reverse(s){
 	x=""
 	for(i=length(s);i!=0;i--)
@@ -67,6 +71,18 @@ BEGIN {
 		if ( length($10) != length($11) ){
 			print $1 " " length($10) " " length($11) >> base".diff_length_read_and_quality"
 		}
+
+#	check that reads are NOT the same lane
+
+#	testing
+
+		if( and($2,64) == and(b2,64) ){
+			print $1 " " $2 " " b2 >> base".reads_have_same_lane_flags"
+		}
+
+
+
+
 		print_to_fastq(b1,b2,toupper(b10),b11)
 		print_to_fastq($1,$2,toupper($10),$11)
 		b1=b2=b10=b11=""
