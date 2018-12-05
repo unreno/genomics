@@ -555,6 +555,7 @@ ll *983899.hg38_no_alts.bam *983899.hg38_no_alts.PP.bam
 
 
 Testing a jobqueue using parallel. Works, but perhaps not the best for this set up
+( parallel won't start until there are as many jobs as there are slots! by default this is the number of cores (40 for us) although you can specify with -P option. )
 
 true > jobqueue; tail -n+0 -f jobqueue | parallel --joblog parallel.log -P 1 &
 
