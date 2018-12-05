@@ -1,0 +1,41 @@
+
+
+PRJEB3381
+
+https://www.ebi.ac.uk/ena/data/view/PRJEB3381
+
+Whole genome sequencing and variant calls for the Coriell CEPH/UTAH 1463 family to create a "platinum" standard comprehensive set for variant calling improvement.
+
+We are providing whole genome sequence and variant call data for 17 members of the Coriell CEPH/UTAH 1463 family in order to create a "platinum" standard comprehensive set of variant calls. These genomes include three trio’s, as well as a technical replicate (separate library and sequencing, but same DNA sample) of NA12882 for accuracy estimation. All 18 genomes are sequenced to greater than 30x. Additional information and analyses will be provided at www.platinumgenomes.org.
+
+
+This only contains 6 samples. NOT 17 or 18.
+
+
+bam reference is chr1-22,X,Y,M (no alts)
+
+
+
+
+
+
+NA12891_S1.bam ERR194160_1 are corrupt
+
+
+
+I have recently downloaded the bam and fastq files from this data set and I have found that the following 2 are corrupt.
+
+ftp://ftp.sra.ebi.ac.uk/vol1/ERA172/ERA172924/bam/NA12891_S1.bam
+ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR194/ERR194160/ERR194160_1.fastq.gz
+
+If I try to gunzip the fastq file, I get ...
+gzip: ERR194160_1.fastq.gz: invalid compressed data--format violated
+
+And if I try to "samtools view" the bam file, I get ...
+[E::bgzf_uncompress] Inflate operation failed: progress temporarily not possible, or in() / out() returned an error
+[E::bgzf_read] Read block operation failed with error -1 after 0 of 4 bytes
+[main_samview] truncated file.
+
+I have downloaded them multiple times with the same results. Is it possible to reacquire these files?
+
+

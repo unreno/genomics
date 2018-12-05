@@ -1,0 +1,13 @@
+
+
+E-GEOD-81089 - RNA-seq of 199 non-small cell lung carcinoma patients and 19 paired normal lung tissues
+
+
+https://www.ebi.ac.uk/arrayexpress/experiments/E-GEOD-81089/samples/
+
+
+
+nohup ./getfiles.bash &
+
+
+
