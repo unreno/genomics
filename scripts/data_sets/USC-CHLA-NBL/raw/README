@@ -13,6 +13,10 @@ git clone https://github.com/unreno/genomics.git
 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch scripts/data_sets/USC-CHLA-NBL/raw/README' --prune-empty --tag-name-filter cat -- --all
 git push origin --force --all
 
+git rebase
+
+
+
 
 20180821
 
