@@ -1,0 +1,8 @@
+
+Complete Genomics
+
+rsync -avzuP publicdata.opensciencedatacloud.org::ark:/31807/osdc-919d4bed/Cancer_pairs/ ./Cancer_pairs/
+
+
+rsync -avzuP --exclude ASM_Build36_2.0.2 publicdata.opensciencedatacloud.org::ark:/31807/osdc-919d4bed/Cancer_pairs/ ~/s3/herv/OpenScienceDataCloud/Cancer_pairs/
+
