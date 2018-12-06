@@ -1,6 +1,8 @@
 
 
 nohup ./dark_wrapper.bash > dark_wrapper.1.out 2>&1 &
+nohup ./dark_wrapper.bash > dark_wrapper.2.out 2>&1 &
+
 
 nohup ./count_fasta_reads.bash > count_fasta_reads.out 2>&1 &
 

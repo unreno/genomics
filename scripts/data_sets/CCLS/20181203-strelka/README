@@ -31,6 +31,8 @@ samtools index GM_983899.hg38_no_alts.bam
 samtools index 983899.hg38_no_alts.bam 
 
 
+Strelka DOES NOT like --xeq CIGAR string output ( no = or X, just M )
+Actually, this may not be true. Strelka fails one time, then succeeds if rerun???
 
 
 

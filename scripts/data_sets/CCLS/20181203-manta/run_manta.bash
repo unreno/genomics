@@ -6,9 +6,9 @@
 for base in 983899 ; do
  
 	~/.local/manta/bin/configManta.py \
-		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38_no_alts.RG.bam \
-		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38_no_alts.RG.bam \
-		--referenceFasta /raid/refs/fasta/hg38_no_alts.fa \
+		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.bam \
+		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa \
 		--runDir ${base}
 
 	#Seems that each option NEEDS an explicit path
@@ -17,9 +17,9 @@ for base in 983899 ; do
 
 
 	~/.local/manta/bin/configManta.py \
-		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38_no_alts.PP.RG.bam \
-		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38_no_alts.PP.RG.bam \
-		--referenceFasta /raid/refs/fasta/hg38_no_alts.fa \
+		--normalBam /raid/data/raw/CCLS/bam/redo/GM_${base}.hg38.num.PP.bam \
+		--tumorBam /raid/data/raw/CCLS/bam/redo/${base}.hg38.num.PP.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa \
 		--runDir ${base}.PP
 
 	#Seems that each option NEEDS an explicit path
