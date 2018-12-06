@@ -35,6 +35,8 @@ while [ $# -ne 0 ] ; do
 	forward="-F 16"
 	reverse="-f 16"
 
+echo "samtools view ${mapped} ${forward} ${read1} $1"
+
 samtools view ${mapped} ${forward} ${read1} $1 | awk '
 BEGIN{ FS=OFS="\t" }
 {
@@ -43,6 +45,8 @@ BEGIN{ FS=OFS="\t" }
 			split($i,a,":")
 	print $1,$3,$4,a[3]
 }' > ${base}.forward.positions.csv
+
+echo "samtools view ${mapped} ${reverse} ${read1} $1"
 
 samtools view ${mapped} ${reverse} ${read1} $1 | awk '
 BEGIN{ FS=OFS="\t" }
