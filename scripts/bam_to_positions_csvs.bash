@@ -3,6 +3,7 @@
 base=${1%.*}
 
 echo $1 $base
+echo "CSV columns ... ReadName, Chromosome, Position, AlignmentScore"
 
 samtools view -F 20 $1 | awk '
 BEGIN{ FS=OFS="\t" }
