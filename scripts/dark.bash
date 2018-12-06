@@ -87,11 +87,15 @@ while [ $# -ne 0 ] ; do
 	{
 		date
 
+#	This was a mistake as it can include too many files.
+#	If $base is 1, the 1*fastq.gz includes so much more.
+#			-U $(ls ${base}*fastq.gz | paste -sd ',' ) \
+
 		#	if the input are fastq, then --un, --al, etc are also. blastn only uses fastA
 		#	very fast, fast, sensitive, or very sensitive. Tried very fast, but probably should've gone the other way.
 		#	-N only works if sam/bam file has paired info. Aligned -U, does not have paired info.
 		bowtie2 --threads ${threads} --very-fast -x ${human} \
-			-U $(ls ${base}*fastq.gz | paste -sd ',' ) \
+			-U $(ls ${base}.R?.fastq.gz | paste -sd ',' ) \
 			| samtools fasta -f 4 --threads $[threads-1] -N -	\
 			| gzip --best > ${local_base}.non${human}.fasta.gz
 		chmod -w ${local_base}.non${human}.fasta.gz
