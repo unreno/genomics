@@ -1,25 +1,58 @@
 #!/usr/bin/env bash
 
-base=${1%.*}
 
-echo $1 $base
-echo "CSV columns ... ReadName, Chromosome, Position, AlignmentScore"
+while [ $# -ne 0 ] ; do
+	case $1 in
+		-p|--p*)
+			paired=true; shift ;;
+		-*)
+			echo ; echo "Unexpected args from: ${*}"; usage ;;
+		*)
+			break;;
+	esac
+done
 
-samtools view -F 20 $1 | awk '
+#       Basically, this is TRUE AND DO ...
+#[ $# -gt 0 ] && usage
+
+
+while [ $# -ne 0 ] ; do
+
+	base=${1%.*}
+
+	echo $1 $base
+	echo "CSV columns ... ReadName, Chromosome, Position, AlignmentScore"
+
+	#	if paired, only use READ1 ( 64 )
+	if [ -z "${paired}" ] ; then
+		echo "Getting all positions"
+		read1=""
+	else
+		echo "Getting only READ1 positions"
+		read1="-f 64"
+	fi
+	mapped="-F 4"
+	forward="-F 16"
+	reverse="-f 16"
+
+samtools view ${mapped} ${forward} ${read1} $1 | awk '
 BEGIN{ FS=OFS="\t" }
 {
 	for(i=12;i<=NF;i++)
 		if($i ~ /^AS:/)
 			split($i,a,":")
 	print $1,$3,$4,a[3]
-}' > $base.forward.positions.csv
+}' > ${base}.forward.positions.csv
 
-samtools view -F 4 -f 16 $1 | awk '
+samtools view ${mapped} ${reverse} ${read1} $1 | awk '
 BEGIN{ FS=OFS="\t" }
 {
 	for(i=12;i<=NF;i++)
 		if($i ~ /^AS:/)
 			split($i,a,":")
 	print $1,$3,$4+length($10),a[3]
-}' > $base.reverse.positions.csv
+}' > ${base}.reverse.positions.csv
 
+
+	shift
+done
