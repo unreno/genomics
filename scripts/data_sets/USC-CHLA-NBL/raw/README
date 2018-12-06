@@ -64,6 +64,7 @@ l=${l/.unmapped/}
 l=${l/.trimmed/}
 l=${l/_001./.}
 l=${l/_R/.R}
+l=${l/080217_SA_*_S/080217_S}
 l=${l/080217_SA_*_S/S}
 echo $f $l
 ln -s ../$f 20180821/$l

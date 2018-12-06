@@ -15,12 +15,43 @@ nohup ./count_fasta_reads.bash > count_fasta_reads.out 2>&1 &
 
 nohup ./count_viral_hits.bash > count_viral_hits.out 2>&1 &
 
+head -q -n 25 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.25.txt
+head -q -n 10 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.10.txt
 
+./report.bash > report.csv
+
+
+
+The previous run is incorrect as the glob pattern included too many files
+
+for log in *log ; do echo -n "$log "; grep bowtie $log | grep -o , | wc -l ; done | awk '( $2 > 1 )'
+080217_S1.log 21
+080217_S2.log 21
+080217_S3.log 21
+080217_S4.log 21
+080217_S5.log 21
+080217_S6.log 21
+080217_S7.log 21
+080217_S8.log 21
+080217_S9.log 11
+SMS-KAN.log 3
+
+nohup ./dark_wrapper_redo.bash > dark_wrapper_redo.1.out 2>&1 &
+nohup ./dark_wrapper_redo.bash > dark_wrapper_redo.2.out 2>&1 &
+
+nohup ./count_fasta_reads.bash > count_fasta_reads.out.2 2>&1 &
+
+nohup ./count_viral_hits.bash > count_viral_hits.out.2 2>&1 &
 
 head -q -n 25 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.25.txt
 head -q -n 10 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.10.txt
 
+rm -f virii.txt
+ln -s virii.25.txt virii.txt
+./report.bash > USC_Blast_Report_25.csv
 
-./report.bash > report.csv
+rm -f virii.txt
+ln -s virii.10.txt virii.txt
+./report.bash > USC_Blast_Report_10.csv
 
 
