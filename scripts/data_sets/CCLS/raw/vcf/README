@@ -52,3 +52,14 @@ for f in *output-hc.vcf ; do echo $f; bgzip $f & done
 for f in *output-hc.vcf.gz ; do echo $f; gatk IndexFeatureFile -F $f & bcftools index $f & done
 
 
+
+
+
+
+
+
+
+Depth Analysis
+
+zcat 983899.output-HC.vcf.gz | grep -o -E 'DP=[[:digit:]]+' | awk -F= '{print $2}'
+
