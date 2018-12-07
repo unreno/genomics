@@ -1,0 +1,14 @@
+
+
+
+Using ORIGINAL 983899/GM_983899
+
+Trying manta https://github.com/Illumina/manta
+
+nohup ./run_manta.bash > run_manta.out 2>&1 &
+
+
+
+
+
+./create_snp_tsv.bash
