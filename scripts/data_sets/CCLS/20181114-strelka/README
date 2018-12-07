@@ -1,5 +1,9 @@
 strelka 2.9.10
 
+
+Using the sequencer's bam files ( locally aligned to hg38 num no_alts )
+
+
 nohup ./run_strelka.bash > run_strelka.out 2>&1 &
 
 ./create_snp_tsv.bash

@@ -2,7 +2,10 @@ strelka 2.9.10
 
 
 
-Realigned 983899/GM_983899 end-to-end to hg38_no_alts
+Realigned 983899/GM_983899 end-to-end to hg38.num
+
+
+
 
 Trying strelka again
 Also, gonna do a depth coverage analysis too
