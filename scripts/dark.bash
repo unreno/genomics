@@ -23,6 +23,8 @@ function usage(){
 	echo
 	echo "$script --human hg38 --blastn_viral /Users/jakewendt/BLAST_DBS/viral --threads 8 H74_S6_L00"
 	echo
+	echo "Expecting file names matching FILE_BASE.R?.fastq.gz"
+	echo
 	exit 1
 }
 
