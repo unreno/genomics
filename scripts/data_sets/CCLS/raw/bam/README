@@ -700,7 +700,17 @@ nohup gatk HaplotypeCaller --input 983899.hg38.num.PP.bam --output 983899.hg38.n
 
 
 
+Awk Sum Squares Standard Deviation (stddev)
 
-samtools depth 983899.recaled.bam
+RUNNING samtools depth -a ../983899.recaled.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2; print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}'
+
+nohup samtools depth -a 983899.recaled.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.recaled.bam.depth.txt &
+nohup samtools depth -a GM_983899.recaled.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.recaled.bam.depth.txt &
+
+
+nohup samtools depth -a 983899.hg38.num.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.hg38.num.bam.depth.txt &
+nohup samtools depth -a 983899.hg38.num.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.hg38.num.PP.bam.depth.txt &
+nohup samtools depth -a GM_983899.hg38.num.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.hg38.num.bam.depth.txt &
+nohup samtools depth -a GM_983899.hg38.num.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.hg38.num.PP.bam.depth.txt &
 
 
