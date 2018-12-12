@@ -45,6 +45,7 @@ nohup ./count_viral_hits.bash > count_viral_hits.out.2 2>&1 &
 
 head -q -n 25 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.25.txt
 head -q -n 10 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.10.txt
+head -q -n  5 *.nonhg38.blastn.viral_hits.txt | awk -F">" '{print $2}' | sort | uniq > virii.05.txt
 
 rm -f virii.txt
 ln -s virii.25.txt virii.txt
@@ -53,5 +54,15 @@ ln -s virii.25.txt virii.txt
 rm -f virii.txt
 ln -s virii.10.txt virii.txt
 ./report.bash > USC_Blast_Report_10.csv
+
+
+./report.bash virii.25.txt > report.25.csv &
+./report.bash virii.10.txt > report.10.csv &
+./report.bash virii.05.txt > report.05.csv &
+
+
+
+chmod a-w *csv *txt
+
 
 

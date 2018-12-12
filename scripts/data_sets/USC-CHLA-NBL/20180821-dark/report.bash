@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
 
+function usage(){
+	echo
+	echo "Usage: (NO EQUALS SIGNS)"
+	echo
+	echo "$( basename $0 ) virii_list"
+	echo
+	exit 1
+}
+
+virii=$1
+[ $# -eq 0 ] && usage
+
+
+
 sep=","
 
 
@@ -26,7 +40,7 @@ echo -en ${sep}$( grep  ">${virus}\s*$" $b.nonhg38.blastn.viral_hits.txt | awk -
 done
 echo
 
-done < virii.txt
+done < $virii
 
 
 

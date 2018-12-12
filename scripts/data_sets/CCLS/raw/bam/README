@@ -696,6 +696,8 @@ nohup gatk HaplotypeCaller --input GM_983899.hg38.num.PP.bam --output GM_983899.
 nohup gatk HaplotypeCaller --input 983899.hg38.num.PP.bam --output 983899.hg38.num.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.vcf.gz > 983899.hg38.num.PP.vcf.gz.out 2> 983899.hg38.num.PP.vcf.gz.err &
 
 
+nohup samtools view -f 2 -o 983899.recaled.PP.bam 983899.recaled.bam &
+nohup samtools view -f 2 -o GM_983899.recaled.PP.bam GM_983899.recaled.bam &
 
 
 
@@ -708,9 +710,83 @@ nohup samtools depth -a 983899.recaled.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sums
 nohup samtools depth -a GM_983899.recaled.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.recaled.bam.depth.txt &
 
 
+
 nohup samtools depth -a 983899.hg38.num.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.hg38.num.bam.depth.txt &
 nohup samtools depth -a 983899.hg38.num.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.hg38.num.PP.bam.depth.txt &
 nohup samtools depth -a GM_983899.hg38.num.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.hg38.num.bam.depth.txt &
 nohup samtools depth -a GM_983899.hg38.num.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.hg38.num.PP.bam.depth.txt &
+
+
+
+nohup samtools view -c 983899.recaled.bam > 983899.recaled.bam.count.txt &
+nohup samtools view -c -F 4 983899.recaled.bam > 983899.recaled.bam.mapped.count.txt &
+nohup samtools view -c -f 2 983899.recaled.bam > 983899.recaled.bam.proper_pair.count.txt &
+nohup samtools view -c GM_983899.recaled.bam > GM_983899.recaled.bam.count.txt &
+nohup samtools view -c -F 4 GM_983899.recaled.bam > GM_983899.recaled.bam.mapped.count.txt &
+nohup samtools view -c -f 2 GM_983899.recaled.bam > GM_983899.recaled.bam.proper_pair.count.txt &
+
+nohup samtools view -c 983899.hg38.num.bam > 983899.hg38.num.bam.count.txt &
+nohup samtools view -c -F 4 983899.hg38.num.bam > 983899.hg38.num.bam.mapped.count.txt &
+nohup samtools view -c -f 2 983899.hg38.num.bam > 983899.hg38.num.bam.proper_pair.count.txt &
+nohup samtools view -c GM_983899.hg38.num.bam > GM_983899.hg38.num.bam.count.txt &
+nohup samtools view -c -F 4 GM_983899.hg38.num.bam > GM_983899.hg38.num.bam.mapped.count.txt &
+nohup samtools view -c -f 2 GM_983899.hg38.num.bam > GM_983899.hg38.num.bam.proper_pair.count.txt &
+
+
+gatk HaplotypeCaller --input GM_983899.recaled.bam --output GM_983899.recaled.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.recaled.vcf.gz.out 2> GM_983899.recaled.vcf.gz.err &
+
+gatk HaplotypeCaller --input 983899.recaled.bam --output 983899.recaled.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.recaled.vcf.gz.out 2> 983899.recaled.vcf.gz.err &
+
+
+nohup samtools depth -a GM_983899.recaled.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > GM_983899.recaled.PP.bam.depth.txt &
+
+nohup samtools index GM_983899.recaled.PP.bam &
+
+
+
+nohup bcftools query -i 'TYPE="snp"' -f '-\n' GM_983899.hg38.num.PP.vcf.gz | wc -l > GM_983899.hg38.num.PP.vcf.snp.count.txt &
+nohup bcftools query -i 'TYPE="indel"' -f '-\n' GM_983899.hg38.num.PP.vcf.gz | wc -l > GM_983899.hg38.num.PP.vcf.indel.count.txt &
+nohup bcftools query -i 'TYPE="snp"' -f '-\n' GM_983899.hg38.num.vcf.gz | wc -l > GM_983899.hg38.num.vcf.snp.count.txt &
+nohup bcftools query -i 'TYPE="indel"' -f '-\n' GM_983899.hg38.num.vcf.gz | wc -l > GM_983899.hg38.num.vcf.indel.count.txt &
+
+
+nohup gatk HaplotypeCaller --input GM_983899.recaled.PP.bam --output GM_983899.recaled.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.recaled.PP.vcf.gz.out 2> GM_983899.recaled.PP.vcf.gz.err &
+
+
+
+nohup samtools index 983899.recaled.PP.bam &
+
+nohup samtools depth -a 983899.recaled.PP.bam | awk 'BEGIN{OFS="\t"}{ sum+=$3; sumsq+=($3)^2}END{print "Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > 983899.recaled.PP.bam.depth.txt &
+nohup gatk HaplotypeCaller --input 983899.recaled.PP.bam --output 983899.recaled.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.recaled.PP.vcf.gz.out 2> 983899.recaled.PP.vcf.gz.err &
+
+
+------
+
+
+ll {*983899.recaled*,redo/*983899.hg38.num*}bam
+ll {*983899.recaled*,redo/*983899.hg38.num*}.bam.depth.txt
+ll {*983899.recaled*,redo/*983899.hg38.num*}.bam.max.depth.txt
+for f in *983899.recaled*bam redo/*983899.hg38.num*bam ; do
+nohup samtools depth -a $f | awk 'BEGIN{OFS="\t";max=0;z=0}{if($3>max){max=$3};if($3==0){z+=1};sum+=$3;sumsq+=($3)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.max.depth.txt &
+done
+
+ll {*983899.recaled*,redo/*983899.hg38.num*}vcf.gz
+ll {*983899.recaled*,redo/*983899.hg38.num*}vcf.gz.*.count.txt
+
+nohup bcftools query -i 'TYPE="'${t}'"' -f '-\n' ${f} | wc -l > ${f}.${t}.count.txt &
+
+
+for f in *983899.recaled*vcf.gz ; do
+for f in ../vcf/*983899.output-HC.vcf.gz ; do
+for f in redo/*983899.hg38.num*vcf.gz ; do
+for f in GM_983899.recaled*vcf.gz ; do
+for f in 983899.recaled*vcf.gz ; do
+for f in 983899.recaled*vcf.gz ; do
+
+
+for t in snps indels ; do
+for f in ../vcf/*983899.output-HC.vcf.gz *983899.recaled*vcf.gz redo/*983899.hg38.num*vcf.gz ; do
+bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
+done ; done
 
 
