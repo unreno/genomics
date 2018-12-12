@@ -1,0 +1,9 @@
+
+
+#for f in ../fasta/NC* ../fasta/GU* ../fasta/GQ* ../fasta/KF* ../fasta/EF* ../fasta/FJ* ../fasta/AY* ; do
+for f in /raid/refs/fasta/virii/*fasta ; do
+b=$( basename $f .fasta )
+echo $f $b
+bowtie2-build $f $b
+done
+

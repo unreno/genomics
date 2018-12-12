@@ -1,0 +1,32 @@
+
+
+Created from 
+
+http://genome.ucsc.edu/cgi-bin/hgTables?command=start
+
+
+Sadly, comes down with all of the alternate chromosomes and chr prefix
+
+
+noalt.num
+
+changed chrM to chrMT
+Removed all lines with an _ to get rid of the alternates
+removed the ^chr prefix
+
+
+
+Also unsorted
+
+mv genes.raw.bed genes.raw.unsorted.bed
+bedtools sort -i genes.raw.unsorted.bed > genes.raw.bed
+
+
+Need to index before annotating which needs to be bgzipped (NOT gzipped?) first
+
+bgzip genes.raw.bed 
+tabix -p bed genes.raw.bed.gz 
+
+
+
+

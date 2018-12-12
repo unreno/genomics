@@ -1,0 +1,117 @@
+
+https://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
+
+ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/
+
+wget ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/common_all_20180418.vcf.gz &
+wget ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/common_all_20180418.vcf.gz.tbi &
+
+
+
+These vcfs contain no alternate chromosomes and no M data.
+
+The original version has just the chromosome number.
+I have created a version with the chr prefix.
+
+
+Need to use bgzip and then tabix to be useful.
+
+
+
+
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar_20180701.vcf.gz &
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar_20180701.vcf.gz.tbi &
+
+
+
+
+These don't include "contigs" (chromosomes)
+
+Copied the following from /raid/data/raw/20170804-Adam/VCF/634370.output-hc.vcf
+
+##contig=<ID=1,length=248956422,assembly=hg38>
+##contig=<ID=2,length=242193529,assembly=hg38>
+##contig=<ID=3,length=198295559,assembly=hg38>
+##contig=<ID=4,length=190214555,assembly=hg38>
+##contig=<ID=5,length=181538259,assembly=hg38>
+##contig=<ID=6,length=170805979,assembly=hg38>
+##contig=<ID=7,length=159345973,assembly=hg38>
+##contig=<ID=8,length=145138636,assembly=hg38>
+##contig=<ID=9,length=138394717,assembly=hg38>
+##contig=<ID=10,length=133797422,assembly=hg38>
+##contig=<ID=11,length=135086622,assembly=hg38>
+##contig=<ID=12,length=133275309,assembly=hg38>
+##contig=<ID=13,length=114364328,assembly=hg38>
+##contig=<ID=14,length=107043718,assembly=hg38>
+##contig=<ID=15,length=101991189,assembly=hg38>
+##contig=<ID=16,length=90338345,assembly=hg38>
+##contig=<ID=17,length=83257441,assembly=hg38>
+##contig=<ID=18,length=80373285,assembly=hg38>
+##contig=<ID=19,length=58617616,assembly=hg38>
+##contig=<ID=20,length=64444167,assembly=hg38>
+##contig=<ID=21,length=46709983,assembly=hg38>
+##contig=<ID=22,length=50818468,assembly=hg38>
+##contig=<ID=X,length=156040895,assembly=hg38>
+##contig=<ID=Y,length=57227415,assembly=hg38>
+##contig=<ID=MT,length=16569,assembly=hg38>
+
+
+Still no AF INFO field so no go.
+
+
+
+
+
+
+
+
+https://console.cloud.google.com/storage/browser/gatk-best-practices/somatic-hg38?project=broad-dsde-outreach
+
+Name	Size	Type	Storage class	Last modified	Share publicly	Encryption 	
+  1000g_pon.hg38.vcf.gz	16.47 MB	text/vcard	Multi-Regional	1/27/18, 6:01 PM	Public link	Google-managed key	
+  1000g_pon.hg38.vcf.gz.tbi	1.46 MB	binary/octet-stream	Multi-Regional	1/27/18, 6:01 PM	Public link	Google-managed key	
+  af-only-gnomad.hg38.vcf.gz	2.97 GB	text/x-vcard	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  af-only-gnomad.hg38.vcf.gz.tbi	2.33 MB	application/octet-stream	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  hcc1143_N_clean.bai	4.97 MB	application/octet-stream	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  hcc1143_N_clean.bam	9.63 GB	application/octet-stream	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  hcc1143_T_clean.bai	5.09 MB	application/octet-stream	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  hcc1143_T_clean.bam	12.55 GB	application/octet-stream	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  small_exac_common_3.hg38.vcf.gz	1.24 MB	application/gzip	Multi-Regional	8/23/17, 10:55 AM	Public link	Google-managed key	
+  small_exac_common_3.hg38.vcf.gz.tbi
+
+
+Can't wget them
+
+https://storage.cloud.google.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz?_ga=2.172411235.-15262258.1532467704
+https://storage.cloud.google.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi?_ga=2.172411235.-15262258.1532467704
+https://storage.cloud.google.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz?_ga=2.64309999.-15262258.1532467704
+https://storage.cloud.google.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz.tbi?_ga=2.64309999.-15262258.1532467704
+
+
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.hg38.vcf.gz
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.hg38.vcf.gz.tbi
+
+
+
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/hapmap_3.3.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/hapmap_3.3.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_omni2.5.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_omni2.5.hg38.vcf.gz.tbi &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz &
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi &
+
+
+
+chrM or chrMT??
+
+
+
+
+
+zcat dbsnp_146.hg38.vcf.gz | sed -e 's/^chrM/chrMT/' -e 's/^chr//' | bgzip > dbsnp_146.hg38.num.MT.vcf.gz &
+bcftools index dbsnp_146.hg38.num.MT.vcf.gz
+gatk IndexFeatureFile -F dbsnp_146.hg38.num.MT.vcf.gz &
+
+

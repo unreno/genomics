@@ -1,0 +1,116 @@
+
+
+
+http://hgdownload-test.cse.ucsc.edu/goldenPath/hg38/bigZips/
+
+
+wget http://hgdownload-test.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz
+
+
+
+
+
+Split fasta into individual fastas
+
+
+awk '( /^>/ ){ outfile=$0; gsub(/^>/,"",outfile); }{ print $0 >> outfile".fasta" }' 
+
+
+
+
+
+BeAn 58058 virus
+https://www.ncbi.nlm.nih.gov/nuccore/KY094066.1?report=fasta
+
+
+HHV6 - don't use
+https://www.ncbi.nlm.nih.gov/nuccore/KP257584
+
+
+HHV6a
+https://www.ncbi.nlm.nih.gov/nuccore/NC_001664
+
+
+HHV6b
+https://www.ncbi.nlm.nih.gov/nuccore/NC_000898
+
+
+
+Aotine herpesvirus 1 strain S34E, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_016447.1
+
+Cercopithecine herpesvirus 5 strain 2715, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_012783.2
+
+Papio ursinus cytomegalovirus isolate OCOM4-52, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_027016.1
+
+Human herpesvirus 5 strain Merlin, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_006273.2
+
+Macacine herpesvirus 3, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_006150.1
+
+Panine herpesvirus 2 strain Heberling, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_003521.1
+
+Saimiriine herpesvirus 4 strain SqSHV, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_016448.1
+
+Cynomolgus cytomegalovirus isolate 31908, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/NC_033176.1
+
+Human herpesvirus 5 strain Toledo, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/GU937742.2
+
+Human herpesvirus 5 strain 3157, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/GQ221974.1
+
+Human herpesvirus 5 strain TB40/E clone Lisa, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/KF297339.1
+
+Human herpesvirus 5 strain TB40/E clone TB40-BAC4, complete sequence
+https://www.ncbi.nlm.nih.gov/nuccore/EF999921.1
+
+Human herpesvirus 5 strain TR, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/KF021605.1
+
+Human herpesvirus 5 strain HAN38, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/GQ396662.1
+
+Human herpesvirus 5 strain AD169, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/FJ527563.1
+
+Human herpesvirus 5 strain Merlin, complete genome
+https://www.ncbi.nlm.nih.gov/nuccore/AY446894.2
+
+
+
+AY446894.2
+EF999921.1
+FJ527563.1
+GQ221974.1
+GQ396662.1
+GU937742.2
+KF021605.1
+KF297339.1
+NC_003521.1
+NC_006150.1
+NC_006273.2
+NC_012783.2
+NC_016447.1
+NC_016448.1
+NC_027016.1
+NC_033176.1
+
+
+
+
+
+
+
+
+wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.*.genomic.fna.gz
+wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/bacteria/bacteria.*.genomic.fna.gz
+wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/fungi/fungi.*.genomic.fna.gz
+

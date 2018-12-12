@@ -1,0 +1,237 @@
+
+
+https://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
+
+wget http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/
+
+wget http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/snp150.txt.gz
+wget http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/snp150.sql
+
+Example create table and load data ...
+$ hgsql hg38 < chromInfo.sql
+## load data from the txt.gz file
+$ zcat chromInfo.txt.gz | hgsql hg38 --local-infile=1 
+        -e 'LOAD DATA LOCAL INFILE "/dev/stdin" INTO TABLE chromInfo;'
+
+
+
+
+Or perhaps just access their actual database! Nice! ( something but not exactly like ... )
+
+mysql --user=genome --host=genome-mysql.cse.ucsc.edu -NA \
+    -e "select chrom, chromStart, chromEnd, name from hg19.snp132" hg19 > snp132.hg19.txt
+
+
+
+
+mysql --user=genome --host=genome-mysql.cse.ucsc.edu hg38
+
+MySQL [hg38]> select * from snp150 limit 10;
++-----+-------+------------+----------+--------------+-------+--------+---------+---------+----------+---------+-----------+------------+-------+---------+-------------+---------+--------+------------+----------------+-------------------------------+-----------------+---------+----------+-------------+-----------+
+| bin | chrom | chromStart | chromEnd | name         | score | strand | refNCBI | refUCSC | observed | molType | class     | valid      | avHet | avHetSE | func        | locType | weight | exceptions | submitterCount | submitters                    | alleleFreqCount | alleles | alleleNs | alleleFreqs | bitfields |
++-----+-------+------------+----------+--------------+-------+--------+---------+---------+----------+---------+-----------+------------+-------+---------+-------------+---------+--------+------------+----------------+-------------------------------+-----------------+---------+----------+-------------+-----------+
+| 585 | chr1  |      10019 |    10020 | rs775809821  |     0 | +      | A       | A       | -/A      | genomic | deletion  | unknown    |     0 |       0 | near-gene-5 | exact   |      1 |            |              1 | SSMP,                         |               0 |         |          |             |           |
+
+
+select class, count(1) from snp150 group by class;
+
+select observed, count(1) from snp150 where class = 'single' group by observed;
+
+These are taking FOREVER!
+
+
+sudo apt install mariadb-server
+sudo mysql_secure_installation
+sudo service mysql start
+sudo mysql -u root -e "create database hg38"
+sudo mysql -u root hg38 < snp150.sql
+
+This database has NO indexes so searching can be slow.
+Create a bunch here, which will be slow if data already exists,
+or will be slow to load data. You choose.
+
+sudo mysql -u root hg38
+CREATE INDEX class_index ON snp150 ( class );
+CREATE INDEX observed_index ON snp150 ( observed );
+CREATE INDEX locType_index ON snp150 ( locType );
+CREATE INDEX chrom_index ON snp150 ( chrom );
+CREATE INDEX chromStart_index ON snp150 ( chromStart );
+CREATE INDEX chromEnd_index ON snp150 ( chromEnd );
+CREATE INDEX refNCBI_single_index ON snp150 ( refNCBI(1) );
+CREATE INDEX refUCSC_single_index ON snp150 ( refUCSC(1) );
+
+zcat snp150.txt.gz | sudo mysql -u root hg38 --local-infile=1 \
+	-e 'LOAD DATA LOCAL INFILE "/dev/stdin" INTO TABLE snp150;'
+
+
+sudo mysql -u root hg38
+
+MariaDB [hg38]> select class, count(1) from snp150 group by class;
++----------------+-----------+
+| class          | count(1)  |
++----------------+-----------+
+| single         | 315488612 |
+| in-del         |    285641 |
+| microsatellite |      4774 |
+| named          |     12927 |
+| mnp            |    251374 |
+| insertion      |   7143993 |
+| deletion       |  12134940 |
++----------------+-----------+
+7 rows in set (45.50 sec)
+
+MariaDB [hg38]> select observed, count(*) from snp150 where class = 'single' group by observed;
++-----------+----------+
+| observed  | count(*) |
++-----------+----------+
+| A/C       | 26400717 |
+| A/C/G     |  3234550 |
+| A/C/G/M/T |        1 |
+| A/C/G/N/T |        1 |
+| A/C/G/T   |   360247 |
+| A/C/G/T/W |        1 |
+| A/C/K/T   |        1 |
+| A/C/T     |  3244106 |
+| A/C/T/W   |        1 |
+| A/G       | 99955641 |
+| A/G/T     |  3262640 |
+| A/G/T/W   |        1 |
+| A/T       | 22464093 |
+| C/G       | 27078504 |
+| C/G/T     |  3233556 |
+| C/T       | 99777687 |
+| G/H       |        1 |
+| G/T       | 26476864 |
++-----------+----------+
+18 rows in set (2 min 43.62 sec)
+
+
+
+Confused that only 335,322,261 records, whilst web db shows 672,043,185 (roughly double)?
+
+
+Only 133 / 3e8 where refNCBI different than refUCSC
+
+MariaDB [hg38]> select class, count(1) from snp150 where refNCBI != refUCSC group by class;
++----------+----------+
+| class    | count(1) |
++----------+----------+
+| single   |       16 |
+| in-del   |       28 |
+| named    |       53 |
+| mnp      |        1 |
+| deletion |       35 |
++----------+----------+
+
+
+
+
+MariaDB [hg38]> select refNCBI, observed, count(*) from snp150 where class = 'single' and locType = 'exact' group by refNCBI, observed;
++---------+-----------+----------+
+| refNCBI | observed  | count(*) |
++---------+-----------+----------+
+| A       | A/C       | 12093270 |
+| A       | A/C/G     |   785624 |
+| A       | A/C/G/N/T |        1 |
+| A       | A/C/G/T   |    28727 |
+| A       | A/C/T     |   238740 |
+| A       | A/G       | 44399136 |
+| A       | A/G/T     |   810991 |
+| A       | A/T       | 11258188 |
+| A       | C/G       |     1672 |
+| A       | C/G/T     |    13326 |
+| A       | C/T       |   426168 |
+| A       | G/T       |   127276 |
+| C       | A/C       | 14024127 |
+| C       | A/C/G     |   550175 |
+| C       | A/C/G/M/T |        1 |
+| C       | A/C/G/T   |   150776 |
+| C       | A/C/G/T/W |        1 |
+| C       | A/C/K/T   |        1 |
+| C       | A/C/T     |  2174857 |
+| C       | A/C/T/W   |        1 |
+| C       | A/G       |   561343 |
+| C       | A/G/T     |    30396 |
+| C       | A/G/T/W   |        1 |
+| C       | A/T       |      967 |
+| C       | C/G       | 13548429 |
+| C       | C/G/T     |  1888643 |
+| C       | C/T       | 54521817 |
+| C       | G/T       |   151068 |
+| G       | A/C       |   149465 |
+| G       | A/C/G     |  1885162 |
+| G       | A/C/G/T   |   151560 |
+| G       | A/C/T     |    29670 |
+| G       | A/G       | 54535444 |
+| G       | A/G/T     |  2182606 |
+| G       | A/T       |     1003 |
+| G       | C/G       | 13520698 |
+| G       | C/G/T     |   549063 |
+| G       | C/T       |   553818 |
+| G       | G/H       |        1 |
+| G       | G/T       | 14063962 |
+| K       | G/T       |        2 |
+| N       | A/C/G/T   |        6 |
+| R       | A/G       |        3 |
+| T       | A/C       |   126936 |
+| T       | A/C/G     |    13141 |
+| T       | A/C/G/T   |    28259 |
+| T       | A/C/T     |   800375 |
+| T       | A/G       |   434423 |
+| T       | A/G/T     |   238199 |
+| T       | A/T       | 11197157 |
+| T       | C/G       |     1728 |
+| T       | C/G/T     |   782047 |
+| T       | C/T       | 44253450 |
+| T       | G/T       | 12127397 |
+| W       | A/T       |        3 |
+| Y       | C/T       |        8 |
++---------+-----------+----------+
+56 rows in set (10 min 59.88 sec)
+
+
+
+SELECT chrom, chromStart, chromEnd, refNCBI, observed 
+INTO OUTFILE '/tmp/snps.csv'
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+FROM snp150 WHERE class = 'single' AND locType = 'exact';
+
+head -4 /tmp/snps.csv 
+"chr1",10038,10039,"A","A/C"
+"chr1",10042,10043,"T","A/T"
+"chr1",10050,10051,"A","A/G"
+"chr1",10054,10055,"T","A/T"
+
+
+SELECT COUNT(1) FROM snp150 WHERE class = 'single' AND locType = 'exact'
+315411308
+
+
+skip/no/disable -auto-rehash skips loading data for command completion
+skip/no/disable -column-names removes them from output
+batch removes the grid lines from the output (data tab separated)
+
+mysql --user root --skip-auto-rehash --skip-column-names --batch --execute "SELECT refNCBI, observed FROM snp150 WHERE class = 'single' AND locType = 'exact' AND chrom = 'chr1' AND chromEnd = 10038" hg38
+
+A	A/C
+
+
+Need to devise a way to loop through the snps files and filter out those in this database.
+
+/raid/data/working/20170804
+/raid/data/working/TCGA_Glioma_HERV52/20180416.apobec
+
+
+
+
+
+
+https://bitesizebio.com/37885/using-dbsnp-and-clinvar-to-classify-gene-variants/
+
+https://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
+ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/
+ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/common_all_20180418.vcf.gz
+
+
+

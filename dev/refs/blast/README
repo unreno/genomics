@@ -1,0 +1,16 @@
+
+Using blast 2.8.0 which seems to require new v5 databases.
+
+Sadly, the update_blastdb.pl script still uses the old ftp path so I edited.
+
+Out virus db may need recreated as I created it with an older version.
+
+
+
+
+
+makeblastdb -dbtype nucl -in ../fasta/HHV6a.fasta -out HHV6a -title HHV6a -parse_seqids
+
+makeblastdb -dbtype nucl -in ../fasta/HHV6b.fasta -out HHV6b -title HHV6b -parse_seqids
+
+

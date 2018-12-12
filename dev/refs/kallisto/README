@@ -1,0 +1,37 @@
+
+
+Meddling with kallisto
+
+
+
+
+wget ftp://ftp.ensembl.org/pub/release-93/gtf/homo_sapiens/Homo_sapiens.GRCh38.93.gtf.gz
+
+wget ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+
+wget ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+
+cat Homo_sapiens.GRCh38.cdna.all.fa.gz Homo_sapiens.GRCh38.ncrna.fa.gz > Homo_sapiens.GRCh38.rna.fa.gz
+
+
+
+kallisto index --index Homo_sapiens.GRCh38.idx Homo_sapiens.GRCh38.cdna.all.fa
+
+kallisto index --index Homo_sapiens.GRCh38.rna.idx Homo_sapiens.GRCh38.rna.fa.gz
+
+
+
+
+kallisto index --index HHV6a ../fasta/HHV6a.fasta
+
+kallisto index --index HHV6b ../fasta/HHV6b.fasta
+
+
+
+for f in ../fasta/NC* ../fasta/GU* ../fasta/GQ* ../fasta/KF* ../fasta/EF* ../fasta/FJ* ../fasta/AY* ; do
+b=$( basename $f .fasta )
+echo $f $b
+kallisto index --index $b $f
+done
+
+
