@@ -1,0 +1,3 @@
+
+
+nohup ./process.bash &
