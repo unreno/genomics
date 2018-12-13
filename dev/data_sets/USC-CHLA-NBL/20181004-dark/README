@@ -1,5 +1,10 @@
 
 
+
+NOTE: SRR1559100's fastq.gz files are corrupt.
+
+
+
 nohup ./dark_wrapper.bash > dark_wrapper.1.out 2>&1 &
 nohup ./dark_wrapper.bash > dark_wrapper.2.out 2>&1 &
 nohup ./dark_wrapper.bash > dark_wrapper.3.out 2>&1 &
