@@ -216,3 +216,7 @@ head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
 
 ./report.bash > 1kg-HHV6ab-report.csv &
 
+
+./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
+
+

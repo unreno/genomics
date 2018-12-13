@@ -17,7 +17,8 @@ while read virus ; do
 
 	for subject in $subjects ; do
 		#file="${subject}.${version}.bowtie2.mapped.count.txt"
-		file="${subject}.${version}.bowtie2.mapped.ratio_total.txt"
+		#file="${subject}.${version}.bowtie2.mapped.ratio_total.txt"
+		file="${subject}.${version}.bowtie2.mapped.ratio_unmapped.txt"
 		if [ -f $file ] ; then
 			count=$( cat $file | awk '{print $1" * 1000000000"}' | bc )
 			count=${count%.*}
