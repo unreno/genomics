@@ -33,16 +33,13 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 	fi
 
 
-#	This block is a lot of viruses, NOT HHV, but keeping the variable
-
-#	for virus in AY446894.2 EF999921.1 FJ527563.1 GQ221974.1 GQ396662.1 GU937742.2 KF021605.1 KF297339.1 NC_003521.1 NC_006150.1 NC_006273.2 NC_012783.2 NC_016447.1 NC_016448.1 NC_027016.1 NC_033176.1 NC_001664.4 NC_000898.1 ; do
-
 #	NC_001710.1 GB virus C/Hepatitis G virus, complete genome
 #	NC_001716.2 Human herpesvirus 7, complete genome
 #	NC_001664.4 Human betaherpesvirus 6A, variant A DNA, complete virion genome,
 #	NC_000898.1 Human herpesvirus 6B
+#	NC_008168.1 Choristoneura fumiferana granulovirus, complete genome
 
-	for virus in NC_001710.1 NC_001716.2 NC_001664.4 NC_000898.1 ; do
+	for virus in NC_001710.1 NC_001716.2 NC_001664.4 NC_000898.1 NC_08168.1 ; do
 
 #	for virus in /raid/refs/fasta/virii/*fasta ; do
 #		virus=$( basename $virus .fasta )
