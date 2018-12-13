@@ -5,3 +5,11 @@ nohup ./process.bash &
 nohup ./all_samples.bash &
 
 
+
+
+for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do basename $r1 .R1.fastq.gz ; done > subjects.txt
+for virus in /raid/refs/fasta/virii/*fasta ; do basename $virus .fasta; done > virii_versions.txt
+head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
+
+
+unmapped_virii.bash

@@ -39,7 +39,7 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 #	NC_000898.1 Human herpesvirus 6B
 #	NC_008168.1 Choristoneura fumiferana granulovirus, complete genome
 
-	for virus in NC_001710.1 NC_001716.2 NC_001664.4 NC_000898.1 NC_08168.1 ; do
+	for virus in NC_001710.1 NC_001716.2 NC_001664.4 NC_000898.1 NC_008168.1 ; do
 
 #	for virus in /raid/refs/fasta/virii/*fasta ; do
 #		virus=$( basename $virus .fasta )
