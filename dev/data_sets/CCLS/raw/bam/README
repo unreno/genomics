@@ -781,11 +781,10 @@ for f in ../vcf/*983899.output-HC.vcf.gz ; do
 for f in redo/*983899.hg38.num*vcf.gz ; do
 for f in GM_983899.recaled*vcf.gz ; do
 for f in 983899.recaled*vcf.gz ; do
-for f in 983899.recaled*vcf.gz ; do
-
+for f in ../vcf/*983899.output-HC.vcf.gz *983899.recaled*vcf.gz redo/*983899.hg38.num*vcf.gz ; do
 
 for t in snps indels ; do
-for f in ../vcf/*983899.output-HC.vcf.gz *983899.recaled*vcf.gz redo/*983899.hg38.num*vcf.gz ; do
+for f in 983899.recaled*vcf.gz ; do
 bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
 done ; done
 
