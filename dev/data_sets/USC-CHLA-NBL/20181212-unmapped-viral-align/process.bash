@@ -54,7 +54,7 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 			if [ -f ${subject}.${virus}.unsorted.bam ] && [ ! -w ${subject}.${virus}.unsorted.bam ]  ; then
 				echo "Write-protected ${subject}.${virus}.unsorted.bam exists. Skipping step."
 			else
-				bowtie2 --threads 35 --xeq -x virii/${virus} --very-sensitive -1 ${r1} -2 ${r2} 2>> ${subject}.${virus}.log | samtools view -F 4 -o ${subject}.${virus}.unsorted.bam -
+				bowtie2 --threads 40 --xeq -x virii/${virus} --very-sensitive -1 ${r1} -2 ${r2} 2>> ${subject}.${virus}.log | samtools view -F 4 -o ${subject}.${virus}.unsorted.bam -
 				#chmod a-w ${subject}.${virus}.unsorted.bam
 			fi
 
