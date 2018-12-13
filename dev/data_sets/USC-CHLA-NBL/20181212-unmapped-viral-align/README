@@ -13,5 +13,5 @@ for virus in /raid/refs/fasta/virii/{NC_000898.1,NC_001664.4,NC_001710.1,NC_0017
 head -1q /raid/refs/fasta/virii/{NC_000898.1,NC_001664.4,NC_001710.1,NC_001716.2,NC_008168.1}.fasta | sed 's/^>//' > virii_details.txt
 
 
-nohup ./unmapped_virii_per_billion.bash > unmapped_virii_per_billion.csv &
+nohup ./virii_aligned_per_billion_unmapped.bash > virii_aligned_per_billion_unmapped.csv &
 

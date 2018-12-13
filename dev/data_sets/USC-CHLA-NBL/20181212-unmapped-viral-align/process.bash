@@ -28,7 +28,7 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 	else
 		echo "Counting reads in $r1"
 		r1lines=$( zcat $r1 | wc -l )
-		echo $[r1lines/4] > ${subject}.unmapped.count.txt
+		echo $[r1lines/2] > ${subject}.unmapped.count.txt
 		chmod a-w ${subject}.unmapped.count.txt
 	fi
 
