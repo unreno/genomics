@@ -220,3 +220,9 @@ head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
 ./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
 
 
+Redesigned to align to all virii after HG00733.
+Perhaps remove all products based on alignment from HG00[0-7]* and rerun that too.
+
+
+
+

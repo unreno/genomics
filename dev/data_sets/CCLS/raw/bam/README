@@ -789,3 +789,8 @@ bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
 done ; done
 
 
+for f in *983899.recaled*bam redo/*983899.hg38.num*bam ; do
+nohup samtools depth -d 0 -a $f | awk 'BEGIN{OFS="\t";max=0;z=0}{if($3>max){max=$3};if($3==0){z+=1};sum+=$3;sumsq+=($3)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.new.max.depth.txt &
+done
+
+ll {*983899.recaled*,redo/*983899.hg38.num*}new.max.depth.txt

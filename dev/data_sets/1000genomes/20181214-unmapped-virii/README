@@ -1,0 +1,132 @@
+
+
+Acquire the unmapped bam files for all 1000 genomes subjects.
+
+aws s3 sync s3://1000genomes/phase3/ /raid/data/raw/1000genomes/phase3/ --exclude "*" --include "*/alignment/*.unmapped.ILLUMINA.bwa.*.*.*.bam"
+
+
+Given the variability of the number of samples and reads for each, we need to try to normalize the results.
+
+
+Compare aligned reads to ...
+* number of unmapped reads.
+* number of total reads. (rather than download mapped bam, get mapped bam.bai and use bamReadDepther)
+
+https://github.com/chmille4/bamReadDepther
+bamReadDepther returns way more info than needed so need to parse correctly.
+A line that begins with a \# is followed by a reference id, mapped and placed-unmapped read counts.
+The reference id is relatively useless without the bam file itself.
+I believe that it corresponds to the order of @SQ SN number, but need bam files to check.
+
+"Placed-unmapped" reads are unmapped mates of mapped reads.
+These should also show in unmapped bam file.
+I think that they are only kept in the mapped bam to preserve pairedness.
+
+
+
+Let's examine bam counts and bai counts from a mapped file.
+
+
+The total reads in a bam file ...
+samtools view -c NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam
+172724240
+
+The mapped reads in a bai file ...
+cat NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^#" | awk -F"\t" '{ s+=$2 }END{print s}'
+171503169
+
+The placed-unmapped reads in a bai file ...
+cat NA12878.mapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^#" | awk -F"\t" '{ s+=$3 }END{print s}'
+1221071
+
+The total reads in a bai file ...
+echo "171503169 + 1221071" | bc
+172724240
+
+
+Are placed-unmapped also in the unmapped file? It does not appear so.
+
+
+These datasets include both paired and unpaired data.
+
+
+
+This doesn't seem to be working for the unmapped bam files?
+Ahh. Unmapped is a bit different. Sad face.
+This line begins with a \* and only one number. Super sad.
+Inconsistancy. Perhaps I should edit code.
+
+
+Not sure what "placed-unmapped" means in the unmapped file.
+Confused.
+Viewing unmapped file, but the columns contain positions and good CIGAR strings, but flag says unmapped.
+Apparently, this is/was a bwa bug. Data not cleared from previous alignment. Ignoring.
+
+
+cat NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^*\|^#"
+#23	0	2
+#24	0	25
+#84	0	2
+*		8272866
+
+So 
+
+cat NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam.bai | bamReadDepther | grep "^*\|^#" | awk -F"\t" '{s+=$NF}END{print s}'
+8272895
+samtools view -c NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam
+8272895
+
+
+
+
+
+
+
+
+for f in ../20181010-unmapped-hhv6/*fasta.gz ; do ln -s $f ; done
+
+
+
+nohup ./process.bash &
+
+
+
+for dir in /raid/data/raw/1000genomes/phase3/data/* ; do basename $dir; done > subjects.txt
+for virus in /raid/refs/fasta/virii/*fasta ; do basename $virus .fasta; done > virii_versions.txt
+head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
+
+
+
+
+./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
+
+
+Redesigned to align to all virii after HG00733.
+Perhaps remove all products based on alignment from HG00[0-7]* and rerun that too.
+
+
+
+
+
+bowtie2 --score-min L,-0.6,-0.6 --all --threads 40 -f --xeq -x virii --very-sensitive -U HG02147.fasta.gz 2>> HG02147.virii.6.log | samtools view -F 4 -o HG02147.virii.6.unsorted.bam -
+bowtie2 --score-min L,-0.5,-0.5 --all --threads 40 -f --xeq -x virii --very-sensitive -U HG02147.fasta.gz 2>> HG02147.virii.5.log | samtools view -F 4 -o HG02147.virii.5.unsorted.bam -
+bowtie2 --score-min L,-0.7,-0.7 --all --threads 40 -f --xeq -x virii --very-sensitive -U HG02147.fasta.gz 2>> HG02147.virii.7.log | samtools view -F 4 -o HG02147.virii.7.unsorted.bam -
+bowtie2 --score-min L,-0.4,-0.4 --all --threads 40 -f --xeq -x virii --very-sensitive -U HG02147.fasta.gz 2>> HG02147.virii.4.log | samtools view -F 4 -o HG02147.virii.4.unsorted.bam -
+
+Reads are 90 bases
+
+samtools view -c HG02147.virii.4.unsorted.bam
+samtools view -c HG02147.virii.5.unsorted.bam
+samtools view -c HG02147.virii.6.unsorted.bam
+samtools view -c HG02147.virii.7.unsorted.bam
+
+samtools view -c HG02147.virii.4.unsorted.bam
+4385
+samtools view -c HG02147.virii.5.unsorted.bam
+9395
+samtools view -c HG02147.virii.6.unsorted.bam
+17072
+samtools view -c HG02147.virii.7.unsorted.bam
+27017
+
+

@@ -65,47 +65,6 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 	fi
 
 
-
-	if [ -f ${subject}.virii.bam ] && [ ! -w ${subject}.virii.bam ]  ; then
-		echo "Write-protected ${subject}.virii.bam exists. Skipping step."
-	else
-
-		if [ -f ${subject}.virii.unsorted.bam ] && [ ! -w ${subject}.virii.unsorted.bam ]  ; then
-			echo "Write-protected ${subject}.virii.unsorted.bam exists. Skipping step."
-		else
-			echo "Aligning ${subject} to all virii."
-			bowtie2 --all --threads 35 -f --xeq -x virii --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.virii.log | samtools view -F 4 -o ${subject}.virii.unsorted.bam -
-			#chmod a-w ${subject}.virii.unsorted.bam
-		fi
-
-		echo "Sorting"
-		samtools sort -o ${subject}.virii.bam ${subject}.virii.unsorted.bam
-		chmod a-w ${subject}.virii.bam
-
-		\rm ${subject}.virii.unsorted.bam
-	fi
-
-	if [ -f ${subject}.virii.bam.bai ] && [ ! -w ${subject}.virii.bam.bai ]  ; then
-		echo "Write-protected ${subject}.virii.bam.bai exists. Skipping step."
-	else
-		echo "Indexing"
-		samtools index ${subject}.virii.bam
-		chmod a-w ${subject}.virii.bam.bai
-	fi
-
-	if [ -f ${subject}.virii.depth.csv ] && [ ! -w ${subject}.virii.depth.csv ]  ; then
-		echo "Write-protected ${subject}.virii.depth.csv exists. Skipping step."
-	else
-		echo "Getting depth"
-		samtools depth ${subject}.virii.bam > ${subject}.virii.depth.csv
-		chmod a-w ${subject}.virii.depth.csv
-	fi
-
-
-
-
-
-
 #	for virus in AY446894.2 EF999921.1 FJ527563.1 GQ221974.1 GQ396662.1 GU937742.2 KF021605.1 KF297339.1 NC_003521.1 NC_006150.1 NC_006273.2 NC_012783.2 NC_016447.1 NC_016448.1 NC_027016.1 NC_033176.1 NC_001664.4 NC_000898.1 ; do
 
 	for virus in /raid/refs/fasta/virii/*fasta ; do
@@ -114,66 +73,49 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		echo "Processing $subject / $virus"
 
 
-#		if [ -f ${subject}.${virus}.bam ] && [ ! -w ${subject}.${virus}.bam ]  ; then
-#			echo "Write-protected ${subject}.${virus}.bam exists. Skipping step."
-#		else
-#
-#			if [ -f ${subject}.${virus}.unsorted.bam ] && [ ! -w ${subject}.${virus}.unsorted.bam ]  ; then
-#				echo "Write-protected ${subject}.${virus}.unsorted.bam exists. Skipping step."
-#			else
-#				echo "Aligning ${subject} to ${virus}"
-#				bowtie2 --threads 35 -f --xeq -x virii/${virus} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${virus}.log | samtools view -F 4 -o ${subject}.${virus}.unsorted.bam -
-#				#chmod a-w ${subject}.${virus}.unsorted.bam
-#			fi
-#
-#			echo "Sorting"
-#			samtools sort -o ${subject}.${virus}.bam ${subject}.${virus}.unsorted.bam
-#			chmod a-w ${subject}.${virus}.bam
-#
-#			\rm ${subject}.${virus}.unsorted.bam
-#		fi
-#
-#		if [ -f ${subject}.${virus}.bam.bai ] && [ ! -w ${subject}.${virus}.bam.bai ]  ; then
-#			echo "Write-protected ${subject}.${virus}.bam.bai exists. Skipping step."
-#		else
-#			echo "Indexing"
-#			samtools index ${subject}.${virus}.bam
-#			chmod a-w ${subject}.${virus}.bam.bai
-#		fi
-#
-#		if [ -f ${subject}.${virus}.depth.csv ] && [ ! -w ${subject}.${virus}.depth.csv ]  ; then
-#			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
-#		else
-#			echo "Getting depth"
-#			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
-#			chmod a-w ${subject}.${virus}.depth.csv
-#		fi
-#
-#		if [ -f ${subject}.${virus}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.count.txt ]  ; then
-#			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.count.txt exists. Skipping step."
-#		else
-#			echo "Counting reads bowtie2 aligned to ${virus}"
-#			#	-F 4 needless here as filtered with this flag above.
-#			samtools view -c -F 4 ${subject}.${virus}.bam > ${subject}.${virus}.bowtie2.mapped.count.txt
-#			chmod a-w ${subject}.${virus}.bowtie2.mapped.count.txt
-#		fi
+		if [ -f ${subject}.${virus}.bam ] && [ ! -w ${subject}.${virus}.bam ]  ; then
+			echo "Write-protected ${subject}.${virus}.bam exists. Skipping step."
+		else
 
+			if [ -f ${subject}.${virus}.unsorted.bam ] && [ ! -w ${subject}.${virus}.unsorted.bam ]  ; then
+				echo "Write-protected ${subject}.${virus}.unsorted.bam exists. Skipping step."
+			else
+				echo "Aligning ${subject} to ${virus}"
+				bowtie2 --threads 35 -f --xeq -x virii/${virus} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${virus}.log | samtools view -F 4 -o ${subject}.${virus}.unsorted.bam -
+				#chmod a-w ${subject}.${virus}.unsorted.bam
+			fi
 
+			echo "Sorting"
+			samtools sort -o ${subject}.${virus}.bam ${subject}.${virus}.unsorted.bam
+			chmod a-w ${subject}.${virus}.bam
+
+			\rm ${subject}.${virus}.unsorted.bam
+		fi
+
+		if [ -f ${subject}.${virus}.bam.bai ] && [ ! -w ${subject}.${virus}.bam.bai ]  ; then
+			echo "Write-protected ${subject}.${virus}.bam.bai exists. Skipping step."
+		else
+			echo "Indexing"
+			samtools index ${subject}.${virus}.bam
+			chmod a-w ${subject}.${virus}.bam.bai
+		fi
 
 		if [ -f ${subject}.${virus}.depth.csv ] && [ ! -w ${subject}.${virus}.depth.csv ]  ; then
 			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
-
-
-			awk '( $1 == "'${virus}'" )' ${subject}.virii.depth.csv > ${subject}.${virus}.depth.csv
-#			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
-
-
-
+			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
 			chmod a-w ${subject}.${virus}.depth.csv
 		fi
 
+		if [ -f ${subject}.${virus}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.count.txt ]  ; then
+			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.count.txt exists. Skipping step."
+		else
+			echo "Counting reads bowtie2 aligned to ${virus}"
+			#	-F 4 needless here as filtered with this flag above.
+			samtools view -c -F 4 ${subject}.${virus}.bam > ${subject}.${virus}.bowtie2.mapped.count.txt
+			chmod a-w ${subject}.${virus}.bowtie2.mapped.count.txt
+		fi
 
 		if [ -f ${subject}.${virus}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.count.txt ]  ; then
 			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.count.txt exists. Skipping step."
