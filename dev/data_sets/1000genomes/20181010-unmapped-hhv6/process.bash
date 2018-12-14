@@ -166,7 +166,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			echo "Getting depth"
 
 
-			awk '( $1 == '${virus}' )' ${subject}.virii.depth.csv > ${subject}.${virus}.depth.csv
+			awk '( $1 == "'${virus}'" )' ${subject}.virii.depth.csv > ${subject}.${virus}.depth.csv
 #			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
 
 
