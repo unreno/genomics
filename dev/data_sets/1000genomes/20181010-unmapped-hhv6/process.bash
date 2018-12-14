@@ -65,120 +65,196 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 	fi
 
 
-#	This block is a lot of viruses, NOT HHV, but keeping the variable
 
-#	for hhv in AY446894.2 EF999921.1 FJ527563.1 GQ221974.1 GQ396662.1 GU937742.2 KF021605.1 KF297339.1 NC_003521.1 NC_006150.1 NC_006273.2 NC_012783.2 NC_016447.1 NC_016448.1 NC_027016.1 NC_033176.1 NC_001664.4 NC_000898.1 ; do
+	if [ -f ${subject}.virii.bam ] && [ ! -w ${subject}.virii.bam ]  ; then
+		echo "Write-protected ${subject}.virii.bam exists. Skipping step."
+	else
 
-	for hhv in /raid/refs/fasta/virii/*fasta ; do
-		hhv=$( basename $hhv .fasta )
-
-		echo "Processing $subject / $hhv"
-
-
-		if [ -f ${subject}.${hhv}.bam ] && [ ! -w ${subject}.${hhv}.bam ]  ; then
-			echo "Write-protected ${subject}.${hhv}.bam exists. Skipping step."
+		if [ -f ${subject}.virii.unsorted.bam ] && [ ! -w ${subject}.virii.unsorted.bam ]  ; then
+			echo "Write-protected ${subject}.virii.unsorted.bam exists. Skipping step."
 		else
-
-			if [ -f ${subject}.${hhv}.unsorted.bam ] && [ ! -w ${subject}.${hhv}.unsorted.bam ]  ; then
-				echo "Write-protected ${subject}.${hhv}.unsorted.bam exists. Skipping step."
-			else
-				bowtie2 --threads 35 -f --xeq -x virii/${hhv} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${hhv}.log | samtools view -F 4 -o ${subject}.${hhv}.unsorted.bam -
-				#chmod a-w ${subject}.${hhv}.unsorted.bam
-			fi
-
-			echo "Sorting"
-			samtools sort -o ${subject}.${hhv}.bam ${subject}.${hhv}.unsorted.bam
-			chmod a-w ${subject}.${hhv}.bam
-
-			\rm ${subject}.${hhv}.unsorted.bam
+			echo "Aligning ${subject} to all virii."
+			bowtie2 --all --threads 35 -f --xeq -x virii --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.virii.log | samtools view -F 4 -o ${subject}.virii.unsorted.bam -
+			#chmod a-w ${subject}.virii.unsorted.bam
 		fi
 
-		if [ -f ${subject}.${hhv}.bam.bai ] && [ ! -w ${subject}.${hhv}.bam.bai ]  ; then
-			echo "Write-protected ${subject}.${hhv}.bam.bai exists. Skipping step."
-		else
-			echo "Indexing"
-			samtools index ${subject}.${hhv}.bam
-			chmod a-w ${subject}.${hhv}.bam.bai
-		fi
+		echo "Sorting"
+		samtools sort -o ${subject}.virii.bam ${subject}.virii.unsorted.bam
+		chmod a-w ${subject}.virii.bam
 
-		if [ -f ${subject}.${hhv}.depth.csv ] && [ ! -w ${subject}.${hhv}.depth.csv ]  ; then
-			echo "Write-protected ${subject}.${hhv}.depth.csv exists. Skipping step."
+		\rm ${subject}.virii.unsorted.bam
+	fi
+
+	if [ -f ${subject}.virii.bam.bai ] && [ ! -w ${subject}.virii.bam.bai ]  ; then
+		echo "Write-protected ${subject}.virii.bam.bai exists. Skipping step."
+	else
+		echo "Indexing"
+		samtools index ${subject}.virii.bam
+		chmod a-w ${subject}.virii.bam.bai
+	fi
+
+	if [ -f ${subject}.virii.depth.csv ] && [ ! -w ${subject}.virii.depth.csv ]  ; then
+		echo "Write-protected ${subject}.virii.depth.csv exists. Skipping step."
+	else
+		echo "Getting depth"
+		samtools depth ${subject}.virii.bam > ${subject}.virii.depth.csv
+		chmod a-w ${subject}.virii.depth.csv
+	fi
+
+
+
+
+
+
+#	for virus in AY446894.2 EF999921.1 FJ527563.1 GQ221974.1 GQ396662.1 GU937742.2 KF021605.1 KF297339.1 NC_003521.1 NC_006150.1 NC_006273.2 NC_012783.2 NC_016447.1 NC_016448.1 NC_027016.1 NC_033176.1 NC_001664.4 NC_000898.1 ; do
+
+	for virus in /raid/refs/fasta/virii/*fasta ; do
+		virus=$( basename $virus .fasta )
+
+		echo "Processing $subject / $virus"
+
+
+#		if [ -f ${subject}.${virus}.bam ] && [ ! -w ${subject}.${virus}.bam ]  ; then
+#			echo "Write-protected ${subject}.${virus}.bam exists. Skipping step."
+#		else
+#
+#			if [ -f ${subject}.${virus}.unsorted.bam ] && [ ! -w ${subject}.${virus}.unsorted.bam ]  ; then
+#				echo "Write-protected ${subject}.${virus}.unsorted.bam exists. Skipping step."
+#			else
+#				echo "Aligning ${subject} to ${virus}"
+#				bowtie2 --threads 35 -f --xeq -x virii/${virus} --very-sensitive -U ${subject}.fasta.gz 2>> ${subject}.${virus}.log | samtools view -F 4 -o ${subject}.${virus}.unsorted.bam -
+#				#chmod a-w ${subject}.${virus}.unsorted.bam
+#			fi
+#
+#			echo "Sorting"
+#			samtools sort -o ${subject}.${virus}.bam ${subject}.${virus}.unsorted.bam
+#			chmod a-w ${subject}.${virus}.bam
+#
+#			\rm ${subject}.${virus}.unsorted.bam
+#		fi
+#
+#		if [ -f ${subject}.${virus}.bam.bai ] && [ ! -w ${subject}.${virus}.bam.bai ]  ; then
+#			echo "Write-protected ${subject}.${virus}.bam.bai exists. Skipping step."
+#		else
+#			echo "Indexing"
+#			samtools index ${subject}.${virus}.bam
+#			chmod a-w ${subject}.${virus}.bam.bai
+#		fi
+#
+#		if [ -f ${subject}.${virus}.depth.csv ] && [ ! -w ${subject}.${virus}.depth.csv ]  ; then
+#			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
+#		else
+#			echo "Getting depth"
+#			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
+#			chmod a-w ${subject}.${virus}.depth.csv
+#		fi
+#
+#		if [ -f ${subject}.${virus}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.count.txt ]  ; then
+#			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.count.txt exists. Skipping step."
+#		else
+#			echo "Counting reads bowtie2 aligned to ${virus}"
+#			#	-F 4 needless here as filtered with this flag above.
+#			samtools view -c -F 4 ${subject}.${virus}.bam > ${subject}.${virus}.bowtie2.mapped.count.txt
+#			chmod a-w ${subject}.${virus}.bowtie2.mapped.count.txt
+#		fi
+
+
+
+		if [ -f ${subject}.${virus}.depth.csv ] && [ ! -w ${subject}.${virus}.depth.csv ]  ; then
+			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
-			samtools depth ${subject}.${hhv}.bam > ${subject}.${hhv}.depth.csv
-			chmod a-w ${subject}.${hhv}.depth.csv
+
+
+			awk '( $1 == '${virus}' )' ${subject}.virii.depth.csv > ${subject}.${virus}.depth.csv
+#			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
+
+
+
+			chmod a-w ${subject}.${virus}.depth.csv
 		fi
 
-		if [ -f ${subject}.${hhv}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped.count.txt ]  ; then
-			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped.count.txt exists. Skipping step."
+
+		if [ -f ${subject}.${virus}.bowtie2.mapped.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.count.txt ]  ; then
+			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.count.txt exists. Skipping step."
 		else
-			echo "Counting reads bowtie2 aligned to ${hhv}"
+			echo "Counting reads bowtie2 aligned to ${virus}"
 			#	-F 4 needless here as filtered with this flag above.
-			samtools view -c -F 4 ${subject}.${hhv}.bam > ${subject}.${hhv}.bowtie2.mapped.count.txt
-			chmod a-w ${subject}.${hhv}.bowtie2.mapped.count.txt
+			samtools view -c -F 4 ${subject}.virii.bam ${virus} > ${subject}.${virus}.bowtie2.mapped.count.txt
+			chmod a-w ${subject}.${virus}.bowtie2.mapped.count.txt
 		fi
 
-		if [ -f ${subject}.${hhv}.bowtie2.mapped.ratio_unmapped.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped.ratio_unmapped.txt ] ; then
-			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped.ratio_unmapped.txt exists. Skipping step."
+
+
+
+
+
+
+
+
+
+
+		if [ -f ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt ] ; then
+			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt exists. Skipping step."
 		else
-			echo "Calculating ratio ${hhv} bowtie2 alignments to total unaligned reads"
-			echo "scale=9; "$(cat ${subject}.${hhv}.bowtie2.mapped.count.txt)"/"$(cat ${subject}.unmapped.count.txt) | bc > ${subject}.${hhv}.bowtie2.mapped.ratio_unmapped.txt
-			chmod a-w ${subject}.${hhv}.bowtie2.mapped.ratio_unmapped.txt
+			echo "Calculating ratio ${virus} bowtie2 alignments to total unaligned reads"
+			echo "scale=9; "$(cat ${subject}.${virus}.bowtie2.mapped.count.txt)"/"$(cat ${subject}.unmapped.count.txt) | bc > ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt
+			chmod a-w ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt
 		fi
 
-		if [ -f ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt ] ; then
-			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt exists. Skipping step."
+		if [ -f ${subject}.${virus}.bowtie2.mapped.ratio_total.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped.ratio_total.txt ] ; then
+			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.ratio_total.txt exists. Skipping step."
 		else
-			echo "Calculating ratio ${hhv} bowtie2 alignments to total reads"
-			echo "scale=9; "$(cat ${subject}.${hhv}.bowtie2.mapped.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt
-			chmod a-w ${subject}.${hhv}.bowtie2.mapped.ratio_total.txt
+			echo "Calculating ratio ${virus} bowtie2 alignments to total reads"
+			echo "scale=9; "$(cat ${subject}.${virus}.bowtie2.mapped.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${virus}.bowtie2.mapped.ratio_total.txt
+			chmod a-w ${subject}.${virus}.bowtie2.mapped.ratio_total.txt
 		fi
 
-#		if [ -f ${subject}.${hhv}.bowtie2.mapped_center.count.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped_center.count.txt ]  ; then
-#			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped_center.count.txt exists. Skipping step."
+#		if [ -f ${subject}.${virus}.bowtie2.mapped_center.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped_center.count.txt ]  ; then
+#			echo "Write-protected ${subject}.${virus}.bowtie2.mapped_center.count.txt exists. Skipping step."
 #		else
-#			echo "Counting reads bowtie2 aligned to CENTER of ${hhv} in region ${hhv}:20000-120000"
+#			echo "Counting reads bowtie2 aligned to CENTER of ${virus} in region ${virus}:20000-120000"
 #			#	-F 4 needless here as filtered with this flag above.
 #			#	MUST USE SORTED
-#			samtools view -c -F 4 ${subject}.${hhv}.bam ${hhv}:20000-120000 > ${subject}.${hhv}.bowtie2.mapped_center.count.txt
-#			chmod a-w ${subject}.${hhv}.bowtie2.mapped_center.count.txt
+#			samtools view -c -F 4 ${subject}.${virus}.bam ${virus}:20000-120000 > ${subject}.${virus}.bowtie2.mapped_center.count.txt
+#			chmod a-w ${subject}.${virus}.bowtie2.mapped_center.count.txt
 #		fi
 #
-#		if [ -f ${subject}.${hhv}.bowtie2.mapped_center.ratio_unmapped.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped_center.ratio_unmapped.txt ] ; then
-#			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped_center.ratio_unmapped.txt exists. Skipping step."
+#		if [ -f ${subject}.${virus}.bowtie2.mapped_center.ratio_unmapped.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped_center.ratio_unmapped.txt ] ; then
+#			echo "Write-protected ${subject}.${virus}.bowtie2.mapped_center.ratio_unmapped.txt exists. Skipping step."
 #		else
-#			echo "Calculating ratio ${hhv} bowtie2 alignments to total unaligned reads"
-#			echo "scale=9; "$(cat ${subject}.${hhv}.bowtie2.mapped_center.count.txt)"/"$(cat ${subject}.unmapped.count.txt) | bc > ${subject}.${hhv}.bowtie2.mapped_center.ratio_unmapped.txt
-#			chmod a-w ${subject}.${hhv}.bowtie2.mapped_center.ratio_unmapped.txt
+#			echo "Calculating ratio ${virus} bowtie2 alignments to total unaligned reads"
+#			echo "scale=9; "$(cat ${subject}.${virus}.bowtie2.mapped_center.count.txt)"/"$(cat ${subject}.unmapped.count.txt) | bc > ${subject}.${virus}.bowtie2.mapped_center.ratio_unmapped.txt
+#			chmod a-w ${subject}.${virus}.bowtie2.mapped_center.ratio_unmapped.txt
 #		fi
 #
-#		if [ -f ${subject}.${hhv}.bowtie2.mapped_center.ratio_total.txt ] && [ ! -w ${subject}.${hhv}.bowtie2.mapped_center.ratio_total.txt ] ; then
-#			echo "Write-protected ${subject}.${hhv}.bowtie2.mapped_center.ratio_total.txt exists. Skipping step."
+#		if [ -f ${subject}.${virus}.bowtie2.mapped_center.ratio_total.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped_center.ratio_total.txt ] ; then
+#			echo "Write-protected ${subject}.${virus}.bowtie2.mapped_center.ratio_total.txt exists. Skipping step."
 #		else
-#			echo "Calculating ratio ${hhv} bowtie2 alignments to total reads"
-#			echo "scale=9; "$(cat ${subject}.${hhv}.bowtie2.mapped_center.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${hhv}.bowtie2.mapped_center.ratio_total.txt
-#			chmod a-w ${subject}.${hhv}.bowtie2.mapped_center.ratio_total.txt
+#			echo "Calculating ratio ${virus} bowtie2 alignments to total reads"
+#			echo "scale=9; "$(cat ${subject}.${virus}.bowtie2.mapped_center.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${virus}.bowtie2.mapped_center.ratio_total.txt
+#			chmod a-w ${subject}.${virus}.bowtie2.mapped_center.ratio_total.txt
 #		fi
 
-#		if [ -f ${subject}.${hhv}.kallisto10.count.txt ] && [ ! -w ${subject}.${hhv}.kallisto10.count.txt ] ; then
-#			echo "Write-protected ${subject}.${hhv}.kallisto10.count.txt exists. Skipping step."
+#		if [ -f ${subject}.${virus}.kallisto10.count.txt ] && [ ! -w ${subject}.${virus}.kallisto10.count.txt ] ; then
+#			echo "Write-protected ${subject}.${virus}.kallisto10.count.txt exists. Skipping step."
 #		else
 #			echo "Running kallisto10"
 #			#	kallisto crashes when 0 alignments
 #			set +e
 #			#	estimated fragment length and standard deviation are guesses
-#			kallisto quant --single -l 500 -s 50 -b 10 --threads 10 --index /raid/refs/kallisto/${hhv} --output-dir ${subject}.${hhv}.kallisto10 ${subject}.fasta.gz 2> ${subject}.${hhv}.kallisto10.log
+#			kallisto quant --single -l 500 -s 50 -b 10 --threads 10 --index /raid/refs/kallisto/${virus} --output-dir ${subject}.${virus}.kallisto10 ${subject}.fasta.gz 2> ${subject}.${virus}.kallisto10.log
 #			set -e
-#			awk -F"\t" '( NR == 2 ){ print $4 }' ${subject}.${hhv}.kallisto10/abundance.tsv > ${subject}.${hhv}.kallisto10.count.txt
-#			chmod a-w ${subject}.${hhv}.kallisto10.count.txt
+#			awk -F"\t" '( NR == 2 ){ print $4 }' ${subject}.${virus}.kallisto10/abundance.tsv > ${subject}.${virus}.kallisto10.count.txt
+#			chmod a-w ${subject}.${virus}.kallisto10.count.txt
 #		fi
 #
-#		if [ -f ${subject}.${hhv}.kallisto10.mapped.ratio_total.txt ] && [ ! -w ${subject}.${hhv}.kallisto10.mapped.ratio_total.txt ] ; then
-#			echo "Write-protected ${subject}.${hhv}.kallisto10.mapped.ratio_total.txt exists. Skipping step."
+#		if [ -f ${subject}.${virus}.kallisto10.mapped.ratio_total.txt ] && [ ! -w ${subject}.${virus}.kallisto10.mapped.ratio_total.txt ] ; then
+#			echo "Write-protected ${subject}.${virus}.kallisto10.mapped.ratio_total.txt exists. Skipping step."
 #		else
-#			echo "Calculating ratio ${hhv} kallisto10 alignments to total reads"
-#			echo "scale=9; "$(cat ${subject}.${hhv}.kallisto10.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${hhv}.kallisto10.mapped.ratio_total.txt
-#			chmod a-w ${subject}.${hhv}.kallisto10.mapped.ratio_total.txt
+#			echo "Calculating ratio ${virus} kallisto10 alignments to total reads"
+#			echo "scale=9; "$(cat ${subject}.${virus}.kallisto10.count.txt)"/"$(cat ${subject}.total.count.txt) | bc > ${subject}.${virus}.kallisto10.mapped.ratio_total.txt
+#			chmod a-w ${subject}.${virus}.kallisto10.mapped.ratio_total.txt
 #		fi
 
 	done
