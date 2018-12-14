@@ -6,3 +6,6 @@ echo $f $b
 bowtie2-build $f $b
 done
 
+
+
+bowtie2-build $( ls /raid/refs/fasta/virii/*fasta | paste -sd "," ) virii
