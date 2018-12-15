@@ -114,6 +114,11 @@ bowtie2 --score-min L,-0.7,-0.7 --all --threads 40 -f --xeq -x virii --very-sens
 bowtie2 --score-min L,-0.4,-0.4 --all --threads 40 -f --xeq -x virii --very-sensitive -U HG02147.fasta.gz 2>> HG02147.virii.4.log | samtools view -F 4 -o HG02147.virii.4.unsorted.bam -
 
 Reads are 90 bases
+.1*90 =9
+4=-36.4 - LESS ALIGNMENTS
+5=-45.5
+6=-54.6
+7=-63.7 - MORE ALIGNMENTS
 
 samtools view -c HG02147.virii.4.unsorted.bam
 samtools view -c HG02147.virii.5.unsorted.bam
