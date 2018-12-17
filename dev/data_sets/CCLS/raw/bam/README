@@ -794,3 +794,81 @@ nohup samtools depth -d 0 -a $f | awk 'BEGIN{OFS="\t";max=0;z=0}{if($3>max){max=
 done
 
 ll {*983899.recaled*,redo/*983899.hg38.num*}new.max.depth.txt
+
+
+
+
+
+
+for f in *983899.recaled*bam redo/*983899.hg38.num*bam ; do
+nohup samtools depth -d 0 -a $f | gzip --best > $f.depth.txt.gz &
+done
+
+
+Get depths from VCF files
+
+for t in snps indels ; do
+for f in ../vcf/*983899.output-HC.vcf.gz *983899.recaled*vcf.gz redo/*983899.hg38.num*vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=0;z=0}{if($1>max){max=$1};if($1==0){z+=1};sum+=$1;sumsq+=($1)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.$t.DP.txt &
+done ; done
+
+for t in snps indels ; do
+for f in 983899.recaled.PP.vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=0;z=0}{if($1>max){max=$1};if($1==0){z+=1};sum+=$1;sumsq+=($1)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.$t.DP.txt &
+done ; done
+
+
+
+keeps crashing with 
+Failed to open -: unknown file type
+
+nohup is the cause? How? Why?
+
+#for o in -c -m ; do
+#	u = uncompressed bcf
+#	z =   compressed vcf
+#	-c, --consensus-caller    : the original calling method (conflicts with -m)
+#	-m, --multiallelic-caller : alternative model for multiallelic and rare-variant calling (conflicts with -c)
+
+for o in c m ; do
+for f in *983899.recaled*bam redo/*983899.hg38.num*bam ; do
+bcftools mpileup  --threads 1 --output-type u --fasta-ref /raid/refs/fasta/hg38.num.fa ${f} | bcftools call --threads 1 --output-type z -${o} --variants-only --output ${f}.${o}.vcf.gz &
+done ; done
+
+
+nohup ./create_bcftools_vcfgs.bash &
+
+
+--- TODO
+
+ll {../vcf/*983899.output-HC,*983899.recaled,redo/*983899.hg38.num}*vcf.gz.*.DP.txt
+ll {*983899.recaled,redo/*983899.hg38.num}*bam.depth.txt.gz
+ll {*983899.recaled,redo/*983899.hg38.num}*bam.?.vcf.gz
+
+
+dev/data_sets/CCLS/20180703-vcf-creation/recreate_vcfs_from_bams.bash
+
+#	bcftools mpileup --output-type u --fasta-ref $fasta_ref $f | \
+#	bcftools call  --output-type z --output $b.call.vcf.gz \
+#		--multiallelic-caller --variants-only && \
+#	bcftools index $b.call.vcf.gz && \
+	bcftools annotate --annotations /raid/refs/vcf/common_all_20180418.vcf.gz \
+		--output-type z --output $b.variants.vcf.gz \
+		--columns ID,INFO \
+		$b.call.vcf.gz && \
+	bcftools index $b.variants.vcf.gz && \
+	bcftools annotate --rename-chrs /raid/refs/vcf/num_to_chr.txt \
+		--output-type z --output $b.renamed.vcf.gz \
+		$b.variants.vcf.gz && \
+	bcftools index $b.renamed.vcf.gz && \
+	bcftools annotate --annotations /raid/refs/genes/genes.bed.gz \
+		--columns CHROM,FROM,TO,GENE \
+		--header-lines <(echo '##INFO=<ID=GENE,Number=1,Type=String,Description="Gene name">') \
+		--output-type z --output $b.genes.vcf.gz \
+		$b.renamed.vcf.gz && \
+	bcftools index $b.genes.vcf.gz && \
+	bcftools annotate --rename-chrs /raid/refs/vcf/chr_to_num.txt \
+		--output-type z --output $b.final.vcf.gz \
+		$b.genes.vcf.gz && \
+	echo "Done with $b" &
+
