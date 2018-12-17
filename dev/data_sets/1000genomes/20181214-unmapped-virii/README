@@ -86,7 +86,6 @@ samtools view -c NA12878.unmapped.ILLUMINA.bwa.CEU.low_coverage.20121211.bam
 for f in ../20181010-unmapped-hhv6/*fasta.gz ; do ln -s $f ; done
 
 
-
 nohup ./process.bash &
 
 
@@ -98,7 +97,7 @@ head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
 
 
 
-./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
+nohup ./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
 
 
 Redesigned to align to all virii after HG00733.
