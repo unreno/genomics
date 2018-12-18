@@ -10,14 +10,14 @@ matplotlib.use('Agg')
 import pandas
 import matplotlib.pyplot as plt
 plt.rcParams['scatter.marker'] = '.'
-plt.rcParams['scatter.markersize'] = 1
+#plt.rcParams['scatter.markersize'] = 1
 
 
 import glob
 import os.path
 
-from matplotlib.backends.backend_pdf import PdfPages
-pp = PdfPages('bam-coverage-depth.pdf')
+#from matplotlib.backends.backend_pdf import PdfPages
+#pp = PdfPages('bam-coverage-depth.pdf')
 
 #filename="/raid/data/raw/CCLS/bam/983899.recaled.bam.depth.txt.gz"
 
@@ -71,7 +71,7 @@ pp = PdfPages('bam-coverage-depth.pdf')
 
 chromosomes="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y MT".split()
 
-#chromosomes="Y MT".split()
+#chromosomes="MT".split()
 
 for chromosome in chromosomes:
 	filename="/raid/data/raw/CCLS/bam/983899.recaled.bam.depth."+chromosome+".txt.gz"
@@ -99,9 +99,11 @@ for chromosome in chromosomes:
 
 			#marker='.', #markersize=1,
 
-		pp.savefig()
+		plt.savefig(filename.rstrip(".txt.gz")+".png")
 
-pp.close()
+		#pp.savefig()
+
+#pp.close()
 
 
 
