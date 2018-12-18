@@ -13,7 +13,7 @@ BEGIN {
 	for(hkle in refs){
 		printf("%s - alignments that were <150 away (Hits)\t",refs[hkle])
 		printf("%s - alignments that were >150 away (Off target)\t",refs[hkle])
-		printf("%s - # of SVA which the primer did not align near (Misses)\t",refs[hkle])
+		printf("%s - # of HKLE which the primer did not align near (Misses)\t",refs[hkle])
 	}
 	printf("\n")
 }
@@ -21,7 +21,6 @@ BEGIN {
 ( NR != FNR ){
 #	print "---"
 	rows[$1]++
-
 	for(hkle in refs){
 		if($2 in hkles[refs[hkle]]){
 			if( length(hkles[refs[hkle]][$2]) >= 0 ){
@@ -46,14 +45,6 @@ BEGIN {
 	}
 }
 END {
-#for( hit in hits ){
-#	print hit
-##	print hits[hit]
-#	for(x in hits[hit]){
-#		print x
-#		print hits[hit][x]
-#	}
-#}
 	asorti(rows)
 	for(row in rows){
 		printf("%s\t",rows[row]);
