@@ -841,6 +841,19 @@ nohup ./create_bcftools_vcfs.bash &
 nohup ./bam-coverage-depth.py &
 
 
+
+for t in snps indels ; do
+for f in {GM_983899.recaled,redo/GM_983899.hg38.num}*bam.?.vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=0;z=0}{if($1>max){max=$1};if($1==0){z+=1};sum+=$1;sumsq+=($1)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.$t.DP.txt &
+done ; done
+
+for t in snps indels ; do
+for f in {GM_983899.recaled,redo/GM_983899.hg38.num}*bam.?.vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
+done ; done
+
+
+
 --- TODO
 
 ll {../vcf/*983899.output-HC,*983899.recaled,redo/*983899.hg38.num}*vcf.gz.*.DP.txt
@@ -873,4 +886,23 @@ dev/data_sets/CCLS/20180703-vcf-creation/recreate_vcfs_from_bams.bash
 		--output-type z --output $b.final.vcf.gz \
 		$b.genes.vcf.gz && \
 	echo "Done with $b" &
+
+
+for t in snps indels ; do
+for f in {983899.recaled,redo/983899.hg38.num}*bam.?.vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=0;z=0}{if($1>max){max=$1};if($1==0){z+=1};sum+=$1;sumsq+=($1)^2}END{print "Zero Count:",z,"Max:",max,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.$t.DP.txt &
+nohup bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
+done ; done
+
+for t in snps indels ; do
+for f in {983899.recaled,redo/983899.hg38.num}*bam.?.vcf.gz ; do
+nohup bcftools view --no-header --types ${t} ${f} | wc -l > ${f}.${t}.count.txt &
+done ; done
+
+ll {*983899.recaled,redo/*983899.hg38.num}*bam.?.vcf.gz*.DP.txt
+
+
+
+bcftools provides the same numbers for All and Proper_pair? Perhaps bcftools only uses proper pair?
+
 
