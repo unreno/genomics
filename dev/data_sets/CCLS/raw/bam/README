@@ -836,7 +836,9 @@ bcftools mpileup  --threads 1 --output-type u --fasta-ref /raid/refs/fasta/hg38.
 done ; done
 
 
-nohup ./create_bcftools_vcfgs.bash &
+nohup ./create_bcftools_vcfs.bash &
+
+nohup ./bam-coverage-depth.py &
 
 
 --- TODO
