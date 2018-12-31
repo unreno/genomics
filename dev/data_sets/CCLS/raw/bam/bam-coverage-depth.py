@@ -73,9 +73,18 @@ chromosomes="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y MT".sp
 
 #chromosomes="MT".split()
 
+
 for chromosome in chromosomes:
-	filename="/raid/data/raw/CCLS/bam/983899.recaled.PP.bam.depth."+chromosome+".txt.gz"
-#	filename="/raid/data/raw/CCLS/bam/983899.recaled.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/redo/983899.hg38.num.PP.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/redo/GM_983899.hg38.num.PP.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/redo/983899.hg38.num.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/redo/GM_983899.hg38.num.bam.depth."+chromosome+".txt.gz"
+
+#	filename="/raid/data/raw/CCLS/bam/GM_983899.recaled.PP.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/GM_983899.recaled.bam.depth."+chromosome+".txt.gz"
+#	filename="/raid/data/raw/CCLS/bam/983899.recaled.PP.bam.depth."+chromosome+".txt.gz"
+	filename="/raid/data/raw/CCLS/bam/983899.recaled.bam.depth."+chromosome+".txt.gz"
+
 	#print(filename)
 	#for filename in glob.iglob("/raid/data/raw/CCLS/bam/983899.recaled.bam.depth.*.txt.gz"):
 	print(filename)
