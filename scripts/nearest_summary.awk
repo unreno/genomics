@@ -1,57 +1,81 @@
+#
+#	awk -f nearest_summary.awk \
+#		svas.hg38_no_alts.vs.reverse.positions.csv \
+#		sva_primers.hg38_no_alts.vs.reverse.positions.csv \
+#		> sva_primers.nearest_sva.hg38_no_alts.vs.reverse.summary.csv
+#
 BEGIN {
 	FS=OFS="\t"
 }
+{
+	#	SVA_A	chr19	45647550	-723
+	element=$1
+	chromosome=$2
+	position=$3
+	score=$4
+}
 #	buffer first file
 ( NR == FNR ) {
-	refs[$1]++;	#	columns
-	hkles[$1][$2][$3]=$4;	#	SVA_A	chr19	45647550	-723
+#	I could filter on alignment scores (SVAs are -300 to -900)
+#( NR == FNR && score > -800 ) {
+	hkles[element]++;
+	hkle_alignments[element][chromosome][position]=score;
 }
-#	upon first line of not-first file, print header
+#	first line of not-first file
 ( NR != FNR && FNR == 1 ){
-	printf("REF\t")	#CHR\tPOS\tAS\t")
-	asorti(refs)
-	for(hkle in refs){
-		printf("%s - alignments that were <150 away (Hits)\t",refs[hkle])
-		printf("%s - alignments that were >150 away (Off target)\t",refs[hkle])
-		printf("%s - # of HKLE which the primer did not align near (Misses)\t",refs[hkle])
-	}
-	printf("\n")
+	asorti(hkles,sorted_hkles)
 }
 #	process each line in not-first file
 ( NR != FNR ){
+#	I could filter on alignment scores (Primers are 0 to -8)
+#( NR != FNR && score == 0 ){
 #	print "---"
-	rows[$1]++
-	for(hkle in refs){
-		if($2 in hkles[refs[hkle]]){
-			if( length(hkles[refs[hkle]][$2]) >= 0 ){
-				for( position in hkles[refs[hkle]][$2] ){
-					diff = position-$3
+	primers[element]++
+
+	for(hkle in sorted_hkles){
+		if(chromosome in hkle_alignments[sorted_hkles[hkle]]){
+			if( length(hkle_alignments[sorted_hkles[hkle]][chromosome]) >= 0 ){
+				for( pos in hkle_alignments[sorted_hkles[hkle]][chromosome] ){
+					diff = pos-position
 					absdiff = ( diff < 0 ) ? -diff : diff
 					if( absdiff < 150 ){
-						hits[$1][refs[hkle]]++
+						hits[element][sorted_hkles[hkle]]++
 #						print "HIT " $0
 					} else {
-						off_target[$1][refs[hkle]]++
+						off_target[element][sorted_hkles[hkle]]++
 #						print "OFF " $0
 					}
-#					print $1  " - "  $2 " - " $3 " - " hkle " - " refs[hkle]
+#					print $1  " - "  $2 " - " $3 " - " hkle " - " sorted_hkles[hkle]
 #					print absdiff
 				}
 			}
 		} else {
-			misses[$1][refs[hkle]]++
+			misses[element][sorted_hkles[hkle]]++
 #			print "MIS " $0
 		}
 	}
 }
 END {
-	asorti(rows)
-	for(row in rows){
-		printf("%s\t",rows[row]);
-		for(hkle in refs){	#	columns
-			printf("%s\t",hits[rows[row]][refs[hkle]])
-			printf("%s\t",off_target[rows[row]][refs[hkle]])
-			printf("%s\t",misses[rows[row]][refs[hkle]])
+	printf("REF\talignments")	#CHR\tPOS\tAS\t")
+	for(hkle in sorted_hkles){
+		printf("\t%s - (%d) # alignments that were <150 away (Hits)",sorted_hkles[hkle],hkles[sorted_hkles[hkle]])
+		printf("\t%s - # alignments that were >150 away (Off target)",sorted_hkles[hkle])
+		printf("\t%s - # alignments of HKLE which the primer did not align near (Misses)",sorted_hkles[hkle])
+	}
+	printf("\n")
+#
+#	add "Any SVA"
+#
+	asorti(primers,sorted_primers)
+	for(primer in sorted_primers){
+		printf("%s\t%s",sorted_primers[primer],primers[sorted_primers[primer]]);
+		for(hkle in sorted_hkles){	#	columns
+			printf("\t%s",hits[sorted_primers[primer]][sorted_hkles[hkle]])
+			printf("\t%s",off_target[sorted_primers[primer]][sorted_hkles[hkle]])
+
+			printf("\t%s",misses[sorted_primers[primer]][sorted_hkles[hkle]])
+#			printf("\tXXX")
+
 		}
 		printf("\n")
 	}
