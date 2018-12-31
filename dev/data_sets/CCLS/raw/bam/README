@@ -854,6 +854,23 @@ done ; done
 
 
 
+for f in *.bam.depth.txt ; do
+echo gzip --best $f
+done | parallel
+
+
+zcat GM_983899.hg38.num.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "GM_983899.hg38.num.bam.depth."$1".txt" }' &
+zcat GM_983899.hg38.num.PP.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "GM_983899.hg38.num.PP.bam.depth."$1".txt" }' &
+zcat 983899.hg38.num.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "983899.hg38.num.bam.depth."$1".txt" }' &
+zcat 983899.hg38.num.PP.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "983899.hg38.num.PP.bam.depth."$1".txt" }' &
+
+zcat GM_983899.recaled.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "GM_983899.recaled.bam.depth."$1".txt" }' &
+zcat GM_983899.recaled.PP.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "GM_983899.recaled.PP.bam.depth."$1".txt" }' &
+zcat 983899.recaled.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "983899.recaled.bam.depth."$1".txt" }' &
+zcat 983899.recaled.PP.bam.depth.txt.gz | awk -F"\t" '{ print $2"\t"$3 >> "983899.recaled.PP.bam.depth."$1".txt" }' &
+
+
+
 --- TODO
 
 ll {../vcf/*983899.output-HC,*983899.recaled,redo/*983899.hg38.num}*vcf.gz.*.DP.txt
@@ -901,8 +918,11 @@ done ; done
 
 ll {*983899.recaled,redo/*983899.hg38.num}*bam.?.vcf.gz*.DP.txt
 
-
+gzip *.bam.depth.*.txt
 
 bcftools provides the same numbers for All and Proper_pair? Perhaps bcftools only uses proper pair?
+
+
+
 
 
