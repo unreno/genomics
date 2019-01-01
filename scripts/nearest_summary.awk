@@ -14,7 +14,7 @@ BEGIN {
 	position=$3
 	score=$4
 }
-#	buffer first file
+#	buffer first file (reference)
 ( NR == FNR ) {
 #	I could filter on alignment scores (SVAs are -300 to -900)
 #( NR == FNR && score > -800 ) {
@@ -29,29 +29,26 @@ BEGIN {
 ( NR != FNR ){
 #	I could filter on alignment scores (Primers are 0 to -8)
 #( NR != FNR && score == 0 ){
-#	print "---"
 	primers[element]++
 
 	for(hkle in sorted_hkles){
+		#	sorted_hkles[hkle] ... SVA_A, SVA_B, ...
 		if(chromosome in hkle_alignments[sorted_hkles[hkle]]){
-			if( length(hkle_alignments[sorted_hkles[hkle]][chromosome]) >= 0 ){
-				for( pos in hkle_alignments[sorted_hkles[hkle]][chromosome] ){
-					diff = pos-position
+#	not necessary. 
+#			if( length(hkle_alignments[sorted_hkles[hkle]][chromosome]) >= 0 ){
+				for( target_position in hkle_alignments[sorted_hkles[hkle]][chromosome] ){
+					diff = target_position - position
 					absdiff = ( diff < 0 ) ? -diff : diff
 					if( absdiff < 150 ){
 						hits[element][sorted_hkles[hkle]]++
-#						print "HIT " $0
 					} else {
 						off_target[element][sorted_hkles[hkle]]++
-#						print "OFF " $0
 					}
-#					print $1  " - "  $2 " - " $3 " - " hkle " - " sorted_hkles[hkle]
-#					print absdiff
 				}
-			}
+#			}
 		} else {
-			misses[element][sorted_hkles[hkle]]++
-#			print "MIS " $0
+			missed_chromosomes[element][sorted_hkles[hkle]][chromosome]++
+#			misses[element][sorted_hkles[hkle]]++
 		}
 	}
 }
@@ -73,8 +70,15 @@ END {
 			printf("\t%s",hits[sorted_primers[primer]][sorted_hkles[hkle]])
 			printf("\t%s",off_target[sorted_primers[primer]][sorted_hkles[hkle]])
 
-			printf("\t%s",misses[sorted_primers[primer]][sorted_hkles[hkle]])
-#			printf("\tXXX")
+			missed=0
+			if(sorted_hkles[hkle] in missed_chromosomes[sorted_primers[primer]]){
+				for(missed_chromosome in missed_chromosomes[sorted_primers[primer]][sorted_hkles[hkle]]){
+					if(missed_chromosome in hkle_alignments[sorted_hkles[hkle]]){
+						missed+=length(hkle_alignments[sorted_hkles[hkle]][missed_chromosome])
+					}
+				}
+			}
+			printf("\t%s",missed)
 
 		}
 		printf("\n")
