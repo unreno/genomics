@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-
 import os    
-#import os.path
 import sys
 import pandas
 import numpy
@@ -10,7 +8,6 @@ import numpy
 
 #	common_depth_coverage_regions.py {HG,NA}*.NC_001664.4.depth.csv
 #	common_depth_coverage_regions.py {HG,NA}*.NC_000898.1.depth.csv
-
 
 #print( sys.argv[1:] )
 #['20180103-awsqueue.sql', 'Makefile', 'Makefile.example', 'NA12878_SRR010942', 'PersonalGenomeProject', 'README.md', 'dev', 'docker', 'geuvadis.txt', 'notebooks', 'notes', 'oneoff', 'scripts', 'test_user_data']
@@ -22,18 +19,9 @@ import numpy
 #	~/github/unreno/genomics/dev/data_sets/1000genomes/20181010-unmapped-hhv6/hhv6.py
 #	dev/data_sets/CCLS/raw/bam/bam-coverage-depth.py
 
-#	pvalues = pandas.DataFrame(index=trinuc_muts,columns=trinuc_muts)
-#d=pandas.DataFrame(columns=['position','depth'])
-#d.set_index('position',inplace=True)
-#d=pandas.DataFrame(columns=['position','depth'])
-#df=pandas.DataFrame(data=None, index=['position'], columns=['depth'], dtype=int)
-#df=pandas.DataFrame(data=None, index=['position'], columns=[], dtype=int)
 
-df=pandas.DataFrame()
-boo=pandas.DataFrame()
-flagged=pandas.DataFrame()
-#print( df.head() )
-#print( df.dtypes )
+data_frames = []
+flagged_data_frames = []
 
 for filename in sys.argv[1:]:
 	print(filename)
@@ -49,51 +37,22 @@ for filename in sys.argv[1:]:
 			names=["position",sample],
 			dtype={"position": int, sample: int},
 			index_col=["position"] )
-		#print( d.head() )
-		#print( d.dtypes )
-		#df = df.merge( d )
-		#df = pandas.concat([df, d], axis=1, sort=True )
-		df = pandas.concat([df, d], axis=1)
-		#df = df.append(d, axis=1)
-		#.fillna(0)
-		#print( df.head() )
-		#print( df.dtypes )
-		#d[sample]=d[sample]>100
-		#d[sample] = d.apply(lambda row: row[sample] > 100 , axis=1)
-		#boo = pandas.concat([boo, d], axis=1)
-		#print( boo.head() )
-		#print( boo.dtypes )
-		#	NOPE d[sample]=( d[sample]>1 ) ? 1 : 0
+		data_frames.append(d)
 
-		#print( "SUM" )
-		#print( d.sum() )
 		d[sample] = numpy.where(d[sample]>1, 1, 0)
-		#d[sample] = numpy.where(d[sample]>5, 1, 0)
+		flagged_data_frames.append(d)
 
-		flagged = pandas.concat([flagged, d], axis=1)
-		#flagged = flagged.append(d, axis=1)
-		print( flagged.head() )
-		print( flagged.dtypes )
+df = pandas.concat(data_frames, axis=1)
+flagged = pandas.concat(flagged_data_frames, axis=1)
 
-		#	merge
-#subjects = subjects.merge( kg, left_on='Subject', right_on='subject', how='outer')
+data_frames = []
+flagged_data_frames = []
+
 
 df.fillna(0, inplace=True)
-#print( df.head() )
-#print( df.tail() )
-#print( df.dtypes )
 print( df )
-#print( df.mean(axis=1) )
-
-#boo.fillna(False, inplace=True)
-#print( boo.head() )
-#print( boo.dtypes )
-#print( boo.mean(axis=1).tail() )
-
 
 flagged.fillna(0, inplace=True)
-#print( flagged.head() )
-#print( flagged.dtypes )
 print( flagged.mean(axis=1) )
 
 #	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
@@ -158,7 +117,8 @@ else:
 #	[[7803, 7941], [159038, 159069], [159211, 159223]]
 
 #	common_depth_coverage_regions.py {HG,NA}*.NC_001664.4.depth.csv
-
+#	[[7695, 7986], [158988, 159276]]
+#	[[7695, 7986], [158988, 159276]]
 
 
 
