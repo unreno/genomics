@@ -32,8 +32,8 @@ import numpy
 df=pandas.DataFrame()
 boo=pandas.DataFrame()
 flagged=pandas.DataFrame()
-print( df.head() )
-print( df.dtypes )
+#print( df.head() )
+#print( df.dtypes )
 
 for filename in sys.argv[1:]:
 	print(filename)
@@ -49,14 +49,14 @@ for filename in sys.argv[1:]:
 			names=["position",sample],
 			dtype={"position": int, sample: int},
 			index_col=["position"] )
-		print( d.head() )
-		print( d.dtypes )
+		#print( d.head() )
+		#print( d.dtypes )
 		#df = df.merge( d )
 		#df = pandas.concat([df, d], axis=1, sort=True )
 		df = pandas.concat([df, d], axis=1)
 		#.fillna(0)
-		print( df.head() )
-		print( df.dtypes )
+		#print( df.head() )
+		#print( df.dtypes )
 		#d[sample]=d[sample]>100
 		#d[sample] = d.apply(lambda row: row[sample] > 100 , axis=1)
 		#boo = pandas.concat([boo, d], axis=1)
@@ -66,8 +66,8 @@ for filename in sys.argv[1:]:
 
 		#print( "SUM" )
 		#print( d.sum() )
-		#d[sample] = numpy.where(d[sample]>1, 1, 0)
-		d[sample] = numpy.where(d[sample]>5, 1, 0)
+		d[sample] = numpy.where(d[sample]>1, 1, 0)
+		#d[sample] = numpy.where(d[sample]>5, 1, 0)
 
 		flagged = pandas.concat([flagged, d], axis=1)
 		print( flagged.head() )
@@ -77,9 +77,9 @@ for filename in sys.argv[1:]:
 #subjects = subjects.merge( kg, left_on='Subject', right_on='subject', how='outer')
 
 df.fillna(0, inplace=True)
-print( df.head() )
-print( df.tail() )
-print( df.dtypes )
+#print( df.head() )
+#print( df.tail() )
+#print( df.dtypes )
 print( df )
 #print( df.mean(axis=1) )
 
@@ -90,8 +90,8 @@ print( df )
 
 
 flagged.fillna(0, inplace=True)
-print( flagged.head() )
-print( flagged.dtypes )
+#print( flagged.head() )
+#print( flagged.dtypes )
 print( flagged.mean(axis=1) )
 
 #	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
@@ -110,20 +110,41 @@ print( flagged.mean(axis=1) )
 #	p.append([start, last])
 #
 
-common=flagged.index[ flagged.mean(axis=1) >= 0.75 ].tolist()
+common=flagged.index[ flagged.mean(axis=1) >= 0.7 ].tolist()
 print( common )
 
 if( len(common) > 0 ):
-	last=common[0]
-	for i in common:
-		if( i == common[0] ):
-			print("Region start: ",i)
-		elif( i == common[-1] ):
-			print("Region end: ",i)
-		elif( i != last+1 ):
-			print("Region end: ",last)
-			print("Region start: ",i)
-		last=i
+	regions=[]
+	first=last=common[0]
+	for item in common[1:]:
+		if( item != last+1 ):
+			regions.append([first,last])
+			first=item
+
+		last=item
+	regions.append([first,last])
+	print(regions)
+
+	#	fill gaps less than 20 base pairs
+	filled_regions=[]
+	buffered=regions[0]
+	for pair in regions[1:]:
+		if( pair[0] < buffered[1]+20 ):
+			buffered[1] = pair[1]
+		else:
+			filled_regions.append(buffered)
+			buffered=pair
+	filled_regions.append(buffered)
+	print( filled_regions )
+		
+
 else:
 	print("No common regions found.")
+
+
+
+#	common_depth_coverage_regions.py HG000*.NC_001664.4.depth.csv
+#	[[7717, 7728], [7730, 7765], [7871, 7877], [7908, 7921], [158982, 159028], [159039, 159058], [159060, 159066]]
+#	[[7717, 7765], [7871, 7877], [7908, 7921], [158982, 159066]]
+
 
