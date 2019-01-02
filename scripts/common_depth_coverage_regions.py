@@ -66,7 +66,8 @@ for filename in sys.argv[1:]:
 
 		#print( "SUM" )
 		#print( d.sum() )
-		d[sample] = numpy.where(d[sample]>1, 1, 0)
+		#d[sample] = numpy.where(d[sample]>1, 1, 0)
+		d[sample] = numpy.where(d[sample]>5, 1, 0)
 
 		flagged = pandas.concat([flagged, d], axis=1)
 		print( flagged.head() )
@@ -93,15 +94,36 @@ print( flagged.head() )
 print( flagged.dtypes )
 print( flagged.mean(axis=1) )
 
+#	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
+#
+#	p = []
+#	last = -2                                                            
+#	start = -1
+#
+#	for item in list:
+#		if item != last+1:                        
+#			if start != -1:
+#				p.append([start, last])
+#			start = item
+#		last = item
+#
+#	p.append([start, last])
+#
 
-common=flagged.index[ flagged.mean(axis=1) > 0.6 ].tolist()
+common=flagged.index[ flagged.mean(axis=1) >= 0.75 ].tolist()
 print( common )
 
-last=0
-
-for i in common:
-	if( i != last+1 ):
-		print("Region end: ",last)
-		print("Region start: ",i)
-	last=i
+if( len(common) > 0 ):
+	last=common[0]
+	for i in common:
+		if( i == common[0] ):
+			print("Region start: ",i)
+		elif( i == common[-1] ):
+			print("Region end: ",i)
+		elif( i != last+1 ):
+			print("Region end: ",last)
+			print("Region start: ",i)
+		last=i
+else:
+	print("No common regions found.")
 
