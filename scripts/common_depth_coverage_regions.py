@@ -5,6 +5,54 @@ import sys
 import pandas
 import numpy
 
+# include standard modules
+import argparse
+
+# initiate the parser
+parser = argparse.ArgumentParser(prog='frobble')
+
+parser.add_argument('files', nargs='*', help='files help')
+parser.add_argument('-V', '--version', help='show program version', action='store_true')
+parser.add_argument('-p', '--percentage', nargs=1, type=int, default=50, help='the percentage to %(prog)s (default: %(default)s)')
+parser.add_argument('-d', '--depth', nargs=1, type=int, default=1, help='the depth to %(prog)s (default: %(default)s)')
+
+# read arguments from the command line
+args = parser.parse_args()
+
+# check for --version or -V
+if args.version:  
+	print("this is myprogram version 0.1")
+	quit()
+
+
+
+#	Note that nargs=1 produces a list of one item. This is different from the default, in which the item is produced by itself.
+#	THAT IS JUST STUPID! And now I have to check it manually.
+
+if isinstance(args.percentage,list):
+	percentage=args.percentage[0]
+else:
+	percentage=args.percentage
+
+print( "Filtering commonality on sample percentage: ", percentage )
+
+
+
+
+if isinstance(args.depth,list):
+	depth=args.depth[0]
+else:
+	depth=args.depth
+
+print( "Filtering commonality on sample depth: ", depth )
+
+
+
+
+
+
+
+
 
 #	common_depth_coverage_regions.py {HG,NA}*.NC_001664.4.depth.csv
 #	common_depth_coverage_regions.py {HG,NA}*.NC_000898.1.depth.csv
@@ -23,7 +71,8 @@ import numpy
 data_frames = []
 flagged_data_frames = []
 
-for filename in sys.argv[1:]:
+#for filename in sys.argv[1:]:
+for filename in args.files:  
 	print(filename)
 	if os.path.isfile(filename) and os.path.getsize(filename) > 0:
 		print("Reading "+filename)
@@ -39,21 +88,22 @@ for filename in sys.argv[1:]:
 			index_col=["position"] )
 		data_frames.append(d)
 
-		d[sample] = numpy.where(d[sample]>1, 1, 0)
+		d[sample] = numpy.where(d[sample]>depth, 1, 0)
 		flagged_data_frames.append(d)
 
-df = pandas.concat(data_frames, axis=1)
-flagged = pandas.concat(flagged_data_frames, axis=1)
+if len(data_frames) > 0:
+	df = pandas.concat(data_frames, axis=1)
+	flagged = pandas.concat(flagged_data_frames, axis=1)
 
-data_frames = []
-flagged_data_frames = []
+	data_frames = []
+	flagged_data_frames = []
 
 
-df.fillna(0, inplace=True)
-print( df )
+	df.fillna(0, inplace=True)
+	print( df )
 
-flagged.fillna(0, inplace=True)
-print( flagged.mean(axis=1) )
+	flagged.fillna(0, inplace=True)
+	print( flagged.mean(axis=1) )
 
 #	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
 #
@@ -71,36 +121,36 @@ print( flagged.mean(axis=1) )
 #	p.append([start, last])
 #
 
-common=flagged.index[ flagged.mean(axis=1) >= 0.6 ].tolist()
-print( common )
+	common=flagged.index[ flagged.mean(axis=1) >= percentage/100 ].tolist()
+	print( common )
 
-if( len(common) > 0 ):
-	regions=[]
-	first=last=common[0]
-	for item in common[1:]:
-		if( item != last+1 ):
-			regions.append([first,last])
-			first=item
+	if( len(common) > 0 ):
+		regions=[]
+		first=last=common[0]
+		for item in common[1:]:
+			if( item != last+1 ):
+				regions.append([first,last])
+				first=item
 
-		last=item
-	regions.append([first,last])
-	print(regions)
+			last=item
+		regions.append([first,last])
+		print(regions)
 
-	#	fill gaps less than 20 base pairs
-	filled_regions=[]
-	buffered=regions[0]
-	for pair in regions[1:]:
-		if( pair[0] < buffered[1]+20 ):
-			buffered[1] = pair[1]
-		else:
-			filled_regions.append(buffered)
-			buffered=pair
-	filled_regions.append(buffered)
-	print( filled_regions )
+		#	fill gaps less than 20 base pairs
+		filled_regions=[]
+		buffered=regions[0]
+		for pair in regions[1:]:
+			if( pair[0] < buffered[1]+20 ):
+				buffered[1] = pair[1]
+			else:
+				filled_regions.append(buffered)
+				buffered=pair
+		filled_regions.append(buffered)
+		print( filled_regions )
 		
 
-else:
-	print("No common regions found.")
+	else:
+		print("No common regions found.")
 
 
 
@@ -119,6 +169,17 @@ else:
 #	common_depth_coverage_regions.py {HG,NA}*.NC_001664.4.depth.csv
 #	[[7695, 7986], [158988, 159276]]
 #	[[7695, 7986], [158988, 159276]]
+
+
+
+#	common_depth_coverage_regions.py -p 70 {HG,NA}*.NC_001664.4.depth.csv
+#	[[7715, 7964], [159008, 159251]]
+
+#	common_depth_coverage_regions.py -p 60 {HG,NA}*.NC_001664.4.depth.csv
+#	[[7695, 7986], [158988, 159276]]
+
+#	common_depth_coverage_regions.py -p 50 {HG,NA}*.NC_001664.4.depth.csv
+#	[[7683, 8002], [158972, 159290]]
 
 
 
