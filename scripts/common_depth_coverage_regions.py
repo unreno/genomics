@@ -54,6 +54,7 @@ for filename in sys.argv[1:]:
 		#df = df.merge( d )
 		#df = pandas.concat([df, d], axis=1, sort=True )
 		df = pandas.concat([df, d], axis=1)
+		#df = df.append(d, axis=1)
 		#.fillna(0)
 		#print( df.head() )
 		#print( df.dtypes )
@@ -70,6 +71,7 @@ for filename in sys.argv[1:]:
 		#d[sample] = numpy.where(d[sample]>5, 1, 0)
 
 		flagged = pandas.concat([flagged, d], axis=1)
+		#flagged = flagged.append(d, axis=1)
 		print( flagged.head() )
 		print( flagged.dtypes )
 
@@ -110,7 +112,7 @@ print( flagged.mean(axis=1) )
 #	p.append([start, last])
 #
 
-common=flagged.index[ flagged.mean(axis=1) >= 0.7 ].tolist()
+common=flagged.index[ flagged.mean(axis=1) >= 0.6 ].tolist()
 print( common )
 
 if( len(common) > 0 ):
@@ -146,5 +148,17 @@ else:
 #	common_depth_coverage_regions.py HG000*.NC_001664.4.depth.csv
 #	[[7717, 7728], [7730, 7765], [7871, 7877], [7908, 7921], [158982, 159028], [159039, 159058], [159060, 159066]]
 #	[[7717, 7765], [7871, 7877], [7908, 7921], [158982, 159066]]
+
+#	common_depth_coverage_regions.py HG00*.NC_001664.4.depth.csv
+#	[[7707, 7971], [158991, 159253]]
+
+
+#	common_depth_coverage_regions.py HG00*.NC_001664.4.depth.csv
+#	[[7803, 7803], [7809, 7825], [7829, 7830], [7844, 7844], [7850, 7873], [7879, 7879], [7881, 7883], [7885, 7885], [7887, 7890], [7894, 7894], [7904, 7904], [7907, 7941], [159038, 159048], [159057, 159067], [159069, 159069], [159211, 159215], [159217, 159217], [159223, 159223]]
+#	[[7803, 7941], [159038, 159069], [159211, 159223]]
+
+#	common_depth_coverage_regions.py {HG,NA}*.NC_001664.4.depth.csv
+
+
 
 
