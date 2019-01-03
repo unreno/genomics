@@ -164,6 +164,15 @@ echo "samtools depth -a -r ${virus} --reference /raid/refs/fasta/virii.fasta ALL
 done | parallel --no-notice &
 
 
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "common_depth_coverage_regions.py -n ${virus} {HG,NA}*.${virus}.depth.csv > common_regions.${virus}.txt"
+done | parallel --no-notice --joblog ~/common_regions.log &
+
+
+
+
+
 
 
 
