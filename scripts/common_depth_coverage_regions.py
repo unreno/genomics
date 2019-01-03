@@ -15,6 +15,8 @@ parser.add_argument('files', nargs='*', help='files help')
 parser.add_argument('-V', '--version', help='show program version', action='store_true')
 parser.add_argument('-p', '--percentage', nargs=1, type=int, default=50, help='the percentage to %(prog)s (default: %(default)s)')
 parser.add_argument('-d', '--depth', nargs=1, type=int, default=1, help='the depth to %(prog)s (default: %(default)s)')
+parser.add_argument('-n', '--name', nargs=1, type=str, default='Reference', help='the name to %(prog)s (default: %(default)s)')
+parser.add_argument('-l', '--length', nargs=1, type=int, default=1000000, help='the length to %(prog)s (default: %(default)s)')
 
 # read arguments from the command line
 args = parser.parse_args()
@@ -27,7 +29,7 @@ if args.version:
 
 
 #	Note that nargs=1 produces a list of one item. This is different from the default, in which the item is produced by itself.
-#	THAT IS JUST STUPID! And now I have to check it manually.
+#	THAT IS JUST STUPID! And now I have to check it manually. Am I the only one?
 
 if isinstance(args.percentage,list):
 	percentage=args.percentage[0]
@@ -37,14 +39,32 @@ else:
 print( "Filtering commonality on sample percentage: ", percentage )
 
 
-
-
 if isinstance(args.depth,list):
 	depth=args.depth[0]
 else:
 	depth=args.depth
 
 print( "Filtering commonality on sample depth: ", depth )
+
+
+
+
+if isinstance(args.name,list):
+	name=args.name[0]
+else:
+	name=args.name
+
+print( "Using reference name: ", name )
+
+
+
+
+if isinstance(args.length,list):
+	length=args.length[0]
+else:
+	length=args.length
+
+print( "Using reference length: ", length )
 
 
 
@@ -100,10 +120,10 @@ if len(data_frames) > 0:
 
 
 	df.fillna(0, inplace=True)
-	print( df )
+	#print( df )
 
 	flagged.fillna(0, inplace=True)
-	print( flagged.mean(axis=1) )
+	#print( flagged.mean(axis=1) )
 
 #	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
 #
@@ -134,7 +154,7 @@ if len(data_frames) > 0:
 
 			last=item
 		regions.append([first,last])
-		print(regions)
+		print("Common regions: ",regions)
 
 		#	fill gaps less than 20 base pairs
 		filled_regions=[]
@@ -146,8 +166,30 @@ if len(data_frames) > 0:
 				filled_regions.append(buffered)
 				buffered=pair
 		filled_regions.append(buffered)
-		print( filled_regions )
+		print("Filled common regions: ", filled_regions )
 		
+		#	Need to convert to inverse with reference name
+		#	Need reference name and length
+
+		#	[[7683, 8002], [158972, 159290]]
+		#		to
+		#	7683-8002, 158972-159290
+		#		to
+		#	AF037218.1:1-7682 AF037218.1:8003-158971 AF037218.1:159291-153080
+
+		start=1
+		s=name
+		s+=":1-"
+		for region in filled_regions:
+			s+=str(region[0]-1) + " " + name + ":" + str(region[1]+1) + "-"
+#			s+=" "
+#			s+=name
+#			s+=":"
+#			s+=str(region[1]+1)
+#			s+="-"
+
+		s+=str(length)
+		print("Samtools uncommon regions: " + s)
 
 	else:
 		print("No common regions found.")
@@ -181,5 +223,5 @@ if len(data_frames) > 0:
 #	common_depth_coverage_regions.py -p 50 {HG,NA}*.NC_001664.4.depth.csv
 #	[[7683, 8002], [158972, 159290]]
 
-
+#	20000-120000
 
