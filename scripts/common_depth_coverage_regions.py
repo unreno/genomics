@@ -2,6 +2,8 @@
 
 
 #	significant difference between python2.7 and python3.6
+#	/ is different. In 2.7 is integer division. In 3.6, it is float.
+#	To force the same float behavior, one of the input MUST be a float, so add .0 or call float() on one.
 
 
 import os    
@@ -105,8 +107,6 @@ for filename in args.files:
 			sep="\t",
 			header=None,
 			usecols=[1,2],	# usecols=[0,1],
-			#names=["position","depth"],
-			#dtype={"position": int,"depth": int},
 			names=["position",sample],
 			dtype={"position": int, sample: int},
 			index_col=["position"] )
@@ -128,31 +128,26 @@ if len(data_frames) > 0:
 	data_frames = []
 	flagged_data_frames = []
 
-
 	df.fillna(0, inplace=True)
-	#print( df )
+	#print( df.head() )
+
+
+#	NOTE     mean will be different if include empty files or don't
+
 
 	flagged.fillna(0, inplace=True)
-	#print( flagged.mean(axis=1) )
+#	print( flagged.max(axis=1) )
+	#print( flagged.mean(axis=1).head() )
 
-#	https://stackoverflow.com/questions/4628333/converting-a-list-of-integers-into-range-in-python
-#
-#	p = []
-#	last = -2                                                            
-#	start = -1
-#
-#	for item in list:
-#		if item != last+1:                        
-#			if start != -1:
-#				p.append([start, last])
-#			start = item
-#		last = item
-#
-#	p.append([start, last])
-#
+	#print( "Percentage:"+str(percentage)+" - " + str(percentage/100.0))
 
-	common=flagged.index[ flagged.mean(axis=1) >= percentage/100 ].tolist()
+	#print( "Means: " + str(flagged.mean(axis=1).tolist()))
+	print( "Max: " + str(max(flagged.mean(axis=1).tolist())))
+	print( "Mean: " + str(numpy.mean(flagged.mean(axis=1).tolist())))
+
+	common=flagged.index[ flagged.mean(axis=1) >= (percentage/100.0) ].tolist()
 	print( common )
+	#print( len(common) )
 
 	if( len(common) > 0 ):
 		regions=[]
