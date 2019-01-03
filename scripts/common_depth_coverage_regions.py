@@ -106,10 +106,16 @@ for filename in args.files:
 			names=["position",sample],
 			dtype={"position": int, sample: int},
 			index_col=["position"] )
-		data_frames.append(d)
 
+#		if( len(d.index) > 0 ):
+		print("Appending")
+		data_frames.append(d)
 		d[sample] = numpy.where(d[sample]>depth, 1, 0)
 		flagged_data_frames.append(d)
+#		else:
+#			print("Empty. Ignoring.")
+	else:
+		print(filename + " is empty")
 
 if len(data_frames) > 0:
 	df = pandas.concat(data_frames, axis=1)
@@ -156,11 +162,11 @@ if len(data_frames) > 0:
 		regions.append([first,last])
 		print("Common regions: ",regions)
 
-		#	fill gaps less than 20 base pairs
+		#	fill gaps less than 50 base pairs
 		filled_regions=[]
 		buffered=regions[0]
 		for pair in regions[1:]:
-			if( pair[0] < buffered[1]+20 ):
+			if( pair[0] < buffered[1]+50 ):
 				buffered[1] = pair[1]
 			else:
 				filled_regions.append(buffered)
@@ -179,14 +185,14 @@ if len(data_frames) > 0:
 
 		start=1
 		s=name
-		s+=":1-"
-		for region in filled_regions:
+		if filled_regions[0][0] == 1:
+			s+=":" + str(filled_regions[0][1]+1) + "-"
+			i=1
+		else:
+			s+=":1-"
+			i=0
+		for region in filled_regions[i:]:
 			s+=str(region[0]-1) + " " + name + ":" + str(region[1]+1) + "-"
-#			s+=" "
-#			s+=name
-#			s+=":"
-#			s+=str(region[1]+1)
-#			s+="-"
 
 		s+=str(length)
 		print("Samtools uncommon regions: " + s)
@@ -194,6 +200,8 @@ if len(data_frames) > 0:
 	else:
 		print("No common regions found.")
 
+else:
+	print("No data.")
 
 
 #	common_depth_coverage_regions.py HG000*.NC_001664.4.depth.csv
