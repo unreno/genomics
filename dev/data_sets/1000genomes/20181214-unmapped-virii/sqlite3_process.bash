@@ -13,6 +13,7 @@ CREATE UNIQUE INDEX subjects_subject ON subjects (subject);"
 for virus in /raid/refs/fasta/virii/*fasta ; do
 	virus=$( basename $virus .fasta )
 	sqlite3 viral_mapped_unmapped.sqlite3 "ALTER TABLE subjects ADD COLUMN \"${virus}\""
+	sqlite3 viral_mapped_unmapped.sqlite3 "ALTER TABLE subjects ADD COLUMN \"Uncommon ${virus}\""
 done
 
 #for bam in $( find /raid/data/raw/1000genomes/phase3/data/ -name *unmapped*bam ) ; do
@@ -42,6 +43,12 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		virus_mapped_count=$( cat ${subject}.${virus}.bowtie2.mapped.count.txt )
 
 		command="UPDATE subjects SET '${virus}' = ${virus_mapped_count} WHERE subject = \"${subject}\""
+		echo "${command}"
+		sqlite3 viral_mapped_unmapped.sqlite3 "${command}"
+
+		virus_mapped_uncommon_count=$( cat ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt )
+
+		command="UPDATE subjects SET 'Uncommon ${virus}' = ${virus_mapped_uncommon_count} WHERE subject = \"${subject}\""
 		echo "${command}"
 		sqlite3 viral_mapped_unmapped.sqlite3 "${command}"
 

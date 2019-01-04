@@ -3,7 +3,6 @@
 
 set -e	#	exit if any command fails
 set -u	#	Error on usage of unset variables
-
 set -o pipefail
 
 
@@ -135,6 +134,32 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			#	-F 4 needless here as filtered with this flag above.
 			samtools view -c -F 4 ${subject}.virii.bam ${virus} > ${subject}.${virus}.bowtie2.mapped.count.txt
 			chmod a-w ${subject}.${virus}.bowtie2.mapped.count.txt
+		fi
+
+
+
+
+
+
+
+		if [ -f ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt ] && [ ! -w ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt ]  ; then
+			echo "Write-protected ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt exists. Skipping step."
+		else
+			echo "Counting reads bowtie2 aligned uncommon to ${virus}"
+			#	-F 4 needless here as filtered with this flag above.
+
+			region=$( grep Samtools common_regions.${virus}.txt || true ) #	grep will return error code if no line found so add || true
+			echo $region
+			region=${region#Samtools uncommon regions: }
+			#common_regions.D13784.1.txt:Samtools uncommon regions: D13784.1:1-4163 D13784.1:4208-7649 D13784.1:7691-8000 D13784.1:8053-1000000
+
+			echo "${region}"
+			[ -z "${region}" ] && region="${virus}"
+
+			samtools view -c -F 4 ${subject}.virii.bam ${region} > ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt
+
+
+			chmod a-w ${subject}.${virus}.bowtie2.mapped_uncommon.count.txt
 		fi
 
 
