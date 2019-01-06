@@ -161,17 +161,47 @@ if len(data_frames) > 0:
 		regions.append([first,last])
 		print("Common regions: ",regions)
 
-		#	fill gaps less than 50 base pairs
+
+#regions=[[50,100], [7717, 7728], [7730, 7765], [7871, 7877], [7908, 7921], [158982, 159028], [159039, 159058], [159060, 159066]]
+
+		#	Expand and fill gaps 
+		expanded_regions=map(lambda x: [x[0]-100,x[1]+100], regions)
+#[[-50,200], [7617, 7828], [7630, 7865], [7771, 7977], [7808, 8021], [158882, 159128], [158939, 159158], [158960, 159166]]
+
+#	This can cause a problem
+#	 [14242, 14794], [14795, 15392],
+# Add 5 to deal with possibility
+
 		filled_regions=[]
-		buffered=regions[0]
-		for pair in regions[1:]:
-			if( pair[0] < buffered[1]+50 ):
+		buffered=expanded_regions[0]
+		if buffered[0] < 0:
+			buffered[0]=0
+		for pair in expanded_regions[1:]:
+			if( pair[0] < buffered[1]+5 ):
 				buffered[1] = pair[1]
 			else:
 				filled_regions.append(buffered)
 				buffered=pair
 		filled_regions.append(buffered)
 		print("Filled common regions: ", filled_regions )
+
+
+#		#	fill gaps less than 100 base pairs
+#		filled_regions=[]
+#		buffered=regions[0]
+#		for pair in regions[1:]:
+#			if( pair[0] < buffered[1]+100 ):
+#				buffered[1] = pair[1]
+#			else:
+#				filled_regions.append(buffered)
+#				buffered=pair
+#		filled_regions.append(buffered)
+#		print("Filled common regions: ", filled_regions )
+
+
+
+
+
 		
 		#	Need to convert to inverse with reference name
 		#	Need reference name and length

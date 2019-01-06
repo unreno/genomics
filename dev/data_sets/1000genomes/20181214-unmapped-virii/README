@@ -166,7 +166,65 @@ done | parallel --no-notice &
 
 for fasta in /raid/refs/fasta/virii/*fasta ; do
 virus=$( basename $fasta .fasta )
-echo "common_depth_coverage_regions.py -n ${virus} {HG,NA}*.${virus}.depth.csv > common_regions.${virus}.txt"
+echo "common_depth_coverage_regions.py -p 50 -n ${virus} {HG,NA}*.${virus}.depth.csv > common_regions.50.${virus}.txt"
+done | parallel --no-notice --joblog ~/common_regions.log &
+
+
+grep -H Samtools common_regions.50.*.txt
+
+
+cp viral_mapped_unmapped.sqlite3 viral_mapped_unmapped.original.sqlite3
+chmod a-w viral_mapped_unmapped.original.sqlite3
+
+
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "select \"${virus}:\", max(\"${virus}\") from subjects;"
+done | sqlite3 viral_mapped_unmapped.sqlite3 > viral_mapped_unmapped.sqlite3.max
+
+grep ":|0$" viral_mapped_unmapped.sqlite3.max | awk -F: '{print $1}'
+
+Can't drop a column from a sqlite3 table, so just ignoring them now.
+
+
+
+grep -H Samtools common_regions.50.*.txt
+
+
+for virus in $( grep -l Samtools common_regions.50.*.txt ) ; do
+virus=${virus#common_regions.50.}
+virus=${virus%.txt}
+echo "ALTER TABLE subjects ADD COLUMN 'Uncommon ${virus} / unmapped';"
+echo "UPDATE subjects SET 'Uncommon ${virus} / unmapped' = 'Uncommon ${virus}' / 'unmapped';"
+echo "ALTER TABLE subjects ADD COLUMN 'Uncommon ${virus} / total';"
+echo "UPDATE subjects SET 'Uncommon ${virus} / total' = 'Uncommon ${virus}' / 'total';"
+done | sqlite3 viral_mapped_unmapped.sqlite3
+
+
+for virus in $( grep -l Samtools common_regions.*.txt ) ; do
+virus=${virus#common_regions.}
+virus=${virus%.txt}
+echo "UPDATE subjects SET 'Uncommon ${virus} / unmapped' = 1.0 * \"Uncommon ${virus}\" / unmapped;"
+echo "UPDATE subjects SET 'Uncommon ${virus} / total' = 1.0 * \"Uncommon ${virus}\" / total;"
+done | sqlite3 viral_mapped_unmapped.sqlite3
+
+Quotes are really important here. Best to avoid needing them. NO spaces, periods, commas, slashes, ...
+
+sqlite> update subjects set "Uncommon X83413.2 / total" = 1.0 * "Uncommon X83413.2" / total;
+
+select "Uncommon X83413.2 / total" from subjects;
+
+
+
+
+
+
+
+for p in 5 25 50 ; do
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "common_depth_coverage_regions.py -p ${p} -n ${virus} depth.csv/{HG,NA}*.${virus}.depth.csv > common_regions.${p}.${virus}.txt"
+done
 done | parallel --no-notice --joblog ~/common_regions.log &
 
 
