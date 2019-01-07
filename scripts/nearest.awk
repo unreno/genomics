@@ -6,15 +6,12 @@ BEGIN {
 	hkles[$1][$2][$3]=$4;
 }
 ( NR != FNR && FNR == 1 ){
-	printf("REF\tCHR\tPOS\tAS\t")
+	printf("REF\tCHR\tPOS\tAS")
 	asorti(refs)
 	for(hkle in refs){
-		printf("NEAREST %s\t",refs[hkle])
-		printf("DIST NEAREST %s\t",refs[hkle])
-		printf("AS NEAREST %s\t",refs[hkle])
-#	for(hkle in hkles){
-#		printf("NEAREST %s\t",hkle)
-#		printf("DIST NEAREST %s\t",hkle)
+		printf("\tNEAREST %s",refs[hkle])
+		printf("\tDIST NEAREST %s",refs[hkle])
+		printf("\tAS NEAREST %s",refs[hkle])
 	}
 	printf("\n")
 }
