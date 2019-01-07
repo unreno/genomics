@@ -15,7 +15,7 @@ import numpy
 import argparse
 
 # initiate the parser
-parser = argparse.ArgumentParser(prog='frobble')
+parser = argparse.ArgumentParser(prog='common_depth_coverage_regions')
 
 parser.add_argument('files', nargs='*', help='files help')
 parser.add_argument('-V', '--version', help='show program version', action='store_true')
@@ -23,6 +23,7 @@ parser.add_argument('-p', '--percentage', nargs=1, type=int, default=50, help='t
 parser.add_argument('-d', '--depth', nargs=1, type=int, default=1, help='the depth to %(prog)s (default: %(default)s)')
 parser.add_argument('-n', '--name', nargs=1, type=str, default='Reference', help='the name to %(prog)s (default: %(default)s)')
 parser.add_argument('-l', '--length', nargs=1, type=int, default=1000000, help='the length to %(prog)s (default: %(default)s)')
+parser.add_argument('-e', '--expand', nargs=1, type=int, default=1000, help='the expand to %(prog)s (default: %(default)s)')
 
 # read arguments from the command line
 args = parser.parse_args()
@@ -71,6 +72,16 @@ else:
 	length=args.length
 
 print( "Using reference length: ", length )
+
+
+
+
+if isinstance(args.expand,list):
+	expand=args.length[0]
+else:
+	expand=args.length
+
+print( "Using region expand: ", expand )
 
 
 
@@ -165,7 +176,7 @@ if len(data_frames) > 0:
 #regions=[[50,100], [7717, 7728], [7730, 7765], [7871, 7877], [7908, 7921], [158982, 159028], [159039, 159058], [159060, 159066]]
 
 		#	Expand and fill gaps 
-		expanded_regions=map(lambda x: [x[0]-1000,x[1]+1000], regions)
+		expanded_regions=map(lambda x: [x[0]-expand,x[1]+expand], regions)
 #	100
 #[[-50,200], [7617, 7828], [7630, 7865], [7771, 7977], [7808, 8021], [158882, 159128], [158939, 159158], [158960, 159166]]
 
