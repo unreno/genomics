@@ -165,7 +165,8 @@ if len(data_frames) > 0:
 #regions=[[50,100], [7717, 7728], [7730, 7765], [7871, 7877], [7908, 7921], [158982, 159028], [159039, 159058], [159060, 159066]]
 
 		#	Expand and fill gaps 
-		expanded_regions=map(lambda x: [x[0]-100,x[1]+100], regions)
+		expanded_regions=map(lambda x: [x[0]-1000,x[1]+1000], regions)
+#	100
 #[[-50,200], [7617, 7828], [7630, 7865], [7771, 7977], [7808, 8021], [158882, 159128], [158939, 159158], [158960, 159166]]
 
 #	This can cause a problem
@@ -175,7 +176,7 @@ if len(data_frames) > 0:
 		filled_regions=[]
 		buffered=expanded_regions[0]
 		if buffered[0] < 0:
-			buffered[0]=0
+			buffered[0]=1
 		for pair in expanded_regions[1:]:
 			if( pair[0] < buffered[1]+5 ):
 				buffered[1] = pair[1]

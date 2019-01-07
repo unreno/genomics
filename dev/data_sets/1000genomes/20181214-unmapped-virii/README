@@ -228,6 +228,14 @@ done
 done | parallel --no-notice --joblog ~/common_regions.log &
 
 
+for p in 5 ; do
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "common_depth_coverage_regions.py -p ${p} -n ${virus} depth.csv/{HG,NA}*.${virus}.depth.csv > common_regions.1000.${p}.${virus}.txt"
+done
+done | parallel --no-notice --joblog ~/common_regions.log &
+
+
 
 
 

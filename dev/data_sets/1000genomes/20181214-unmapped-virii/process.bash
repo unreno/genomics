@@ -165,17 +165,21 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 
 
-		for p in 50 25 5 ; do
+#		for p in 50 25 5 ; do
+		for p in 5 ; do
 
-			mkdir -p bowtie2.mapped_uncommon.${p}.count.txt/
+			outdir="bowtie2.mapped_uncommon.1000.${p}.count.txt"
+			outfile="${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt"
 
-			if [ -f bowtie2.mapped_uncommon.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt ] && [ ! -w bowtie2.mapped_uncommon.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt ]  ; then
-				echo "Write-protected ${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt exists. Skipping step."
+			mkdir -p "${outdir}/"
+
+			if [ -f ${outdir}/${outfile} ] && [ ! -w ${outdir}/${outfile} ]  ; then
+				echo "Write-protected ${outfile} exists. Skipping step."
 			else
 				echo "Counting reads bowtie2 aligned uncommon.${p} to ${virus}"
 				#	-F 4 needless here as filtered with this flag above.
 	
-				region=$( grep Samtools common_regions.${p}.${virus}.txt || true ) #	grep will return error code if no line found so add || true
+				region=$( grep Samtools common_regions.1000.${p}.${virus}.txt || true ) #	grep will return error code if no line found so add || true
 				echo $region
 				region=${region#Samtools uncommon regions: }
 				#common_regions.D13784.1.txt:Samtools uncommon regions: D13784.1:1-4163 D13784.1:4208-7649 D13784.1:7691-8000 D13784.1:8053-1000000
@@ -183,10 +187,9 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 				echo "${region}"
 				[ -z "${region}" ] && region="${virus}"
 	
-				samtools view -c -F 4 virii.bam/${subject}.virii.bam ${region} > bowtie2.mapped_uncommon.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt
+				samtools view -c -F 4 virii.bam/${subject}.virii.bam ${region} > ${outdir}/${outfile}
 	
-	
-				chmod a-w bowtie2.mapped_uncommon.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt
+				chmod a-w ${outdir}/${outfile}
 			fi
 
 		done
