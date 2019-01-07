@@ -77,9 +77,9 @@ print( "Using reference length: ", length )
 
 
 if isinstance(args.expand,list):
-	expand=args.length[0]
+	expand=args.expand[0]
 else:
-	expand=args.length
+	expand=args.expand
 
 print( "Using region expand: ", expand )
 

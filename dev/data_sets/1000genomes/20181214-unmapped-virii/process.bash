@@ -166,9 +166,10 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 
 #		for p in 50 25 5 ; do
-		for p in 5 ; do
+#		for p in 5 ; do
+		for p in 2 ; do
 
-			outdir="bowtie2.mapped_uncommon.1000.${p}.count.txt"
+			outdir="bowtie2.mapped_uncommon.2000.${p}.count.txt"
 			outfile="${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt"
 
 			mkdir -p "${outdir}/"
@@ -179,7 +180,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 				echo "Counting reads bowtie2 aligned uncommon.${p} to ${virus}"
 				#	-F 4 needless here as filtered with this flag above.
 	
-				region=$( grep Samtools common_regions.1000.${p}.${virus}.txt || true ) #	grep will return error code if no line found so add || true
+				region=$( grep Samtools common_regions.2000.${p}.${virus}.txt || true ) #	grep will return error code if no line found so add || true
 				echo $region
 				region=${region#Samtools uncommon regions: }
 				#common_regions.D13784.1.txt:Samtools uncommon regions: D13784.1:1-4163 D13784.1:4208-7649 D13784.1:7691-8000 D13784.1:8053-1000000

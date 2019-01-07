@@ -6,9 +6,15 @@ set -u	#	Error on usage of unset variables
 
 set -o pipefail
 
-p=5 #	percent threshold use to call common coverage
 
-database_file="viral_mapped_unmapped.${p}.sqlite3"
+
+
+p=2 #	percent threshold use to call common coverage
+
+database_file="viral_mapped_unmapped.2000.${p}.sqlite3"
+
+
+
 
 sqlite3 ${database_file} "CREATE TABLE subjects( subject, unmapped, mapped, total );
 CREATE UNIQUE INDEX subjects_subject ON subjects (subject);"
@@ -55,7 +61,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		echo "${command}"
 		sqlite3 ${database_file} "${command}"
 
-		virus_mapped_uncommon_count=$( cat bowtie2.mapped_uncommon.1000.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt )
+		virus_mapped_uncommon_count=$( cat bowtie2.mapped_uncommon.2000.${p}.count.txt/${subject}.${virus}.bowtie2.mapped_uncommon.${p}.count.txt )
 
 		#command="UPDATE subjects SET 'Uncommon ${virus}' = ${virus_mapped_uncommon_count} WHERE subject = \"${subject}\""
 		command="UPDATE subjects SET uncommon_${v} = \"${virus_mapped_uncommon_count}\" WHERE subject = \"${subject}\""

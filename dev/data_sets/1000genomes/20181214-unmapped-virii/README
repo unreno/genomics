@@ -242,3 +242,31 @@ done | parallel --no-notice --joblog ~/common_regions.log &
 
 
 
+
+sqlite3 viral_mapped_unmapped.1000.5.sqlite3
+.schema subjects
+SELECT subject, NC_001664_4, uncommon_NC_001664_4, uncommon_NC_001664_4_unmapped, uncommon_NC_001664_4_total FROM subjects ORDER BY uncommon_NC_001664_4_total;
+
+Yes, but could do better. Shrinking percentage, and increasing gap.
+
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "common_depth_coverage_regions.py -e 2000 -p 2 -n ${virus} depth.csv/{HG,NA}*.${virus}.depth.csv > common_regions.2000.2.${virus}.txt"
+done | parallel --no-notice --joblog ~/common_regions.log &
+
+grep samtools common_regions.*.*.NC_001664.4.txt
+
+nohup ./process.bash &
+
+nohup ./sqlite3_process.bash &
+
+
+
+
+
+
+
+
+
+
+
