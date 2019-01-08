@@ -15,3 +15,6 @@ head -1q /raid/refs/fasta/virii/{NC_000898.1,NC_001664.4,NC_001710.1,NC_001716.2
 
 nohup ./virii_aligned_per_billion_unmapped.bash > virii_aligned_per_billion_unmapped.csv &
 
+
+
+

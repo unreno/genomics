@@ -251,10 +251,10 @@ Yes, but could do better. Shrinking percentage, and increasing gap.
 
 for fasta in /raid/refs/fasta/virii/*fasta ; do
 virus=$( basename $fasta .fasta )
-echo "common_depth_coverage_regions.py -e 2000 -p 2 -n ${virus} depth.csv/{HG,NA}*.${virus}.depth.csv > common_regions.2000.2.${virus}.txt"
+echo "common_depth_coverage_regions.py -e 2000 -p 2 -n ${virus} depth.csv/{HG,NA}*.${virus}.depth.csv > common_regions/common_regions.2000.2.${virus}.txt"
 done | parallel --no-notice --joblog ~/common_regions.log &
 
-grep samtools common_regions.*.*.NC_001664.4.txt
+grep samtools common_regions/common_regions.*.*.NC_001664.4.txt
 
 nohup ./process.bash &
 
@@ -264,6 +264,21 @@ nohup ./sqlite3_process.bash &
 
 
 
+
+
+for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
+ echo "------------------------------------------------------------"
+ base=$( basename $bam )
+ subject=${base%.unmapped.ILLUMINA.bwa*}
+ echo $base
+ echo $subject
+ echo "Processing $subject"
+ mkdir $subject
+ mv $subject.virii.log $subject/
+ for f in depth.csv mapped.count.txt total.count.txt unmapped.count.txt virii.bam virii.depth.csv ; do
+  mv $f/$subject* $subject/
+ done
+done
 
 
 
