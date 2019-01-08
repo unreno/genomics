@@ -212,7 +212,7 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 						chmod a-w ${f}
 					fi
 		
-					if [ -z $( ${sql} "SELECT ${v} FROM subjects WHERE subject = '${subject}'" ) ] ; then
+					if [ -z $( ${sql} "SELECT uncommon_${v} FROM subjects WHERE subject = '${subject}'" ) ] ; then
 						count=$( cat ${f} )
 						command="UPDATE subjects SET uncommon_${v} = '${count}' WHERE subject = '${subject}'"
 						echo "${command}"
