@@ -237,12 +237,6 @@ done | parallel --no-notice --joblog ~/common_regions.log &
 
 
 
-
-
-
-
-
-
 sqlite3 viral_mapped_unmapped.1000.5.sqlite3
 .schema subjects
 SELECT subject, NC_001664_4, uncommon_NC_001664_4, uncommon_NC_001664_4_unmapped, uncommon_NC_001664_4_total FROM subjects ORDER BY uncommon_NC_001664_4_total;
@@ -261,26 +255,18 @@ nohup ./process.bash &
 nohup ./sqlite3_process.bash &
 
 
-
-
-
-
-
-for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
- echo "------------------------------------------------------------"
- base=$( basename $bam )
- subject=${base%.unmapped.ILLUMINA.bwa*}
- echo $base
- echo $subject
- echo "Processing $subject"
- mkdir $subject
- mv $subject.virii.log $subject/
- for f in depth.csv mapped.count.txt total.count.txt unmapped.count.txt virii.bam virii.depth.csv ; do
-  mv $f/$subject* $subject/
- done
+for virus in /raid/refs/fasta/virii/*fasta ; do
+  virus=$( basename $virus .fasta )
+  virus=${virus/./_}
+  sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, ${v}, uncommon_${v}, uncommon_${v}_unmapped, uncommon_${v}_total FROM subjects ORDER BY uncommon_${v}_total DESC LIMIT 15;"
+  sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, ${v}, uncommon_${v}, uncommon_${v}_unmapped, uncommon_${v}_total FROM subjects ORDER BY uncommon_${v}_unmapped DESC LIMIT 15;"
 done
 
 
+
+
+sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4, uncommon_NC_001664_4_unmapped, uncommon_NC_001664_4_total FROM subjects ORDER BY uncommon_NC_001664_4_total;"
+sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4 FROM subjects ORDER BY uncommon_NC_001664_4_total;"
 
 
 
