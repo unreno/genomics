@@ -93,6 +93,7 @@ nohup ./process.bash &
 for dir in /raid/data/raw/1000genomes/phase3/data/* ; do basename $dir; done > subjects.txt
 for virus in /raid/refs/fasta/virii/*fasta ; do basename $virus .fasta; done > virii_versions.txt
 head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
+head -1q /raid/refs/fasta/virii/*fasta | sed -e 's/^>//' -e 's/ /\t/' > virii_details.csv
 
 
 
@@ -100,6 +101,7 @@ head -1q /raid/refs/fasta/virii/*fasta | sed 's/^>//' > virii_details.txt
 nohup ./unmapped_1kg_virii.bash > unmapped_1kg_virii.csv &
 
 
+???? WHAT ???
 Redesigned to align to all virii after HG00733.
 Perhaps remove all products based on alignment from HG00[0-7]* and rerun that too.
 
@@ -255,19 +257,25 @@ nohup ./process.bash &
 nohup ./sqlite3_process.bash &
 
 
-for virus in /raid/refs/fasta/virii/*fasta ; do
-  virus=$( basename $virus .fasta )
-  virus=${virus/./_}
-  sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, ${v}, uncommon_${v}, uncommon_${v}_unmapped, uncommon_${v}_total FROM subjects ORDER BY uncommon_${v}_total DESC LIMIT 15;"
+for v in /raid/refs/fasta/virii/*fasta ; do
+  v=$( basename $v .fasta )
+  v=${v/./_}
   sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, ${v}, uncommon_${v}, uncommon_${v}_unmapped, uncommon_${v}_total FROM subjects ORDER BY uncommon_${v}_unmapped DESC LIMIT 15;"
 done
 
+#  sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, ${v}, uncommon_${v}, uncommon_${v}_unmapped, uncommon_${v}_total FROM subjects ORDER BY uncommon_${v}_total DESC LIMIT 15;"
 
 
 
-sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4, uncommon_NC_001664_4_unmapped, uncommon_NC_001664_4_total FROM subjects ORDER BY uncommon_NC_001664_4_total;"
-sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4 FROM subjects ORDER BY uncommon_NC_001664_4_total;"
+sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4, uncommon_NC_001664_4_unmapped, uncommon_NC_001664_4_total FROM subjects ORDER BY uncommon_NC_001664_4_total DESC LIMIT 15;"
+sqlite3 -column -header viral_mapped_unmapped.2000.2.sqlite3 "SELECT subject, NC_001664_4, uncommon_NC_001664_4 FROM subjects ORDER BY uncommon_NC_001664_4_total DESC LIMIT 15;"
 
 
+Try better
+
+for fasta in /raid/refs/fasta/virii/*fasta ; do
+virus=$( basename $fasta .fasta )
+echo "common_depth_coverage_regions.py -e 2500 -p 1 -n ${virus} {HG,NA}*/{HG,NA}*.${virus}.depth.csv > common_regions/common_regions.2500.1.${virus}.txt"
+done | parallel --no-notice --joblog ~/common_regions.log &
 
 

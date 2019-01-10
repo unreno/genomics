@@ -24,8 +24,8 @@ if [ ! -f ${database_file} ] ; then
 		#echo $virus
 		${sql} "ALTER TABLE subjects ADD COLUMN ${virus}"
 		${sql} "ALTER TABLE subjects ADD COLUMN ${virus}_unmapped"
-	#	${sql} "ALTER TABLE subjects ADD COLUMN uncommon_${virus}"
-	#	${sql} "ALTER TABLE subjects ADD COLUMN uncommon_${virus}_unmapped"
+		${sql} "ALTER TABLE subjects ADD COLUMN uncommon_${virus}"
+		${sql} "ALTER TABLE subjects ADD COLUMN uncommon_${virus}_unmapped"
 	#	${sql} "ALTER TABLE subjects ADD COLUMN uncommon_${virus}_total"
 	done
 
@@ -130,6 +130,50 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 		fi
 
 
+		for exp in 2500 ; do
+
+			for per in 1 ; do
+	
+				if [ -f common_regions/common_regions.${exp}.${per}.${virus}.txt ] ; then
+
+					f="${subject}/${subject}.${virus}.bowtie2.mapped_uncommon.${exp}.${per}.count.txt"
+		
+					if [ -f ${f} ] && [ ! -w ${f} ]  ; then
+						echo "Write-protected ${f} exists. Skipping step."
+					else
+						echo "Counting reads bowtie2 aligned uncommon.${exp}.${per} to ${virus}"
+						#	-F 4 needless here as filtered with this flag above.
+			
+						#	grep will return error code if no line found so add || true
+						region=$( grep Samtools common_regions/common_regions.${exp}.${per}.${virus}.txt || true )
+		
+						echo $region
+						region=${region#Samtools uncommon regions: }
+						#common_regions.D13784.1.txt:Samtools uncommon regions: D13784.1:1-4163 D13784.1:4208-7649 D13784.1:7691-8000 D13784.1:8053-1000000
+			
+						echo "${region}"
+						[ -z "${region}" ] && region="${virus}"
+			
+						#samtools view -c -F 4 ${subject}/${subject}.virii.bam ${region} > ${f}
+						samtools view -c -F 4 ${subject}/${subject}.${virus}.bam ${region} > ${f}
+			
+						chmod a-w ${f}
+					fi
+		
+					if [ -z $( ${sql} "SELECT uncommon_${v} FROM subjects WHERE subject = '${subject}'" ) ] ; then
+						count=$( cat ${f} )
+						command="UPDATE subjects SET uncommon_${v} = '${count}' WHERE subject = '${subject}'"
+						echo "${command}"
+						${sql} "${command}"
+					fi
+
+				fi
+
+			done
+
+		done
+
+
 #		if [ -f ${subject}/${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt ] && [ ! -w ${subject}/${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt ] ; then
 #			echo "Write-protected ${subject}.${virus}.bowtie2.mapped.ratio_unmapped.txt exists. Skipping step."
 #		else
@@ -154,9 +198,9 @@ for virus in NC_001710.1 NC_001716.2 NC_001664.4 NC_000898.1 NC_008168.1 ; do
 	command="UPDATE subjects SET ${virus}_unmapped = 1.0 * ${virus} / unmapped;"
 	echo "${command}"
 	${sql} "${command}"
-#	command="UPDATE subjects SET uncommon_${virus}_total = 1.0 * uncommon_${virus} / total;"
-#	echo "${command}"
-#	sqlite3 ${database_file} "${command}"
+	command="UPDATE subjects SET uncommon_${virus}_unmapped = 1.0 * uncommon_${virus} / unmapped;"
+	echo "${command}"
+	${sql} "${command}"
 done
 
 

@@ -7,9 +7,10 @@ set -o pipefail
 
 
 
-p=2 #	percent threshold use to call common coverage
+p=1 #	percent threshold use to call common coverage
+e=2500	#	expansion
 
-database_file="viral_mapped_unmapped.2000.${p}.sqlite3"
+database_file="viral_mapped_unmapped.${e}.${p}.sqlite3"
 
 sql="sqlite3 ${database_file}"
 
@@ -181,24 +182,24 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 
 
 
-		for g in 2000 ; do
+		for exp in 2500 ; do
 
 			#		for p in 50 25 5 ; do
 			#		for p in 5 ; do
-			for p in 2 ; do
+			for per in 1 ; do
 	
-				if [ -f common_regions/common_regions.${g}.${p}.${virus}.txt ] ; then
+				if [ -f common_regions/common_regions.${exp}.${per}.${virus}.txt ] ; then
 
-					f="${subject}/${subject}.${virus}.bowtie2.mapped_uncommon.${g}.${p}.count.txt"
+					f="${subject}/${subject}.${virus}.bowtie2.mapped_uncommon.${exp}.${per}.count.txt"
 		
 					if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 						echo "Write-protected ${f} exists. Skipping step."
 					else
-						echo "Counting reads bowtie2 aligned uncommon.${g}.${p} to ${virus}"
+						echo "Counting reads bowtie2 aligned uncommon.${exp}.${per} to ${virus}"
 						#	-F 4 needless here as filtered with this flag above.
 			
 						#	grep will return error code if no line found so add || true
-						region=$( grep Samtools common_regions/common_regions.${g}.${p}.${virus}.txt || true )
+						region=$( grep Samtools common_regions/common_regions.${exp}.${per}.${virus}.txt || true )
 		
 						echo $region
 						region=${region#Samtools uncommon regions: }
