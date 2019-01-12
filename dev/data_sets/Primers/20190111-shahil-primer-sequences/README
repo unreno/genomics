@@ -1,0 +1,122 @@
+
+20190111 - need to generate "nearests" table
+
+
+bowtie2 --no-unal --threads 1 -f -x hg38_no_alts --xeq --very-sensitive --all -U hervk10-113-119.fasta | samtools view -o hervk10-113-119.hg38_no_alts.vs.bam - &
+
+bowtie2 --no-unal --threads 1 -f -x hg38_no_alts --xeq --very-sensitive --all -U svas.fasta | samtools view -o svas.hg38_no_alts.vs.bam - &
+
+
+
+
+Pairing
+
+echo ">SVA_05-08RC" >  sva_primers.1.fa
+tail -1 SVA_05.fa   >> sva_primers.1.fa
+echo ">SVA_06-08RC" >> sva_primers.1.fa
+tail -1 SVA_06.fa   >> sva_primers.1.fa
+echo ">SVA_07-08RC" >> sva_primers.1.fa
+tail -1 SVA_07.fa   >> sva_primers.1.fa
+echo ">SVA_05-09RC" >> sva_primers.1.fa
+tail -1 SVA_05.fa   >> sva_primers.1.fa
+echo ">SVA_06-09RC" >> sva_primers.1.fa
+tail -1 SVA_06.fa   >> sva_primers.1.fa
+echo ">SVA_07-09RC" >> sva_primers.1.fa
+tail -1 SVA_07.fa   >> sva_primers.1.fa
+
+echo ">SVA_05-08RC" >  sva_primers.2.fa
+tail -1 SVA_08RC.fa >> sva_primers.2.fa
+echo ">SVA_06-08RC" >> sva_primers.2.fa
+tail -1 SVA_08RC.fa >> sva_primers.2.fa
+echo ">SVA_07-08RC" >> sva_primers.2.fa
+tail -1 SVA_08RC.fa >> sva_primers.2.fa
+echo ">SVA_05-09RC" >> sva_primers.2.fa
+tail -1 SVA_09RC.fa >> sva_primers.2.fa
+echo ">SVA_06-09RC" >> sva_primers.2.fa
+tail -1 SVA_09RC.fa >> sva_primers.2.fa
+echo ">SVA_07-09RC" >> sva_primers.2.fa
+tail -1 SVA_09RC.fa >> sva_primers.2.fa
+
+echo ">HERV_03-04RC" >  hervk_primers.1.fa
+tail -1 HERV_03.fa   >> hervk_primers.1.fa
+echo ">HERV_03-05RC" >> hervk_primers.1.fa
+tail -1 HERV_03.fa   >> hervk_primers.1.fa
+echo ">HERV_03-06RC" >> hervk_primers.1.fa
+tail -1 HERV_03.fa   >> hervk_primers.1.fa
+echo ">HERV_04-05RC" >> hervk_primers.1.fa
+tail -1 HERV_04.fa   >> hervk_primers.1.fa
+echo ">HERV_04-06RC" >> hervk_primers.1.fa
+tail -1 HERV_04.fa   >> hervk_primers.1.fa
+echo ">HERV_05-06RC" >> hervk_primers.1.fa
+tail -1 HERV_05.fa   >> hervk_primers.1.fa
+
+echo ">HERV_03-04RC" >  hervk_primers.2.fa
+tail -1 HERV_04RC.fa >> hervk_primers.2.fa
+echo ">HERV_03-05RC" >> hervk_primers.2.fa
+tail -1 HERV_05RC.fa >> hervk_primers.2.fa
+echo ">HERV_03-06RC" >> hervk_primers.2.fa
+tail -1 HERV_06RC.fa >> hervk_primers.2.fa
+echo ">HERV_04-05RC" >> hervk_primers.2.fa
+tail -1 HERV_05RC.fa >> hervk_primers.2.fa
+echo ">HERV_04-06RC" >> hervk_primers.2.fa
+tail -1 HERV_06RC.fa >> hervk_primers.2.fa
+echo ">HERV_05-06RC" >> hervk_primers.2.fa
+tail -1 HERV_06RC.fa >> hervk_primers.2.fa
+ 
+
+
+
+
+
+
+
+
+
+Primers are 20bp each. Expected insert it about 40bp. Set to 100?
+
+
+  -X/--maxins <int>  maximum fragment length (500)
+
+
+
+bowtie2 -X 100 --no-unal -f -x hg38_no_alts --xeq --very-sensitive --all -1 sva_primers.1.fa -2 sva_primers.2.fa | samtools view -o sva_primers.hg38_no_alts.vs.bam - &
+
+bowtie2 -X 100 --no-unal -f -x hg38_no_alts --xeq --very-sensitive --all -1 hervk_primers.1.fa -2 hervk_primers.2.fa | samtools view -o hervk_primers.hg38_no_alts.vs.bam - &
+
+
+
+samtools view -f 2 -o sva_primers.hg38_no_alts.vs.PP.bam sva_primers.hg38_no_alts.vs.bam &
+
+samtools view -f 2 -o hervk_primers.hg38_no_alts.vs.PP.bam hervk_primers.hg38_no_alts.vs.bam &
+
+
+
+---
+
+
+
+bam_to_positions_csvs.bash --paired sva_primers.hg38_no_alts.vs.bam
+
+bam_to_positions_csvs.bash --paired hervk_primers.hg38_no_alts.vs.bam
+
+bam_to_positions_csvs.bash svas.hg38_no_alts.vs.bam
+
+bam_to_positions_csvs.bash hervk10-113-119.hg38_no_alts.vs.bam
+
+
+
+awk -f nearest.awk hervk_primers.hg38_no_alts.vs.forward.positions.csv hervk10-113-119.hg38_no_alts.vs.forward.positions.csv > hervk10-113-119.nearest_primer.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk hervk_primers.hg38_no_alts.vs.reverse.positions.csv hervk10-113-119.hg38_no_alts.vs.reverse.positions.csv > hervk10-113-119.nearest_primer.hg38_no_alts.vs.reverse.positions.csv
+
+awk -f nearest.awk hervk10-113-119.hg38_no_alts.vs.forward.positions.csv hervk_primers.hg38_no_alts.vs.forward.positions.csv > hervk_primer.nearest_herv.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk hervk10-113-119.hg38_no_alts.vs.reverse.positions.csv hervk_primers.hg38_no_alts.vs.reverse.positions.csv > hervk_primer.nearest_herv.hg38_no_alts.vs.reverse.positions.csv
+
+awk -f nearest.awk sva_primers.hg38_no_alts.vs.forward.positions.csv svas.hg38_no_alts.vs.forward.positions.csv > svas.nearest_primers.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk sva_primers.hg38_no_alts.vs.reverse.positions.csv svas.hg38_no_alts.vs.reverse.positions.csv > svas.nearest_primers.hg38_no_alts.vs.reverse.positions.csv
+
+awk -f nearest.awk svas.hg38_no_alts.vs.forward.positions.csv sva_primers.hg38_no_alts.vs.forward.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk svas.hg38_no_alts.vs.reverse.positions.csv sva_primers.hg38_no_alts.vs.reverse.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.reverse.positions.csv
+
+
+
+
