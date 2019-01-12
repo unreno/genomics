@@ -89,6 +89,7 @@ samtools view -f 2 -o sva_primers.hg38_no_alts.vs.PP.bam sva_primers.hg38_no_alt
 
 samtools view -f 2 -o hervk_primers.hg38_no_alts.vs.PP.bam hervk_primers.hg38_no_alts.vs.bam &
 
+They are the same!!!! Yay!
 
 
 ---
@@ -117,6 +118,15 @@ awk -f nearest.awk sva_primers.hg38_no_alts.vs.reverse.positions.csv svas.hg38_n
 awk -f nearest.awk svas.hg38_no_alts.vs.forward.positions.csv sva_primers.hg38_no_alts.vs.forward.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.forward.positions.csv
 awk -f nearest.awk svas.hg38_no_alts.vs.reverse.positions.csv sva_primers.hg38_no_alts.vs.reverse.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.reverse.positions.csv
 
+
+
+
+
+awk -f nearest_summary.awk hervk10-113-119.hg38_no_alts.vs.forward.positions.csv hervk_primers.hg38_no_alts.vs.forward.positions.csv > hervk_primer.nearest_herv.hg38_no_alts.vs.forward.summary.csv
+awk -f nearest_summary.awk hervk10-113-119.hg38_no_alts.vs.reverse.positions.csv hervk_primers.hg38_no_alts.vs.reverse.positions.csv > hervk_primer.nearest_herv.hg38_no_alts.vs.reverse.summary.csv
+
+awk -f nearest_summary.awk svas.hg38_no_alts.vs.forward.positions.csv sva_primers.hg38_no_alts.vs.forward.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.forward.summary.csv
+awk -f nearest_summary.awk svas.hg38_no_alts.vs.reverse.positions.csv sva_primers.hg38_no_alts.vs.reverse.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.reverse.summary.csv
 
 
 
