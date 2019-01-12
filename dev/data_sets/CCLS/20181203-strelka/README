@@ -82,7 +82,7 @@ https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-
 #	minor mod to ~/count_trinuc_muts_v8.pl
 #	don't add "chr" prefix
 
-for i in *.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38_no_alts.fa $i & done
+for i in *.tsv; do ~/count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.num.fa $i & done
 
 
 
