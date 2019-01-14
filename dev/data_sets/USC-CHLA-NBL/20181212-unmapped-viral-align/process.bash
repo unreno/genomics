@@ -109,6 +109,8 @@ for r1 in /raid/data/raw/USC-CHLA-NBL/2018????/*.R1.fastq.gz ; do
 			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
+#	Should have
+#			samtools depth -d 0 ${subject}/${subject}.${virus}.bam > ${subject}/${subject}.${virus}.depth.csv
 			samtools depth ${subject}/${subject}.${virus}.bam > ${subject}/${subject}.${virus}.depth.csv
 			chmod a-w ${subject}/${subject}.${virus}.depth.csv
 		fi

@@ -16,6 +16,8 @@ for virus in NC_008168.1 ; do
 	samtools index ${virus}.bam
 	chmod a-w ${virus}.bam.bai
 	echo Depth
+#	Should have
+#	samtools depth -d 0 ${virus}.bam > ${virus}.depth.csv
 	samtools depth ${virus}.bam > ${virus}.depth.csv
 	chmod a-w ${virus}.depth.csv
 done

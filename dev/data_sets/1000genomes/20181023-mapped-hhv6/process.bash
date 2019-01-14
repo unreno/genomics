@@ -122,6 +122,8 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*.mapped*bam ; do
 				echo "Write-protected ${subject}.${m}.${hhv}.depth.csv exists. Skipping step."
 			else
 				echo "Getting depth"
+#	Should have
+#				samtools depth -d 0 ${subject}.${m}.${hhv}.sorted.bam > ${subject}.${m}.${hhv}.depth.csv
 				samtools depth ${subject}.${m}.${hhv}.sorted.bam > ${subject}.${m}.${hhv}.depth.csv
 				chmod a-w ${subject}.${m}.${hhv}.depth.csv
 			fi

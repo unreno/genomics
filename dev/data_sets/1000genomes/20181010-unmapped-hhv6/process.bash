@@ -104,6 +104,8 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			echo "Write-protected ${subject}.${virus}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
+#	Should have
+#			samtools depth -d 0 ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
 			samtools depth ${subject}.${virus}.bam > ${subject}.${virus}.depth.csv
 			chmod a-w ${subject}.${virus}.depth.csv
 		fi
@@ -257,6 +259,8 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 			echo "Write-protected ${subject}.${hhv}.depth.csv exists. Skipping step."
 		else
 			echo "Getting depth"
+#	Should have
+#			samtools depth -d 0 ${subject}.${hhv}.bam > ${subject}.${hhv}.depth.csv
 			samtools depth ${subject}.${hhv}.bam > ${subject}.${hhv}.depth.csv
 			chmod a-w ${subject}.${hhv}.depth.csv
 		fi

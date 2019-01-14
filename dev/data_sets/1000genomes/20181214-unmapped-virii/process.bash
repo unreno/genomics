@@ -134,6 +134,8 @@ for bam in /raid/data/raw/1000genomes/phase3/data/*/alignment/*unmapped*bam ; do
 		echo "Write-protected ${f} exists. Skipping step."
 	else
 		echo "Getting depth"
+#	Should have
+#		samtools depth -d 0 ${subject}/${subject}.virii.bam > ${f}
 		samtools depth ${subject}/${subject}.virii.bam > ${f}
 		chmod a-w ${f}
 	fi
