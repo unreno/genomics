@@ -1,5 +1,8 @@
 
 
 
+ll -tr /raid/data/raw/CCLS/bam/*fasta.gz*
+
+
 nohup ./process.bash &
 
