@@ -9,8 +9,8 @@ set -o pipefail
 wd=$PWD
 
 
-for fasta in /raid/data/raw/CCLS/bam/1*fasta.gz ; do
-	core=$( basename $fasta .fasta.gz )
+for fasta in /raid/data/raw/CCLS/bam/*.unaligned.fasta.gz ; do
+	core=$( basename $fasta .unaligned.fasta.gz )
 	echo $fasta $core
 
 	cd $wd
@@ -36,10 +36,32 @@ for fasta in /raid/data/raw/CCLS/bam/1*fasta.gz ; do
 		if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 			echo "Write-protected ${f} exists. Skipping step."
 		else
-			echo "Aligning"
-			bowtie2 --no-unal --very-sensitive --threads 39 -x virii/${v} -f -U $fasta 2> ${f}.bowtie2.log | samtools view -o ${bam} -
+
+			if [ -f ${f}.unsorted ] && [ ! -w ${f}.unsorted ]  ; then
+				echo "Write-protected ${f} exists. Skipping step."
+			else
+
+				echo "Aligning"
+				bowtie2 --no-unal --very-sensitive --threads 39 -x virii/${v} -f -U $fasta 2> ${f}.bowtie2.log | samtools view -h -o ${f}.unsorted -
+				chmod a-w ${f}.bowtie2.log
+
+			fi
+
+			echo "Sorting"
+			samtools sort -o ${f} ${f}.unsorted > ${f}.sort.STDOUT 2> ${f}.sort.STDERR
 			chmod a-w ${f}
-			chmod a-w ${f}.bowtie2.log
+			\rm ${f}.unsorted
+			chmod a-w ${f}.sort.STDOUT ${f}.sort.STDERR
+
+		fi
+
+		f=${bam}.bai
+		if [ -f ${f} ] && [ ! -w ${f} ]  ; then
+			echo "Write-protected ${f} exists. Skipping step."
+		else
+			echo "Indexing"
+			samtools index ${bam}
+			chmod a-w ${f}
 		fi
 	
 		#f=${core}.${v}.all_count.txt

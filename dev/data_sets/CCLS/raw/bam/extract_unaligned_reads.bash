@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-for bam in *bam ; do
+for bam in *.recaled.bam ; do
 	base=${bam%.recaled.bam}
 	echo $bam $base
 
-	f="${base}.fasta.gz"
+	f="${base}.unaligned.fasta.gz"
 	if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 
 		echo "${f} already exists, so skipping."
