@@ -1,0 +1,20 @@
+
+
+sudo sh -c "aws s3 ls s3://giab/ >> README"
+
+                           PRE changelog_details/
+                           PRE data/
+                           PRE data_indexes/
+                           PRE release/
+                           PRE technical/
+                           PRE tools/
+                           PRE use_cases/
+2015-09-11 09:02:46        683 CHANGELOG
+2016-04-27 17:26:51       3555 README.ftp_structure
+2016-09-12 09:55:49       3070 README.s3_structure
+2017-09-27 07:19:44   19006317 current.tree
+2017-09-27 07:19:47   18749496 giab_s3_urls
+2018-03-29 07:32:29       3701 readme.html
+
+
+
