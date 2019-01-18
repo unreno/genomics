@@ -11,7 +11,9 @@ for f in */*.aligned_count.txt ; do
 	s=${b%%.*}
 	v=${b#*.}
 
-	echo -e $s"\t"$v"\t"$c
+	desc=$( head -1 /raid/refs/fasta/virii/${v}.fasta )
+
+	echo -e $s"\t"$desc"\t"$c
 	
 
 done

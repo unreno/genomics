@@ -926,3 +926,29 @@ bcftools provides the same numbers for All and Proper_pair? Perhaps bcftools onl
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------
+20190117
+
+
+nohup sambamba sort --uncompressed-chunks --sort-by-name --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 186069.recaled.name.bam 186069.recaled.bam > 186069.sambamba_sort.bam.out 2> 186069.sambamba_sort.bam.err &
+
+Only took a few hours.
+
+
+nohup samtools view -f 1 -F 3840 186069.recaled.name.bam | gawk -v base=186069 -f sam_to_paired_fastq.gawk > 186069.recaled.name.sam_to_paired_fastq.gawk.out 2> 186069.recaled.name.sam_to_paired_fastq.gawk.err &
+
+
+
