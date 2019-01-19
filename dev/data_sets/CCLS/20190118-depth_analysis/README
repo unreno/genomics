@@ -1,0 +1,12 @@
+
+
+
+#for r in 1:111259960-111259980 12:123581920-123581940 12:43919849-43919869 4:9601606-9601626 5:81146437-81146457 6:32675678-32675698 9:41380177-41380197 ;do
+for r in 1:111259960-111259980 ; do
+echo $r
+for f in /raid/data/raw/CCLS_983899/*983899.hg38.num*bam /raid/data/raw/CCLS/bam/*983899.recaled*bam ; do
+echo $f
+samtools depth -a -r $r $f
+done
+done
+
