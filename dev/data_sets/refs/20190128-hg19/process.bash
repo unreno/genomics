@@ -10,7 +10,7 @@ for virus_path in /raid/refs/fasta/virii/*fasta ; do
 	if [ -f ${virus}.bam ] && [ ! -w ${virus}.bam ]; then 
 		echo "${virus}.bam exists already."
 	else
-		bowtie2 --no-unal --threads 35 -f --xeq -x virii/${virus} --very-sensitive-local -U /raid/refs/fasta/hg19.100.fa.gz 2>> ${virii}.bowtie.log | samtools view -F 4 -o ${virus}.unsorted.bam - 2>> ${virii}.samtools.log
+		bowtie2 --no-unal --threads 35 -f --xeq -x virii/${virus} --very-sensitive-local -U /raid/refs/fasta/hg19.100.fa.gz 2>> ${virus}.bowtie.log | samtools view -F 4 -o ${virus}.unsorted.bam - 2>> ${virus}.samtools.log
 		samtools sort -o ${virus}.bam ${virus}.unsorted.bam
 		\rm ${virus}.unsorted.bam
 		chmod a-w ${virus}.bam

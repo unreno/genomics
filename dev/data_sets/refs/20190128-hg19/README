@@ -1,5 +1,8 @@
 
 
+nohup ./process.bash &
+
+
 
 
 Chop up hg19 into 100 bp ( 1KG aligned to hg19 )
