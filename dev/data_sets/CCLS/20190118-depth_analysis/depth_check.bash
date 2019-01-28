@@ -7,12 +7,25 @@
 
 for f in /raid/data/raw/CCLS_983899/*983899.hg38.num*bam /raid/data/raw/CCLS/bam/*983899.recaled*bam ; do
 	echo $f
-	samtools depth -a -r 1 $f | awk '
+	samtools depth -a -r 21 $f | awk '
 		BEGIN{
-			FS="\t";
-			c=100;
-			overlap=0;
+			FS="\t"
+			last_chr=""
 		}
+		( $1 != last_chr ){	#	RESET
+			c=100
+			overlap=0
+			chr_row_count=0
+			delete last_5_counts[0]
+		}
+		{ chr_row_count++ }
+		( chr_row_count < 6 ){ # BUFFER and SKIP
+
+
+			next;
+		}
+
+
 		( $3 < 100 && $3 < c-10 ){
 			#	overlap ended
 			if( overlap && overlap > 6 && overlap < 9 ){

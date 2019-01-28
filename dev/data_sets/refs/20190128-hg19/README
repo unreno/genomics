@@ -1,0 +1,26 @@
+
+
+
+
+Chop up hg19 into 100 bp ( 1KG aligned to hg19 )
+Align LOCAL to each virus
+Samtools depth VIRUS >  VIRUS.HG19.depth.csv
+Convert to region string VIRUS.HG19.region.txt
+
+
+Plot common hg19/viral depths
+
+
+Re-select 1000 genomes viral uncommon regions
+Plot and group by population or super population
+Use Log scale as well
+
+
+
+virus=NC_001664.4
+bowtie2 --no-unal --threads 35 -f --xeq -x virii/${virus} --very-sensitive-local -U /raid/refs/fasta/hg19.100.fa.gz 2>> ${virii}.bowtie.log | samtools view -F 4 -o ${virus}.unsorted.bam - 2>> ${virii}.samtools.log
+samtools sort -o ${virus}.bam ${virus}.unsorted.bam
+\rm ${virus}.unsorted.bam
+samtools index ${virus}.bam
+
+

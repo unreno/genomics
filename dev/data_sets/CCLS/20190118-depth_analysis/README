@@ -1,12 +1,19 @@
 
 
 
-#for r in 1:111259960-111259980 12:123581920-123581940 12:43919849-43919869 4:9601606-9601626 5:81146437-81146457 6:32675678-32675698 9:41380177-41380197 ;do
-for r in 1:111259960-111259980 ; do
-echo $r
-for f in /raid/data/raw/CCLS_983899/*983899.hg38.num*bam /raid/data/raw/CCLS/bam/*983899.recaled*bam ; do
-echo $f
-samtools depth -a -r $r $f
-done
-done
+
+
+
+cat ../20190118-chimera-*/working_dir/*paired_overlappers.hg38_no_alts* | awk -F"|" '{gsub("chr","",$1);a=$2-10;b=$2+10;print $1":"a"-"b}' | sort -t : -k 1n | uniq | awk '{print "samtools depth -a -r "$0" /raid/data/raw/CCLS_983899/*983899.hg38.num*bam /raid/data/raw/CCLS/bam/*983899.recaled*bam" }' | bash
+
+
+
+
+seq 10 | awk 'BEGIN{delete a[0]}
+( length(a) == 5){
+for(i=1;i<length(a);i++){ a[i]=a[i+1] }
+delete a[length(a)]
+}
+{ a[length(a)+1]=$1 }
+( length(a) == 5){ print a[1],a[2],a[3],a[4],a[5] }'
 
