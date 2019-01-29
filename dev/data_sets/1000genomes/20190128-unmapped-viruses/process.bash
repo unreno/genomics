@@ -57,7 +57,7 @@ for fastagz in ${previous}/*.fasta.gz ; do
 
 		if [ -f /raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt ] ; then
 
-			f="${subject}.${virus}.bowtie2.mapped_uncommon.count.txt"
+			f="${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
 
 			if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 				echo "Write-protected ${f} exists. Skipping step."
