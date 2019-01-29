@@ -1,0 +1,26 @@
+
+
+
+
+
+for virus in /raid/refs/fasta/virii/*fasta ; do
+	virus=$( basename $virus .fasta )
+	virus=${virus/./_}
+
+	echo "Processing $virus"
+
+	if [ -f /raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt ] ; then
+
+		region=$( cat /raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt || true )
+
+		echo "${region}"
+		[ -z "${region}" ] && region="${virus}"
+	
+		#samtools view -c -F 4 ${previous}/${subject}/${subject}.virii.bam ${region} > ${f}
+	
+
+
+
+	fi
+
+done

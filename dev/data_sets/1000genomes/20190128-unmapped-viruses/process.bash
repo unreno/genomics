@@ -55,7 +55,9 @@ for fastagz in ${previous}/*.fasta.gz ; do
 
 		echo "Processing $subject / $virus"
 
-		if [ -f /raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt ] ; then
+		region_file="/raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt"
+
+		if [ -f ${region_file} ] ; then
 
 			f="${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
 
@@ -66,7 +68,7 @@ for fastagz in ${previous}/*.fasta.gz ; do
 				#	-F 4 needless here as filtered with this flag above.
 	
 				#	grep will return error code if no line found so add || true
-				region=$( cat /raid/data/working/refs/20190128-hg19/${virus}.nonhg19.txt || true )
+				region=$( cat ${region_file} || true )
 
 				echo "${region}"
 				[ -z "${region}" ] && region="${virus}"
