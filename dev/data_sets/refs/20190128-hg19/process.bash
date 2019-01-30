@@ -26,11 +26,12 @@ for virus_path in /raid/refs/fasta/virii/*fasta ; do
 	if [ -f ${virus}.nonhg19.txt ] && [ ! -w ${virus}.nonhg19.txt ]; then 
 		echo "${virus}.nonhg19.txt exists already."
 	else
+		viral_length=$( tail -n +2 ${virus_path} | tr -d "\n" | wc --chars )
 		if [ $(samtools view -c ${virus}.bam) -eq 0 ] ; then
 			echo "Bam file empty."
-			echo "${virus}:1-10000000" > ${virus}.nonhg19.txt
+			echo "${virus}:1-${viral_length}" > ${virus}.nonhg19.txt
 		else
-			samtools depth ${virus}.bam | awk -f depths_to_reverse_regions.awk > ${virus}.nonhg19.txt
+			samtools depth ${virus}.bam | awk -v l=${viral_length} -f depths_to_reverse_regions.awk > ${virus}.nonhg19.txt
 		fi
 		chmod a-w ${virus}.nonhg19.txt
 	fi

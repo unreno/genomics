@@ -27,3 +27,10 @@ samtools sort -o ${virus}.bam ${virus}.unsorted.bam
 samtools index ${virus}.bam
 
 
+
+
+
+./shrink_regions.bash 
+
+
+
