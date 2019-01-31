@@ -21,7 +21,9 @@ for s in 1000 2000 ; do
 					next
 				}
 				( NR == region_count ){
-					print($1":"$2+s"-"$3)
+					if( $3-$2 > s ){
+						print($1":"$2+s"-"$3)
+					}
 					next
 				}
 				{
