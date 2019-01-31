@@ -31,8 +31,6 @@ if [ ! -f ${database_file} ] ; then
 fi
 
 
-#previous="/raid/data/working/1000genomes/20181214-unmapped-virii"
-
 for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 	echo "------------------------------------------------------------"
 	echo $subject
@@ -54,8 +52,8 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 	fi
 
 	if [ -z $( ${sql} "SELECT total FROM subjects WHERE subject = '${subject}'" ) ] ; then
-		#mapped=$( cat ${previous}/${subject}/${subject}.mapped.count.txt )
-		#unmapped=$( cat ${previous}/${subject}/${subject}.unmapped.count.txt )
+		#mapped=$( cat ${subject}/${subject}.mapped.count.txt )
+		#unmapped=$( cat ${subject}/${subject}.unmapped.count.txt )
 		total=$( cat ${subject}/${subject}.total.count.txt )
 		#command="INSERT INTO subjects( subject, unmapped, mapped, total ) VALUES ( '${subject}', '${unmapped}', '${mapped}', '${total}' );"
 		command="INSERT INTO subjects( subject, total ) VALUES ( '${subject}', '${total}' );"
@@ -153,7 +151,7 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 
 		if [ -f ${region_file} ] ; then
 
-			f="${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
+			f="${subject}/${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
 
 			if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 				echo "Write-protected ${f} exists. Skipping step."
@@ -167,7 +165,7 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 				echo "${region}"
 				[ -z "${region}" ] && region="${virus}"
 	
-				samtools view -c -F 4 ${previous}/${subject}/${subject}.virii.bam ${region} > ${f}
+				samtools view -c -F 4 ${subject}/${subject}.virii.bam ${region} > ${f}
 	
 				chmod a-w ${f}
 			fi
