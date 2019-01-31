@@ -5,9 +5,12 @@ Using shrunken regions
 
 
 
-./all_nonhg19.bash
+
+nohup ./process.bash &
 
 
 
-./process.bash
+Need to create ALL.virii.bam
+
+nohup ./all_nonhg19.bash &
 
