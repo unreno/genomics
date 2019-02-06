@@ -149,7 +149,6 @@ samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA10-ALL.vi
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA11-ALL.virii.bam NA11*.virii.bam &
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA12-ALL.virii.bam NA12*.virii.bam &
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA18-ALL.virii.bam NA18*.virii.bam &
-samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA18-ALL.virii.bam NA19*.virii.bam &
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA19-ALL.virii.bam NA19*.virii.bam &
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA20-ALL.virii.bam NA20*.virii.bam &
 samtools merge --threads 39 --reference /raid/refs/fasta/virii.fasta NA21-ALL.virii.bam NA21*.virii.bam &

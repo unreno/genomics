@@ -102,20 +102,21 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 	#		chmod a-w ${f}
 	#	fi
 
-	for virus in /raid/refs/fasta/virii/*fasta ; do
-		virus=$( basename $virus .fasta )
+	for virus_fasta in /raid/refs/fasta/virii/*fasta ; do
+		virus=$( basename $virus_fasta .fasta )
 		v=${virus/./_}
 
 		echo "Processing $subject / $virus"
 
-		#	f="${subject}/${subject}.${virus}.depth.csv"
-		#	if [ -f ${f} ] && [ ! -w ${f} ]  ; then
-		#		echo "Write-protected ${f} exists. Skipping step."
-		#	else
-		#		echo "Getting depth"
+		f="${subject}/${subject}.${virus}.depth.csv"
+		if [ -f ${f} ] && [ ! -w ${f} ]  ; then
+			echo "Write-protected ${f} exists. Skipping step."
+		else
+			echo "Getting depth"
 		#		awk '( $1 == "'${virus}'" )' ${subject}/${subject}.virii.depth.csv > ${f}
-		#		chmod a-w ${f}
-		#	fi
+			samtools depth -d 0 --reference $virus_fasta -r ${virus} ${subject}/${subject}.virii.bam > ${f}
+			chmod a-w ${f}
+		fi
 
 		f="${subject}/${subject}.${virus}.bowtie2.mapped.count.txt"
 		if [ -f ${f} ] && [ ! -w ${f} ]  ; then
@@ -130,7 +131,8 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 		if [ -z $( ${sql} "SELECT ${v} FROM subjects WHERE subject = '${subject}'" ) ] ; then
 			count=$( cat ${subject}/${subject}.${virus}.bowtie2.mapped.count.txt )
 
-			command="UPDATE subjects SET ${v} = '${count}', ${v}_total = 1.0 * ${v} / total WHERE subject = '${subject}'"
+			#command="UPDATE subjects SET ${v} = '${count}', ${v}_total = 1.0 * ${v} / total WHERE subject = '${subject}'"
+			command="UPDATE subjects SET ${v} = '${count}', ${v}_total = 1.0 * '${count}' / total WHERE subject = '${subject}'"
 			echo "${command}"
 			${sql} "${command}"
 
@@ -173,7 +175,8 @@ for subject in $( cat /raid/data/raw/gEUVADIS/subjects.txt ) ; do
 			if [ -z $( ${sql} "SELECT nonhg19_${v} FROM subjects WHERE subject = '${subject}'" ) ] ; then
 				count=$( cat ${f} )
 
-				command="UPDATE subjects SET nonhg19_${v} = '${count}', nonhg19_${v}_total = 1.0 * nonhg19_${v} / total WHERE subject = '${subject}'"
+				#command="UPDATE subjects SET nonhg19_${v} = '${count}', nonhg19_${v}_total = 1.0 * nonhg19_${v} / total WHERE subject = '${subject}'"
+				command="UPDATE subjects SET nonhg19_${v} = '${count}', nonhg19_${v}_total = 1.0 * '${count}' / total WHERE subject = '${subject}'"
 				echo "${command}"
 				${sql} "${command}"
 

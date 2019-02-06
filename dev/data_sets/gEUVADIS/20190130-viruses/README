@@ -12,5 +12,27 @@ nohup ./process.bash &
 
 Need to create ALL.virii.bam
 
+
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG-ALL.virii.bam HG*.virii.bam
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG00-ALL.virii.bam HG00*.virii.bam
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG01-ALL.virii.bam HG01*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG02-ALL.virii.bam HG02*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG03-ALL.virii.bam HG03*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta HG04-ALL.virii.bam HG04*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA0-ALL.virii.bam NA0*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA10-ALL.virii.bam NA10*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA11-ALL.virii.bam NA11*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA12-ALL.virii.bam NA12*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA18-ALL.virii.bam NA18*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA19-ALL.virii.bam NA19*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA20-ALL.virii.bam NA20*.virii.bam &
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta NA21-ALL.virii.bam NA21*.virii.bam &
+
+samtools merge --threads 40 --reference /raid/refs/fasta/virii.fasta ALL.virii.bam *ALL.virii.bam &
+
+
+samtools index -@ 40 ALL.virii.bam
+
+
 nohup ./all_nonhg19.bash &
 

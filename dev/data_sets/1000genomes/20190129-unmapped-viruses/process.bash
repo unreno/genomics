@@ -38,6 +38,8 @@ for fastagz in ${previous}/*.fasta.gz ; do
 	echo $base
 	echo $subject
 
+	mkdir -p $subject
+
 	echo "Processing $subject"
 
 	if [ -z $( ${sql} "SELECT unmapped FROM subjects WHERE subject = '${subject}'" ) ] ; then
@@ -72,7 +74,7 @@ for fastagz in ${previous}/*.fasta.gz ; do
 
 		if [ -f ${region_file} ] ; then
 
-			f="${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
+			f="${subject}/${subject}.${virus}.bowtie2.mapped_nonhg19.count.txt"
 
 			if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 				echo "Write-protected ${f} exists. Skipping step."

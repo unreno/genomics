@@ -114,3 +114,15 @@ wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.*.genomi
 wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/bacteria/bacteria.*.genomic.fna.gz
 wget --no-clobber ftp://ftp.ncbi.nlm.nih.gov/refseq/release/fungi/fungi.*.genomic.fna.gz
 
+
+
+
+ALWAYS USE -oneFile! Otherwise, it will create a ridiculous number of small files.
+
+faSplit size hg19.fa.gz 50 hg19-50bp- -oneFile
+mv hg19-50bp-.fa hg19-50bp.fa
+bgzip hg19-50bp.fa
+samtools faidx hg19-50bp.fa.gz
+
+
+

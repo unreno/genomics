@@ -28,8 +28,8 @@ for virus_fasta in /raid/refs/fasta/virii/*fasta ; do
 	
 		\rm -f ALL.${virus}.nonhg19.depth.txt
 		for r in $region ; do
-			echo samtools depth -aa --reference $virus_fasta -r $r ALL.virii.bam
-			samtools depth -aa --reference $virus_fasta -r $r ALL.virii.bam >> ALL.${virus}.nonhg19.depth.txt
+			echo samtools depth -d 0 -aa --reference $virus_fasta -r $r ALL.virii.bam
+			samtools depth -d 0 -aa --reference $virus_fasta -r $r ALL.virii.bam >> ALL.${virus}.nonhg19.depth.txt
 		done
 
 	fi
