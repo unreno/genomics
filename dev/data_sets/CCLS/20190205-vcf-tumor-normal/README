@@ -5,7 +5,198 @@
 /raid/data/working/TCGA_Glioma_HERV52/20180416.apobec/
 
 
+Publication
+https://doi.org/10.1093/jncics/pky002
 https://academic.oup.com/jncics/article/2/1/pky002/4942295
 
+Github repo
 https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
+
+
+Gonna try to reproduce paper's analysis.
+
+“CosmicCLP_MutantExport.tsv,” version 81, was downloaded on July 17, 2017, from the COSMIC cell line project (CLP) online database
+
+Register and download "COSMIC Mutation Data" (CosmicMutantExport.tsv.gz) from https://cancer.sanger.ac.uk/cosmic/download
+The paper used v81. v87 was available for me.
+
+Gunzipp and rename CosmicCLP_MutantExport.tsv
+gunzip CosmicMutantExportv87.tsv.gz
+ln -s CosmicMutantExportv87.tsv CosmicCLP_MutantExport.tsv
+
+
+From publication ...
+Step 1: Download, organize, and filter raw mutation data: The fields cell line name (column 5), mutation (column 18), mutation type (column 20), version of the reference genome (column 23), chromosome position of the mutation (column 24), and DNA strand (column 25) were extracted from the “CosmicCLP_MutantExport.tsv” file using the following command:
+
+awk 'BEGIN{FS="\t"; OFS="\t"}; $0 !~ /^#/ {print $5, $18, $20, $23, $24, $25}' CosmicCLP_MutantExport.tsv > cosmic_mut.txt
+
+
+There are no comments so the condition is unnecessary.
+
+head -1 CosmicCLP_MutantExport.tsv
+Gene name	Accession Number	Gene CDS length	HGNC ID	Sample name	ID_sample	ID_tumour	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	Genome-wide screen	Mutation ID	Mutation CDS	Mutation AA	Mutation Description	Mutation zygosity	LOH	GRCh	Mutation genome position	Mutation strand	SNP	Resistance Mutation	FATHMM prediction	FATHMM score	Mutation somatic status	Pubmed_PMID	ID_STUDY	Sample Type	Tumour origin	Age
+
+
+head -1 CosmicCLP_MutantExport.tsv | awk 'BEGIN{FS="\t"; OFS="\t"};{print $5, $18, $20, $23, $24, $25}'
+Sample name	Mutation CDS	Mutation Description	GRCh	Mutation genome position	Mutation strand
+
+Are these the correct columns? In 2 years, some things change. Gonna have to assume they are
+
+Sample name                cell line name (column 5)
+Mutation CDS               mutation (column 18)
+Mutation Description       mutation type (column 20)
+GRCh                       version of the reference genome (column 23)
+Mutation genome position   chromosome position of the mutation (column 24)
+Mutation strand            DNA strand (column 25)
+
+
+
+
+The github analysis seems quite bogus as well.
+
+From https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/blob/master/README_mutation_processing_commands
+
+
+Confused, as the above parsing DOES NOT PRODUCE THESE 5 FIELDS
+Which also explains the upcoming confusion as well.
+# From the 5-field mutation file (chr, pos, ref, alt, sample):
+
+
+# 1. Split file into each separate cell line, keeping the header
+awk  'NR==1 {h=$0; next} !seen[$5]++{ f="FILE_"FILENAME"_"$5".txt";print h > f } { print >> f; close(f)}' cosmic_mut.txt
+
+I don't think this is correct.
+The field separator isn't defined and the data has spaces so won't parse correctly.
+Also, and perhaps more important, $5 IS NOT THE CELL LINE NAME.
+And lastly, the coding is wrong. f will be incorrectly set to the last cell line.
+More, some $1 contain slashes which can't be in files.
+
+awk -F"\t" 'NR==1 {h=$0; next}{f="FILE_"FILENAME"_"$1".txt";gsub("/","_",f)} !seen[$1]++{print h > f }{print >> f; close(f)}' cosmic_mut.txt
+
+That worked, but still don't know if correct.
+
+
+
+
+#
+# 2. Run "count_trinuc_muts_v7.pl" script on every file
+for i in *.txt; do perl ../count_trinuc_muts_v7.pl pvcf ../hg38.fa $i; done
+
+I don't have access to v7 of this script, but v8 won't work.
+The expected format and the format of these files are way different.
+
+for i in *.txt; do echo $i; perl ../count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38.fa $i; done
+
+
+
+
+
+# 3. Concatenate files together, and check that the file has the same number of mutations as the initial mutation file
+head -1 *BA*count.txt > all.txt; tail -n +2 -q *count.txt >> all.txt
+
+That doesn't make any sense.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+R
+source("https://bioconductor.org/biocLite.R")
+biocLite('deconstructSigs')
+biocLite("BSgenome.Hsapiens.UCSC.hg38")
+install.packages('ggplot2')
+
+
+
+R ( basically analysis_and_visualization_commands.R )
+require(deconstructSigs)
+require(ggplot2)
+require(BSgenome.Hsapiens.UCSC.hg38)
+hg38 <- BSgenome.Hsapiens.UCSC.hg38
+
+cosmic_mut = read.table("cosmic_mut.txt",header = FALSE, col.names = c("chr","pos","ref","alt","sample"))
+
+
+cosmic_mut_all_sort <- read.table(file = "cosmic_mut_all_sort.txt", header = FALSE, sep = "\t", stringsAsFactors = T )
+
+
+colnames(cosmic_mut_all_sort) <- c("chr", "pos", "5_tetnuc", "3_tetnuc", "trinuc", "mut", "trinuc_mut", "strand", "context", "C_count", "TC_count", "TCA_count", "TCT_count", "YTCA_count", "RTCA_count", "sample")
+
+
+cosmic_mut_sort <- with(cosmic_mut, cosmic_mut[order(cosmic_mut[,"sample"]),])
+rownames(cosmic_mut_sort) <- NULL
+cosmic_mut_sort$sample <- as.factor(cosmic_mut_sort$sample)
+
+deconstructSigs_input <- cosmic_mut_all_sort[,c(1:2,6,16)]
+deconstructSigs_input$ref <- substr(deconstructSigs_input$mut, 1, 1) 
+deconstructSigs_input$alt <- substr(deconstructSigs_input$mut, 3, 3) 
+deconstructSigs_input <- subset(deconstructSigs_input, select = c("chr", "pos", "ref", "alt", "sample"))
+
+
+mut.counts <- mut.to.sigs.input(mut.ref = deconstructSigs_input, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+
+signatures.nature2013 <- load("signatures.nature2013.rda") 
+
+
+context <- getTriContextFraction(mut.counts.ref = mut.counts, trimer.counts.method = "default")
+context$tca_tct <- context[,"T[C>T]A"] + context[,"T[C>T]T"] + context[,"T[C>G]A"] + context[,"T[C>G]T"]
+context$sample <- rownames(context)
+tca_tct <- subset(context, select = c("sample", "tca_tct"))
+rownames(tca_tct) <- NULL
+context$sample <- NULL
+context$tca_tct <- NULL
+
+
+
+output.sigs.final <- as.data.frame(whichSignatures(context,
+    sample.id = 'x186069',
+    signatures.cosmic,
+    contexts.needed = F))
+
+for(i in (2:nrow(context))) {
+  output.sigs <- as.data.frame(whichSignatures(context,
+      sample.id = rownames(context[i,]),
+      signatures.cosmic,
+      contexts.needed = F))
+  output.sigs.final <- rbind(output.sigs.final, output.sigs)
+}
+
+
+output.sigs.final <- output.sigs.final[-c(1021),]
+output.sigs.final$zAPOBEC.Sig <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
+
+output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
+output.sigs.final$sample <- rownames(output.sigs.final)
+rownames(output.sigs.final) <- NULL
+
+
+# Not sure if this is useful 
+write.table(mut.counts,file='mut.counts.tsv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+nohup ./process.bash > process.out &
+
 

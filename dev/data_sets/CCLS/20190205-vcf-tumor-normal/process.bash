@@ -27,8 +27,19 @@ for vcf in /raid/data/raw/CCLS/vcf/{GM_,}{268325,439338,63185,634370,983899}.out
 		echo "Write-protected ${f} exists. Skipping step."
 	else
 
-		#	this will skip SNPs with multiple alternates
-		#	Also, strand not in VCF files, but raw count_trinuc_muts_v8.pl expects it
+		#	This will skip SNPs with multiple alternates
+		#	Also, strand not in VCF files, but raw count_trinuc_muts_v8.pl expects it, so add "+"
+		#	Use bcftools query instead of, or with, awk
+		#	Add filter?
+		#
+		#	SNPs:
+		#	• QD  < 2.0         
+		#	• FS  >  60.0         
+		#	• MQ  <  40.0 	
+		#	• MQRankSum  <  -12.5 
+		#	• ReadPosRankSum  <  -8.0
+		#	
+
   	zcat $vcf | awk 'BEGIN{FS=OFS="\t"}( !/^#/ && length($4) == 1 && length($5) == 1 ){ 
 			if($1=="MT") $1="M"; print "chr"$1,$2,$4,$5,"+" }' > ${f}
 
@@ -49,13 +60,32 @@ for vcf in /raid/data/raw/CCLS/vcf/{GM_,}{268325,439338,63185,634370,983899}.out
 		#	/raid/refs/fasta/hg38.fa.gz contains chr prefix and chrM (not chrMT)
 		#	count_trinuc_muts_v8 DOES NOT work with gzipped reference
 
-		#	for some reason /raid/refs/fasta/hg38.fa.index needs to be writable?
+		#	for some reason existing /raid/refs/fasta/hg38.fa.index needs to be writable?
 		./count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.fa ${base}.snps.txt
 
 		mv ${base}.snps.txt.*.count.txt ${f}
 		chmod a-w ${f}
 
 	fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 done
