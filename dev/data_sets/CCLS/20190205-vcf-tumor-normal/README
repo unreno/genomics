@@ -195,37 +195,33 @@ write.table(mut.counts,file='mut.counts.tsv')
 
 
 
-Flags:
-	0x1	PAIRED        .. paired-end (or multiple-segment) sequencing technology
-	0x2	PROPER_PAIR   .. each segment properly aligned according to the aligner
-	0x4	UNMAP         .. segment unmapped
-	0x8	MUNMAP        .. next segment in the template unmapped
-	0x10	REVERSE       .. SEQ is reverse complemented
-	0x20	MREVERSE      .. SEQ of the next segment in the template is reversed
-	0x40	READ1         .. the first segment in the template
-	0x80	READ2         .. the last segment in the template
-	0x100	SECONDARY     .. secondary alignment
-	0x200	QCFAIL        .. not passing quality controls
-	0x400	DUP           .. PCR or optical duplicate
-	0x800	SUPPLEMENTARY .. supplementary alignment
-
-
-
-
-ll /raid/data/raw/CCLS*/bam/*flagstat.txt
-ll /raid/data/raw/CCLS*/bam/*.QCFAIL.count.txt
-ll /raid/data/raw/CCLS*/bam/*.DUP.count.txt
-
-for f in /raid/data/raw/CCLS*/bam/*983899*bam ; do
-echo $f
-samtools view -c --threads 2 -f 0x200 $f > $f.QCFAIL.count.txt &
-samtools view -c --threads 2 -f 0x400 $f > $f.DUP.count.txt &
-done
-
-
 
 nohup ./run_strelka.bash > run_strelka.out &
 
 nohup ./process.bash > process.out &
+
+
+
+HaplotypeCallerSpark STILL IN BETA
+
+ll /raid/data/raw/CCLS*/bam/*vcf.gz
+
+
+gatk HaplotypeCaller --input GM_983899.hg38.num.bam --output GM_983899.hg38.num.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.hg38.num.vcf.gz.out 2> GM_983899.hg38.num.vcf.gz.err &
+
+gatk HaplotypeCaller --input 983899.hg38.num.bam --output 983899.hg38.num.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.hg38.num.vcf.gz.out 2> 983899.hg38.num.vcf.gz.err &
+
+gatk HaplotypeCaller --input GM_983899.hg38.num.PP.bam --output GM_983899.hg38.num.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.hg38.num.PP.vcf.gz.out 2> GM_983899.hg38.num.PP.vcf.gz.err &
+
+gatk HaplotypeCaller --input 983899.hg38.num.PP.bam --output 983899.hg38.num.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.hg38.num.PP.vcf.gz.out 2> 983899.hg38.num.PP.vcf.gz.err &
+
+gatk HaplotypeCaller --input GM_983899.recaled.bam --output GM_983899.recaled.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.recaled.vcf.gz.out 2> GM_983899.recaled.vcf.gz.err &
+
+gatk HaplotypeCaller --input 983899.recaled.bam --output 983899.recaled.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.recaled.vcf.gz.out 2> 983899.recaled.vcf.gz.err &
+
+gatk HaplotypeCaller --input GM_983899.recaled.PP.bam --output GM_983899.recaled.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > GM_983899.recaled.PP.vcf.gz.out 2> GM_983899.recaled.PP.vcf.gz.err &
+
+gatk HaplotypeCaller --input 983899.recaled.PP.bam --output 983899.recaled.PP.vcf.gz --reference /raid/refs/fasta/hg38.num.fa --dbsnp /raid/refs/vcf/dbsnp_146.hg38.num.MT.vcf.gz > 983899.recaled.PP.vcf.gz.out 2> 983899.recaled.PP.vcf.gz.err &
+
 
 
