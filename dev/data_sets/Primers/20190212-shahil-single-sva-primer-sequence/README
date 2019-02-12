@@ -1,0 +1,7 @@
+
+
+
+
+samtools view -f 64 -f 2 -c SVA_10-11.sam 
+1706
+
