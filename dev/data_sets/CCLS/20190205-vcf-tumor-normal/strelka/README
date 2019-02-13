@@ -31,12 +31,18 @@ done
 
 #SOMATIC;QSS=3;TQSS=1;NT=ref;QSS_NT=3;TQSS_NT=1;SGT=AA->AA;DP=1384;MQ=16.98;MQ0=614;ReadPosRankSum=-3.06;SNVSB=0.22;SomaticEVS=0.09
 
-for f in *.local/results/variants/somatic.snvs.vcf.gz ; do
+[:digit] does not include signs
+
+
+for f in */results/variants/somatic.snvs.vcf.gz ; do
 echo $f
-bcftools view --no-header ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.DP.txt
-bcftools view --no-header ${f} | grep -o "MQ=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.MQ.txt
-bcftools view --no-header ${f} | grep -o "ReadPosRankSum=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.ReadPosRankSum.txt
+for a in DP MQ ReadPosRankSum QSS TQSS QSS_NT TQSS_NT MQ0 SNVSB; do
+echo $a
+bcftools view --no-header ${f} | grep -o "$a=[-0-9]*;" | grep -o "[-0-9]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.$a.txt
+done ; done
 
 
-done
+for f in */results/variants/somatic.snvs.vcf.gz.*txt ; do echo $f ; cat $f ; done
+
+
 
