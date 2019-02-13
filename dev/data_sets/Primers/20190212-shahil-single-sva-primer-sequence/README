@@ -1,7 +1,45 @@
 
 
+ln -s /home/jake/.local/bin/nearest.awk
+ln -s /home/jake/.local/bin/nearest_summary.awk
 
 
-samtools view -f 64 -f 2 -c SVA_10-11.sam 
+ln -s ../20190111-shahil-primer-sequences/svas.fasta
+ln -s ../20190111-shahil-primer-sequences/svas.hg38_no_alts.vs.bam
+ln -s ../20190111-shahil-primer-sequences/svas.hg38_no_alts.vs.forward.positions.csv
+ln -s ../20190111-shahil-primer-sequences/svas.hg38_no_alts.vs.reverse.positions.csv
+ln -s ../20190111-shahil-primer-sequences/svas.nearest_primers.hg38_no_alts.vs.forward.positions.csv
+ln -s ../20190111-shahil-primer-sequences/svas.nearest_primers.hg38_no_alts.vs.reverse.positions.csv
+
+
+
+
+./process.bash
+
+
+samtools view -f 64 -f 2 -c SVA_10-11.bam 
 1706
+
+bam_to_positions_csvs.bash --paired SVA_10-11.bam
+
+SVA_10-11.forward.positions.csv
+SVA_10-11.reverse.positions.csv
+
+
+
+awk -f nearest.awk SVA_10-11.forward.positions.csv svas.hg38_no_alts.vs.forward.positions.csv > svas.nearest_primers.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk SVA_10-11.reverse.positions.csv svas.hg38_no_alts.vs.reverse.positions.csv > svas.nearest_primers.hg38_no_alts.vs.reverse.positions.csv
+
+awk -f nearest.awk svas.hg38_no_alts.vs.forward.positions.csv SVA_10-11.forward.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.forward.positions.csv
+awk -f nearest.awk svas.hg38_no_alts.vs.reverse.positions.csv SVA_10-11.reverse.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.reverse.positions.csv
+
+
+
+awk -f nearest_summary.awk svas.hg38_no_alts.vs.forward.positions.csv SVA_10-11.forward.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.forward.summary.csv
+awk -f nearest_summary.awk svas.hg38_no_alts.vs.reverse.positions.csv SVA_10-11.reverse.positions.csv > sva_primers.nearest_sva.hg38_no_alts.vs.reverse.summary.csv
+
+
+
+
+
 
