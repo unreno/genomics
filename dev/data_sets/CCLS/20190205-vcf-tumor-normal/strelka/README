@@ -1,0 +1,42 @@
+
+for f in */results/variants/somatic.snvs.vcf.gz ; do
+echo $f
+echo -n "ALL       : "; bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "SNP       : "; bcftools query -i 'TYPE="SNP"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "HighDepth : "; bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "LowDepth  : "; bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "LowEVS    : "; bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "PASS      : "; bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+done
+
+
+
+for f in */results/variants/somatic.indels.vcf.gz ; do
+echo $f
+echo -n "ALL       : "; bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "HighDepth : "; bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "LowDepth  : "; bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "LowEVS    : "; bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+echo -n "PASS      : "; bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+done
+
+
+
+for f in *.local/results/variants/somatic.snvs.vcf.gz ; do
+echo $f
+bcftools view $f | head -100 | grep "Depth_X"
+bcftools view $f | head -100 | grep "Depth_Y"
+done
+
+
+#SOMATIC;QSS=3;TQSS=1;NT=ref;QSS_NT=3;TQSS_NT=1;SGT=AA->AA;DP=1384;MQ=16.98;MQ0=614;ReadPosRankSum=-3.06;SNVSB=0.22;SomaticEVS=0.09
+
+for f in *.local/results/variants/somatic.snvs.vcf.gz ; do
+echo $f
+bcftools view --no-header ${f} | grep -o "DP=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.DP.txt
+bcftools view --no-header ${f} | grep -o "MQ=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.MQ.txt
+bcftools view --no-header ${f} | grep -o "ReadPosRankSum=[[:digit:]]*;" | grep -o "[[:digit:]]*" | awk 'BEGIN{OFS="\t";max=-99999;min=9999999}{if($1>max){max=$1};if($1<min){min=$1};sum+=$1;sumsq+=($1)^2}END{print "Max:",max,"Min:",min,"Avg:",sum/NR,"Stddev:",sqrt((sumsq-sum^2/NR)/NR)}' > $f.ReadPosRankSum.txt
+
+
+done
+
