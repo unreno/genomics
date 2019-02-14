@@ -1,31 +1,48 @@
 
-for f in */results/variants/somatic.snvs.vcf.gz ; do
-echo $f
-echo -n "ALL       : "; bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "SNP       : "; bcftools query -i 'TYPE="SNP"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "HighDepth : "; bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "LowDepth  : "; bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "LowEVS    : "; bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "PASS      : "; bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+file="somatic.snvs.counts.csv"
+echo "Sample,ALL,SNP,HighDepth,LowDepth,LowEVS,PASS" > $file
+for f in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $f >> $file
+f=$f/results/variants/somatic.snvs.vcf.gz
+c=$( bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'TYPE="SNP"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo ,$c >> $file
 done
 
 
 
-for f in */results/variants/somatic.indels.vcf.gz ; do
-echo $f
-echo -n "ALL       : "; bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "HighDepth : "; bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "LowDepth  : "; bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "LowEVS    : "; bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
-echo -n "PASS      : "; bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l
+file="somatic.indels.counts.csv"
+echo "Sample,ALL,HighDepth,LowDepth,LowEVS,PASS" > $file
+for f in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $f >> $file
+f=$f/results/variants/somatic.indels.vcf.gz
+c=$( bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="HighDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="LowDepth"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="LowEVS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo -n ,$c >> $file
+c=$( bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\t%REF\t%ALT\n' $f | wc -l )
+echo ,$c >> $file
 done
 
 
 
 for f in *.local/results/variants/somatic.snvs.vcf.gz ; do
 echo $f
-bcftools view $f | head -100 | grep "Depth_X"
-bcftools view $f | head -100 | grep "Depth_Y"
+bcftools view --header-only $f | grep "Depth_X"
+bcftools view --header-only $f | grep "Depth_Y"
 done
 
 
@@ -43,6 +60,190 @@ done ; done
 
 
 for f in */results/variants/somatic.snvs.vcf.gz.*txt ; do echo $f ; cat $f ; done
+
+Max:	103037	Min:	3	Avg:	139.309	Stddev:	467.966
+
+
+fields="DP MQ ReadPosRankSum QSS QSS_NT MQ0 SNVSB"
+echo sample,$fields | sed -e 's/ /,/g' > somatic.csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> somatic.csv
+for a in $fields ; do
+awk '{printf(",%s/%s/%s (%s)",$4,$6,$2,$8)}' $s/results/variants/somatic.snvs.vcf.gz.$a.txt >> somatic.csv
+done ; echo >> somatic.csv ; done
+
+
+
+echo "SOMATIC;QSS=3;TQSS=1;NT=ref;QSS_NT=3;TQSS_NT=1;SGT=AA->AA;DP=1384;MQ=16.98;MQ0=614;ReadPosRankSum=-3.06;SNVSB=0.22;SomaticEVS=0.09" | awk '{split($1,arr,";");for(i=0;i<length(arr);i++){ if(arr[i] ~ /^DP=/){v=arr[i];gsub(/^DP=/,"",v);break}}; print(v)}'
+
+
+
+
+csv="somatic.all.csv"
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $csv
+for field in $fields ; do
+bcftools view --no-header $s/results/variants/somatic.snvs.vcf.gz | awk -v field=$field 'BEGIN{FS=OFS="\t";max=-99999;min=9999999}{ split($8,arr,";");for(i=0;i<length(arr);i++){ regex="^"field"="; if(arr[i] ~ regex){v=arr[i];gsub(regex,"",v);v=v+0.0;break}} if(v>max){max=v};if(v<min){min=v};sum+=v;sumsq+=(v)^2 }END{printf(",%s/%s/%s (%s)",min,sum/NR,max,sqrt((sumsq-sum^2/NR)/NR))}' >> $csv
+done ; echo >> $csv ; done
+
+csv="somatic.pass.csv"
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $csv
+for field in $fields ; do
+bcftools view --no-header -i 'FILTER="PASS"' $s/results/variants/somatic.snvs.vcf.gz | awk -v field=$field 'BEGIN{FS=OFS="\t";max=-99999;min=9999999}{split($8,arr,";");regex="^"field"=";for(i=0;i<length(arr);i++){ if(arr[i] ~ regex){v=arr[i];gsub(regex,"",v);v=v+0.0;break} } if(v>max){max=v}; if(v<min){min=v};sum+=v;sumsq+=(v)^2 }END{printf(",%s/%s/%s (%s)",min,sum/NR,max,sqrt((sumsq-sum^2/NR)/NR))}' >> $csv
+done ; echo >> $csv ; done
+
+
+csv="somatic.pass.DP1000.csv"
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $csv
+for field in $fields ; do
+bcftools view --no-header -i 'FILTER="PASS" && DP<1000' $s/results/variants/somatic.snvs.vcf.gz | awk -v field=$field 'BEGIN{FS=OFS="\t";max=-99999;min=9999999}{split($8,arr,";");regex="^"field"=";for(i=0;i<length(arr);i++){ if(arr[i] ~ regex){v=arr[i];gsub(regex,"",v);v=v+0.0;break} } if(v>max){max=v}; if(v<min){min=v};sum+=v;sumsq+=(v)^2 }END{printf(",%s/%s/%s (%s)",min,sum/NR,max,sqrt((sumsq-sum^2/NR)/NR))}' >> $csv
+done ; echo >> $csv ; done
+
+
+
+csv="somatic.pass.DP1000.MQ20.csv"
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $csv
+for field in $fields ; do
+bcftools view --no-header -i 'FILTER="PASS" && DP<1000 && MQ>20' $s/results/variants/somatic.snvs.vcf.gz | awk -v field=$field 'BEGIN{FS=OFS="\t";max=-99999;min=9999999}{split($8,arr,";");regex="^"field"=";for(i=0;i<length(arr);i++){ if(arr[i] ~ regex){v=arr[i];gsub(regex,"",v);v=v+0.0;break} } if(v>max){max=v}; if(v<min){min=v};sum+=v;sumsq+=(v)^2 }END{printf(",%s/%s/%s (%s)",min,sum/NR,max,sqrt((sumsq-sum^2/NR)/NR))}' >> $csv
+done ; echo >> $csv ; done
+
+
+
+file="somatic.pass.DP1000.MQ20.counts.txt"
+echo sample,count > $file
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n "$s," >> $file
+bcftools query -i 'FILTER="PASS" && DP<1000 && MQ>20' -f '%CHROM\t%POS\t%REF\t%ALT\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l >> $file
+done
+
+
+file="somatic.counts.csv"
+echo "Sample,ALL,PASS,PASS DP<1000,PASS DP<1000 MQ>20,PASS DP<500 MQ>30,PASS DP<250 MQ>35,PASS DP<100 MQ>35,PASS DP<100 MQ>40" > $file
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $file
+c=$(bcftools query -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<1000' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<1000 && MQ>20' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<500 && MQ>30' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<250 && MQ>35' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<100 && MQ>35' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<100 && MQ>40' -f '%CHROM\t%POS\n' $s/results/variants/somatic.snvs.vcf.gz | wc -l )
+echo ,$c >> $file
+done
+
+
+
+
+
+
+
+
+csv=somatic.all.new.csv
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+vcf=$s/results/variants/somatic.snvs.vcf.gz
+echo -n $s >> $csv
+for field in $fields ; do
+statistics=$( bcftools query -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done ; echo >> $csv ; done
+
+
+csv=somatic.pass.new.csv
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+vcf=$s/results/variants/somatic.snvs.vcf.gz
+echo -n $s >> $csv
+for field in $fields ; do
+statistics=$( bcftools query -i 'FILTER="PASS"' -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done ; echo >> $csv ; done
+
+csv=somatic.pass.DP1000.new.csv
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+vcf=$s/results/variants/somatic.snvs.vcf.gz
+echo -n $s >> $csv
+for field in $fields ; do
+statistics=$( bcftools query -i 'FILTER="PASS" && DP<1000' -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done ; echo >> $csv ; done
+
+csv=somatic.pass.DP1000.MQ20.new.csv
+fields="DP MQ ReadPosRankSum QSS QSS_NT"
+echo sample,$fields | sed -e 's/ /,/g' > $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+vcf=$s/results/variants/somatic.snvs.vcf.gz
+echo -n $s >> $csv
+for field in $fields ; do
+statistics=$( bcftools query -i 'FILTER="PASS" && DP<1000 && MQ>20' -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done ; echo >> $csv ; done
+
+
+
+file="somatic.counts.csv"
+echo "Sample,ALL,PASS,PASS DP<1000,PASS DP<1000 MQ>20,PASS DP<500 MQ>30,PASS DP<250 MQ>35,PASS DP<100 MQ>35,PASS DP<100 MQ>40" > $file
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+echo -n $s >> $file
+s=$s/results/variants/somatic.snvs.vcf.gz
+c=$(bcftools query -f '%CHROM\t%POS\n' $s| wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS"' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<1000' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<1000 && MQ>20' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<500 && MQ>30' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<250 && MQ>35' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<100 && MQ>35' -f '%CHROM\t%POS\n' $s | wc -l )
+echo -n ,$c >> $file
+c=$(bcftools query -i 'FILTER="PASS" && DP<100 && MQ>40' -f '%CHROM\t%POS\n' $s | wc -l )
+echo ,$c >> $file
+done
+
+
+
+
+csv=somatic.pass.SNP.DP150.MQ35.ReadPosRankSum-8.csv
+fields="QSS QSS_NT SNVSB SomaticEVS"
+echo -n sample,$fields | sed -e 's/ /,/g' > $csv
+echo ,Calls >> $csv
+for s in 63185.local 268325.local 439338.local 634370.local 983899.local 983899.local.PP 983899.endtoend 983899.endtoend.PP ; do
+vcf=$s/results/variants/somatic.snvs.vcf.gz
+echo -n $s >> $csv
+for field in $fields ; do
+statistics=$( bcftools query -i 'TYPE="SNP" && FILTER="PASS" && DP>10 && DP<150 && MQ>35 && ReadPosRankSum>-8' -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done
+c=$(bcftools query -i 'TYPE="SNP" && FILTER="PASS" && DP>10 && DP<150 && MQ>35 && ReadPosRankSum>-8' -f '%CHROM\t%POS\n' $vcf | wc -l )
+echo ,$c >> $csv
+done
 
 
 
