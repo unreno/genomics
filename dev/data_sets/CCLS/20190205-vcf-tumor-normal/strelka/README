@@ -247,3 +247,26 @@ done
 
 
 
+
+
+csv="raw.SNP.DP150.MQ35.ReadPosRankSum-8.MQRankSum-12.5.FS60.QD2.statistics.csv"
+fields="DP QD FS MQ MQRankSum ReadPosRankSum"
+echo -n sample,$fields | sed -e 's/ /,/g' > $csv
+echo ,Calls >> $csv
+for s in 63185 GM_63185 268325 GM_268325 439338 GM_439338 634370 GM_634370 983899 GM_983899 ; do
+echo -n $s >> $csv
+for field in $fields ; do
+vcf=/raid/data/raw/CCLS/vcf/$s.output-HC.vcf.gz
+statistics=$( bcftools query -i 'TYPE="SNP" && DP>10 && DP<150 && MQ>35 && ReadPosRankSum>-8 && MQRankSum>-12.5 && FS<60 && QD>2' -f "%$field\n" $vcf | awk -f statistics.awk )
+echo -n ,$statistics >> $csv
+done
+c=$(bcftools query -i 'TYPE="SNP" && DP>10 && DP<150 && MQ>35 && ReadPosRankSum>-8 && MQRankSum>-12.5 && FS<60 && QD>2' -f '%CHROM\t%POS\n' $vcf | wc -l )
+echo ,$c >> $csv
+done
+
+
+
+
+
+
+ll /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/983899.local/results/variants/somatic.snvs.vcf.gz /raid/data/raw/CCLS/vcf/983899.output-HC.vcf.gz
