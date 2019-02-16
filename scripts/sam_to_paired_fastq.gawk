@@ -77,7 +77,10 @@ BEGIN {
 #	testing
 
 		if( and($2,64) == and(b2,64) ){
-			print $1 " " $2 " " b2 >> base".reads_have_same_lane_flags"
+			print $1 " " $2 " " b2 >> base".reads_have_same_lane1_flags"
+		}
+		if( and($2,128) == and(b2,128) ){
+			print $1 " " $2 " " b2 >> base".reads_have_same_lane2_flags"
 		}
 
 
@@ -90,7 +93,7 @@ BEGIN {
 
 		if( b1 != "" ){
 			#	Doesn't match buffered read
-			print b1 > base".missing_mates.txt"
+			print b1 >> base".missing_mates.txt"
 		}
 
 		#	buffer this one
@@ -107,4 +110,7 @@ END {
 	close( base".missing_mates.txt" )
 	close( base".1.fastq" )
 	close( base".2.fastq" )
+	close( base".reads_have_same_lane1_flags" )
+	close( base".reads_have_same_lane2_flags" )
+	close( base".unknown_bases.txt" )
 }
