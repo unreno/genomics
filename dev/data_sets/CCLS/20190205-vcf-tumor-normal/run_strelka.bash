@@ -12,7 +12,7 @@ mkdir -p strelka
 
 #for base in 268325 439338 63185 634370 983899 ; do
 #
-#	runDir="strelka/${base}.local"
+#	runDir="strelka/${base}.loc"
 #
 #	~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 #		--normalBam /raid/data/raw/CCLS/bam/GM_${base}.recaled.bam \
@@ -28,7 +28,7 @@ mkdir -p strelka
 base=983899
 
 
-#runDir="strelka/${base}.local.PP"
+#runDir="strelka/${base}.loc.PP"
 #
 #~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
 #	--normalBam /raid/data/raw/CCLS/bam/GM_${base}.recaled.PP.bam \
@@ -37,25 +37,48 @@ base=983899
 #	--runDir ${runDir}
 #
 #${runDir}/runWorkflow.py -m local -j 40
+#
+#
+#runDir="strelka/${base}.e2e"
+#
+#~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
+#	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.num.bam \
+#	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.bam \
+#	--ref /raid/refs/fasta/hg38.num.fa.gz \
+#	--runDir ${runDir}
+#
+#${runDir}/runWorkflow.py -m local -j 40
+#
+#
+#runDir="strelka/${base}.e2e.PP"
+#
+#~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
+#	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.num.PP.bam \
+#	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.PP.bam \
+#	--ref /raid/refs/fasta/hg38.num.fa.gz \
+#	--runDir ${runDir}
+#
+#${runDir}/runWorkflow.py -m local -j 40
 
 
-runDir="strelka/${base}.endtoend"
+
+runDir="strelka/${base}.alts.e2e"
 
 ~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
-	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.num.bam \
-	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.bam \
-	--ref /raid/refs/fasta/hg38.num.fa.gz \
+	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.bam \
+	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.bam \
+	--ref /raid/refs/fasta/hg38.fa.gz \
 	--runDir ${runDir}
 
 ${runDir}/runWorkflow.py -m local -j 40
 
 
-runDir="strelka/${base}.endtoend.PP"
+runDir="strelka/${base}.alts.e2e.PP"
 
 ~/.local/strelka/bin/configureStrelkaSomaticWorkflow.py \
-	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.num.PP.bam \
-	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.PP.bam \
-	--ref /raid/refs/fasta/hg38.num.fa.gz \
+	--normalBam /raid/data/raw/CCLS_983899/bam/GM_${base}.hg38.PP.bam \
+	--tumorBam /raid/data/raw/CCLS_983899/bam/${base}.hg38.PP.bam \
+	--ref /raid/refs/fasta/hg38.fa.gz \
 	--runDir ${runDir}
 
 ${runDir}/runWorkflow.py -m local -j 40
