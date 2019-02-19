@@ -84,3 +84,55 @@ runDir="strelka/${base}.alts.e2e.PP"
 ${runDir}/runWorkflow.py -m local -j 40
 
 
+
+#	Testing single runs
+
+mkdir -p strelka_germline
+
+base="983899"
+
+for base in 983899 GM_983899 ; do
+
+	runDir="strelka_germline/${base}.alts.e2e.PP"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS_983899/bam/${base}.hg38.PP.bam \
+		--referenceFasta /raid/refs/fasta/hg38.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+	runDir="strelka_germline/${base}.alts.e2e"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS_983899/bam/${base}.hg38.bam \
+		--referenceFasta /raid/refs/fasta/hg38.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+	runDir="strelka_germline/${base}.loc"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS/bam/${base}.recaled.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+	runDir="strelka_germline/${base}.loc.PP"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS/bam/${base}.recaled.PP.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+	runDir="strelka_germline/${base}.e2e"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+	runDir="strelka_germline/${base}.e2e.PP"
+	~/.local/strelka/bin/configureStrelkaGermlineWorkflow.py \
+		--bam /raid/data/raw/CCLS_983899/bam/${base}.hg38.num.PP.bam \
+		--referenceFasta /raid/refs/fasta/hg38.num.fa.gz \
+		--runDir ${runDir}
+	${runDir}/runWorkflow.py -m local -j 40
+
+done

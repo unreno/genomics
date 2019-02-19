@@ -63,3 +63,45 @@ Depth Analysis
 
 zcat 983899.output-HC.vcf.gz | grep -o -E 'DP=[[:digit:]]+' | awk -F= '{print $2}'
 
+
+
+
+
+\rm *983899*{local,e2e}*vcf.gz
+
+ln -s ../bam/983899.recaled.PP.bam.c.vcf.gz 983899.local.PP.bcftools-c.vcf.gz
+ln -s ../bam/983899.recaled.PP.bam.m.vcf.gz 983899.local.PP.bcftools-m.vcf.gz
+ln -s ../bam/983899.recaled.PP.vcf.gz       983899.local.PP.gatk.vcf.gz
+ln -s ../bam/983899.recaled.bam.c.vcf.gz    983899.local.bcftools-c.vcf.gz
+ln -s ../bam/983899.recaled.bam.m.vcf.gz    983899.local.bcftools-m.vcf.gz
+ln -s ../bam/983899.recaled.vcf.gz          983899.local.gatk.vcf.gz
+ln -s 983899.output-HC.vcf.gz 983899.local.sentieon.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.bam.c.vcf.gz GM_983899.local.PP.bcftools-c.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.bam.m.vcf.gz GM_983899.local.PP.bcftools-m.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.vcf.gz       GM_983899.local.PP.gatk.vcf.gz
+ln -s ../bam/GM_983899.recaled.bam.c.vcf.gz    GM_983899.local.bcftools-c.vcf.gz
+ln -s ../bam/GM_983899.recaled.bam.m.vcf.gz    GM_983899.local.bcftools-m.vcf.gz
+ln -s ../bam/GM_983899.recaled.vcf.gz          GM_983899.local.gatk.vcf.gz
+ln -s GM_983899.output-HC.vcf.gz GM_983899.local.sentieon.vcf.gz
+
+ln -s ../../CCLS_983899/983899.hg38.num.PP.bam.c.vcf.gz 983899.e2e.PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.num.PP.bam.m.vcf.gz 983899.e2e.PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.num.PP.vcf.gz       983899.e2e.PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.num.bam.c.vcf.gz    983899.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.num.bam.m.vcf.gz    983899.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.num.vcf.gz          983899.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.bam.c.vcf.gz GM_983899.e2e.PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.bam.m.vcf.gz GM_983899.e2e.PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.vcf.gz       GM_983899.e2e.PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.bam.c.vcf.gz    GM_983899.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.bam.m.vcf.gz    GM_983899.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.num.vcf.gz          GM_983899.e2e.gatk.vcf.gz
+
+
+ln -s ../../CCLS_983899/983899.hg38.PP.vcf.gz 983899.alts.e2e-PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38.vcf.gz 983899.alts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.PP.vcf.gz GM_983899.alts.e2e-PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38.vcf.gz GM_983899.alts.e2e.gatk.vcf.gz
+
+
+
