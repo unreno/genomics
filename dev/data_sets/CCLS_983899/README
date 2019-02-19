@@ -1,0 +1,56 @@
+
+
+
+
+20190214 
+
+Align to full hg38
+
+nohup bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38.bam - > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err &
+nohup bowtie2 --rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.name.hg38.bam - > 983899.bowtie2.out 2> 983899.bowtie2.err &
+
+This has quietly failed twice now!!!
+Perhaps both power outage related.
+I don't know what this means, but the timestamp on both bams are 00:49.
+Feb 16 00:49:55 system76-server systemd[1]: Stopping User Manager for UID 1001...
+Feb 16 00:49:55 system76-server systemd[18719]: Reached target Shutdown.
+Feb 16 00:49:55 system76-server systemd[18719]: Starting Exit the Session...
+Feb 16 00:49:55 system76-server systemd[18719]: Stopped target Default.
+Feb 16 00:49:55 system76-server systemd[18719]: Stopped target Basic System.
+Feb 16 00:49:55 system76-server systemd[18719]: Stopped target Timers.
+Feb 16 00:49:55 system76-server systemd[18719]: Stopped target Sockets.
+Feb 16 00:49:55 system76-server systemd[18719]: Stopped target Paths.
+Feb 16 00:49:55 system76-server systemd[18719]: Received SIGRTMIN+24 from PID 24644 (kill).
+Feb 16 00:49:55 system76-server systemd[1]: Stopped User Manager for UID 1001.
+Feb 16 00:49:55 system76-server systemd[1]: Removed slice User Slice of jake.
+
+
+nohup bowtie2 --rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 40 -S 983899.name.hg38.sam > 983899.bowtie2.out 2> 983899.bowtie2.err &
+nohup samtools view -@ 39 -c 983899.name.hg38.sam > 983899.name.hg38.sam.count &
+
+
+Gonna try SortSam again since it will sort sams and I won't have to convert to bam first.
+Should take about 7 or 8 hours
+
+nohup gatk SortSam --INPUT 983899.name.hg38.sam --OUTPUT 983899.hg38.bam --SORT_ORDER coordinate &
+      
+
+nohup samtools view -@ 39 -o 983899.name.hg38.bam 983899.name.hg38.sam > 983899.name.hg38.bam.out 2> 983899.name.hg38.bam.err &
+nohup samtools view -@ 39 -c 983899.name.hg38.bam > 983899.name.hg38.bam.count &
+
+
+
+nohup bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 40 -S GM_983899.name.hg38.sam > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err &
+nohup samtools view -@ 39 -c GM_983899.name.hg38.sam > GM_983899.name.hg38.sam.count &
+nohup samtools view -@ 39 -o GM_983899.name.hg38.bam GM_983899.name.hg38.sam > GM_983899.name.hg38.bam.out 2> GM_983899.name.hg38.bam.err &
+nohup samtools view -@ 39 -c GM_983899.name.hg38.bam > GM_983899.name.hg38.bam.count &
+
+
+
+nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 983899.hg38.bam 983899.name.hg38.bam > 983899.sambamba_sort.hg38.bam.out 2> 983899.sambamba_sort.hg38.bam.err &
+
+nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o GM_983899.hg38.bam GM_983899.name.hg38.bam > GM_983899.sambamba_sort.hg38.bam.out 2> GM_983899.sambamba_sort.hg38.bam.err &
+
+nohup gatk HaplotypeCaller --input 983899.hg38.bam --output 983899.hg38.vcf.gz --reference /raid/refs/fasta/hg38.fa.gz &
+nohup gatk HaplotypeCaller --input GM_983899.hg38.bam --output GM_983899.hg38.vcf.gz --reference /raid/refs/fasta/hg38.fa.gz &
+
