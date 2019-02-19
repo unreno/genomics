@@ -952,22 +952,3 @@ nohup samtools view -f 1 -F 3840 186069.recaled.name.bam | gawk -v base=186069 -
 
 
 
-20190214 
-
-Align to full hg38
-
-nohup bowtie2 --rg-id 1 --rg SM:GM_983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 GM_983899.1.fastq.gz -2 GM_983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o GM_983899.name.hg38.bam - > GM_983899.bowtie2.out 2> GM_983899.bowtie2.err &
-nohup bowtie2 --rg-id 1 --rg SM:983899 --rg LB:unknownLB --rg PL:unknownPL --rg PU:unknownPU -x hg38 -1 983899.1.fastq.gz -2 983899.2.fastq.gz --very-sensitive --threads 20 | samtools view -o 983899.name.hg38.bam - > 983899.bowtie2.out 2> 983899.bowtie2.err &
-
-
-
-nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o 983899.hg38.bam 983899.name.hg38.bam > 983899.sambamba_sort.hg38.bam.out 2> 983899.sambamba_sort.hg38.bam.err &
-
-
-
-
-nohup sambamba sort --uncompressed-chunks --compression-level=9 --nthreads 40 -m 50GB --show-progress -o GM_983899.hg38.bam GM_983899.name.hg38.bam > GM_983899.sambamba_sort.hg38.bam.out 2> GM_983899.sambamba_sort.hg38.bam.err &
-
-
-nohup gatk HaplotypeCaller --input 983899.hg38.bam --output 983899.hg38.vcf.gz --reference /raid/refs/fasta/hg38.fa.gz &
-nohup gatk HaplotypeCaller --input GM_983899.hg38.bam --output GM_983899.hg38.vcf.gz --reference /raid/refs/fasta/hg38.fa.gz &
