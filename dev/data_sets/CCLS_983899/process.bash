@@ -113,6 +113,12 @@ for sample in GM_983899 983899 ; do
 					echo "${vcf} already exists, so skipping."
 				else
 					echo "Creating ${vcf} from ${bam}. Can take 24 hours."
+#	--max-reads-per-alignment-start:Integer
+#		Maximum number of reads to retain per alignment start position. Reads above this threshold
+#		will be downsampled. Set to 0 to disable.  Default value: 50. 
+
+
+#						--max-reads-per-alignment-start 0 \
 					gatk HaplotypeCaller --input ${bam} \
 						--output ${vcf} \
 						--native-pair-hmm-threads 40 \
