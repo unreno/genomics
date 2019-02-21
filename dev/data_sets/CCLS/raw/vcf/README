@@ -67,41 +67,53 @@ zcat 983899.output-HC.vcf.gz | grep -o -E 'DP=[[:digit:]]+' | awk -F= '{print $2
 
 
 
+ll *983899*{loc,e2e}*vcf.gz
 \rm *983899*{loc,e2e}*vcf.gz
 
-ln -s 983899.output-HC.vcf.gz    983899.loc.sentieon.vcf.gz
-ln -s GM_983899.output-HC.vcf.gz GM_983899.loc.sentieon.vcf.gz
+ln -s 983899.output-HC.vcf.gz    983899.hg38_num_noalts.loc.sentieon.vcf.gz
+ln -s GM_983899.output-HC.vcf.gz GM_983899.hg38_num_noalts.loc.sentieon.vcf.gz
+ln -s ../bam/983899.recaled.PP.bcftools-c.vcf.gz    983899.hg38_num_noalts.loc_PP.bcftools-c.vcf.gz
+ln -s ../bam/983899.recaled.PP.bcftools-m.vcf.gz    983899.hg38_num_noalts.loc_PP.bcftools-m.vcf.gz
+ln -s ../bam/983899.recaled.PP.vcf.gz               983899.hg38_num_noalts.loc_PP.gatk.vcf.gz
+ln -s ../bam/983899.recaled.bcftools-c.vcf.gz       983899.hg38_num_noalts.loc.bcftools-c.vcf.gz
+ln -s ../bam/983899.recaled.bcftools-m.vcf.gz       983899.hg38_num_noalts.loc.bcftools-m.vcf.gz
+ln -s ../bam/983899.recaled.vcf.gz                  983899.hg38_num_noalts.loc.gatk.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.bcftools-c.vcf.gz GM_983899.hg38_num_noalts.loc_PP.bcftools-c.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.bcftools-m.vcf.gz GM_983899.hg38_num_noalts.loc_PP.bcftools-m.vcf.gz
+ln -s ../bam/GM_983899.recaled.PP.vcf.gz            GM_983899.hg38_num_noalts.loc_PP.gatk.vcf.gz
+ln -s ../bam/GM_983899.recaled.bcftools-c.vcf.gz    GM_983899.hg38_num_noalts.loc.bcftools-c.vcf.gz
+ln -s ../bam/GM_983899.recaled.bcftools-m.vcf.gz    GM_983899.hg38_num_noalts.loc.bcftools-m.vcf.gz
+ln -s ../bam/GM_983899.recaled.vcf.gz               GM_983899.hg38_num_noalts.loc.gatk.vcf.gz
 
-ln -s ../bam/983899.recaled.PP.bam.c.vcf.gz    983899.loc_PP.bcftools-c.vcf.gz
-ln -s ../bam/983899.recaled.PP.bam.m.vcf.gz    983899.loc_PP.bcftools-m.vcf.gz
-ln -s ../bam/983899.recaled.PP.vcf.gz          983899.loc_PP.gatk.vcf.gz
-ln -s ../bam/983899.recaled.bam.c.vcf.gz       983899.loc.bcftools-c.vcf.gz
-ln -s ../bam/983899.recaled.bam.m.vcf.gz       983899.loc.bcftools-m.vcf.gz
-ln -s ../bam/983899.recaled.vcf.gz             983899.loc.gatk.vcf.gz
-ln -s ../bam/GM_983899.recaled.PP.bam.c.vcf.gz GM_983899.loc_PP.bcftools-c.vcf.gz
-ln -s ../bam/GM_983899.recaled.PP.bam.m.vcf.gz GM_983899.loc_PP.bcftools-m.vcf.gz
-ln -s ../bam/GM_983899.recaled.PP.vcf.gz       GM_983899.loc_PP.gatk.vcf.gz
-ln -s ../bam/GM_983899.recaled.bam.c.vcf.gz    GM_983899.loc.bcftools-c.vcf.gz
-ln -s ../bam/GM_983899.recaled.bam.m.vcf.gz    GM_983899.loc.bcftools-m.vcf.gz
-ln -s ../bam/GM_983899.recaled.vcf.gz          GM_983899.loc.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz    983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz    983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.vcf.gz               983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz       983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz       983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.vcf.gz                  983899.hg38_num_noalts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz GM_983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz GM_983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.vcf.gz            GM_983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz    GM_983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz    GM_983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.vcf.gz               GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz
 
-ln -s ../../CCLS_983899/983899.hg38.num.PP.bam.c.vcf.gz    983899.e2e_PP.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.num.PP.bam.m.vcf.gz    983899.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.num.PP.vcf.gz          983899.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.num.bam.c.vcf.gz       983899.e2e.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.num.bam.m.vcf.gz       983899.e2e.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.num.vcf.gz             983899.e2e.gatk.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.bam.c.vcf.gz GM_983899.e2e_PP.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.bam.m.vcf.gz GM_983899.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.PP.vcf.gz       GM_983899.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.bam.c.vcf.gz    GM_983899.e2e.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.bam.m.vcf.gz    GM_983899.e2e.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.num.vcf.gz          GM_983899.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz    983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.gatk.vcf.gz           983899.hg38_chr_alts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.gatk.vcf.gz        GM_983899.hg38_chr_alts.e2e.gatk.vcf.gz
 
-ln -s ../../CCLS_983899/983899.hg38.PP.vcf.gz    983899.alts.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38.vcf.gz       983899.alts.e2e.gatk.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.PP.vcf.gz GM_983899.alts.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38.vcf.gz    GM_983899.alts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz    983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.bcftools-c.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.bcftools-c.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
+
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz    983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.bcftools-m.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.bcftools-m.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
+
+ll *983899*{loc,e2e}*vcf.gz
 
 
 

@@ -62,3 +62,8 @@ Sample.Reference.Alignment.Caller.vcf.gz
 
 nohup ./process.bash
 
+
+rename -n 's/hg38/hg38_chr_alts.e2e/' *99.hg38.*
+rename -n 's/e2e.PP/e2e_PP/' *e2e.PP*
+
+
