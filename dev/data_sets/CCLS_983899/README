@@ -26,44 +26,9 @@ Feb 16 00:49:55 system76-server systemd[1]: Removed slice User Slice of jake.
 
 
 
-wrap in reference loop hg38 and hg38.num
-
-Change filenames to match something like, although it needs reference
 
 Sample.Reference.Alignment.Caller.vcf.gz
 
-../CCLS/vcf/983899.e2e.bcftools-c.vcf.gz
-../CCLS/vcf/983899.e2e.bcftools-m.vcf.gz
-../CCLS/vcf/983899.e2e.gatk.vcf.gz
-../CCLS/vcf/983899.e2e_PP.bcftools-c.vcf.gz
-../CCLS/vcf/983899.e2e_PP.bcftools-m.vcf.gz
-../CCLS/vcf/983899.e2e_PP.gatk.vcf.gz
-../CCLS/vcf/983899.loc.bcftools-c.vcf.gz
-../CCLS/vcf/983899.loc.bcftools-m.vcf.gz
-../CCLS/vcf/983899.loc.gatk.vcf.gz
-../CCLS/vcf/983899.loc_PP.bcftools-c.vcf.gz
-../CCLS/vcf/983899.loc_PP.bcftools-m.vcf.gz
-../CCLS/vcf/983899.loc_PP.gatk.vcf.gz
-../CCLS/vcf/983899.loc.sentieon.vcf.gz
 
-../CCLS/vcf/GM_983899.e2e.bcftools-c.vcf.gz
-../CCLS/vcf/GM_983899.e2e.bcftools-m.vcf.gz
-../CCLS/vcf/GM_983899.e2e.gatk.vcf.gz
-../CCLS/vcf/GM_983899.e2e_PP.bcftools-c.vcf.gz
-../CCLS/vcf/GM_983899.e2e_PP.bcftools-m.vcf.gz
-../CCLS/vcf/GM_983899.e2e_PP.gatk.vcf.gz
-../CCLS/vcf/GM_983899.loc.bcftools-c.vcf.gz
-../CCLS/vcf/GM_983899.loc.bcftools-m.vcf.gz
-../CCLS/vcf/GM_983899.loc.gatk.vcf.gz
-../CCLS/vcf/GM_983899.loc_PP.bcftools-c.vcf.gz
-../CCLS/vcf/GM_983899.loc_PP.bcftools-m.vcf.gz
-../CCLS/vcf/GM_983899.loc_PP.gatk.vcf.gz
-../CCLS/vcf/GM_983899.loc.sentieon.vcf.gz
-
-nohup ./process.bash
-
-
-rename -n 's/hg38/hg38_chr_alts.e2e/' *99.hg38.*
-rename -n 's/e2e.PP/e2e_PP/' *e2e.PP*
-
+nohup ./process.bash &
 

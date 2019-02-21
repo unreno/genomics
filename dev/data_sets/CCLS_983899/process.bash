@@ -103,7 +103,7 @@ for sample in GM_983899 983899 ; do
 				if [ -f ${flagstat} ] && [ ! -w ${flagstat} ]  ; then
 					echo "${flagstat} already exists, so skipping."
 				else
-					echo "Counting ${bam}"
+					echo "Getting flagstats ${bam}"
 					samtools flagstat -@ 39 ${bam} > ${flagstat} 2> ${flagstat}.err
 					chmod a-w ${flagstat}
 				fi
