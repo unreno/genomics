@@ -69,16 +69,8 @@ for sample in GM_983899 983899 ; do
 			for core in ${alignment} ${alignment}_PP ; do
 				echo "Processing ${core}"
 	
-	#	Sample.Reference.Alignment.Caller.vcf.gz
+				#	Sample.Reference.Alignment.Caller.vcf.gz
 	
-	#	../CCLS/vcf/GM_983899.e2e_PP.bcftools-c.vcf.gz
-	#	../CCLS/vcf/GM_983899.e2e_PP.bcftools-m.vcf.gz
-	#	../CCLS/vcf/GM_983899.e2e_PP.gatk.vcf.gz
-	#	../CCLS/vcf/GM_983899.loc.bcftools-c.vcf.gz
-	#	../CCLS/vcf/GM_983899.loc.bcftools-m.vcf.gz
-	#	../CCLS/vcf/GM_983899.loc.gatk.vcf.gz
-	
-		
 				base=${sample}.${reference}.${core}
 				bam=${base}.bam
 				index=${bam}.bai
@@ -117,7 +109,6 @@ for sample in GM_983899 983899 ; do
 #		Maximum number of reads to retain per alignment start position. Reads above this threshold
 #		will be downsampled. Set to 0 to disable.  Default value: 50. 
 
-
 #						--max-reads-per-alignment-start 0 \
 					gatk HaplotypeCaller --input ${bam} \
 						--output ${vcf} \
@@ -132,11 +123,11 @@ for sample in GM_983899 983899 ; do
 					echo "${vcf} already exists, so skipping."
 				else
 					echo "Creating ${vcf} from ${bam}"
-#					bcftools mpileup --output-type u \
-#						--fasta-ref /raid/refs/fasta/${reference}.fa.gz ${bam} \
-#						| bcftools call --consensus-caller --variants-only --threads 9 \
-#						--output-type z -o ${vcf} > ${vcf}.out 2> ${vcf}.err
-#					chmod a-w ${vcf}
+					bcftools mpileup --output-type u \
+						--fasta-ref /raid/refs/fasta/${reference}.fa.gz ${bam} \
+						| bcftools call --consensus-caller --variants-only --threads 9 \
+						--output-type z -o ${vcf} > ${vcf}.out 2> ${vcf}.err
+					chmod a-w ${vcf}
 				fi
 		
 				vcf=${base}.bcftools-m.vcf.gz
@@ -144,11 +135,11 @@ for sample in GM_983899 983899 ; do
 					echo "${vcf} already exists, so skipping."
 				else
 					echo "Creating ${vcf} from ${bam}"
-#					bcftools mpileup --output-type u \
-#						--fasta-ref /raid/refs/fasta/${reference}.fa.gz ${bam} \
-#						| bcftools call --multiallelic-caller --variants-only --threads 9 \
-#						--output-type z -o ${vcf} > ${vcf}.out 2> ${vcf}.err
-#					chmod a-w ${vcf}
+					bcftools mpileup --output-type u \
+						--fasta-ref /raid/refs/fasta/${reference}.fa.gz ${bam} \
+						| bcftools call --multiallelic-caller --variants-only --threads 9 \
+						--output-type z -o ${vcf} > ${vcf}.out 2> ${vcf}.err
+					chmod a-w ${vcf}
 				fi
 		
 			done
