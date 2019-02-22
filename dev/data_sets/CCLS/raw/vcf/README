@@ -87,16 +87,16 @@ ln -s ../bam/GM_983899.recaled.vcf.gz               GM_983899.hg38_num_noalts.lo
 
 ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz    983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz
 ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz    983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.vcf.gz               983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz          983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
 ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz       983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz
 ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz       983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.vcf.gz                  983899.hg38_num_noalts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_num_noalts.e2e.gatk.vcf.gz             983899.hg38_num_noalts.e2e.gatk.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz GM_983899.hg38_num_noalts.e2e_PP.bcftools-c.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz GM_983899.hg38_num_noalts.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.vcf.gz            GM_983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz        GM_983899.hg38_num_noalts.e2e_PP.gatk.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz    GM_983899.hg38_num_noalts.e2e.bcftools-c.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz    GM_983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.vcf.gz               GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz           GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz
 
 ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz    983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz
 ln -s ../../CCLS_983899/983899.hg38_chr_alts.gatk.vcf.gz           983899.hg38_chr_alts.e2e.gatk.vcf.gz
