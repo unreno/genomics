@@ -11,7 +11,8 @@ wd=$PWD
 #/raid/data/raw/CCLS/vcf/GM_63185.output-HC.vcf.gz
 #/raid/data/raw/CCLS/vcf/GM_634370.output-HC.vcf.gz
 #/raid/data/raw/CCLS/vcf/GM_983899.output-HC.vcf.gz
-for vcf in /raid/data/raw/CCLS/vcf/{GM_,}{268325,439338,63185,634370,983899}.output-HC.vcf.gz ; do
+#for vcf in /raid/data/raw/CCLS/vcf/{GM_,}{268325,439338,63185,634370,983899}.output-HC.vcf.gz ; do
+for vcf in /raid/data/raw/CCLS/vcf/*.output-HC.vcf.gz ; do
 	base=$( basename $vcf .output-HC.vcf.gz )
 	echo $vcf
 
