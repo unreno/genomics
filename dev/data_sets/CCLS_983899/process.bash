@@ -100,23 +100,52 @@ for sample in GM_983899 983899 ; do
 					chmod a-w ${flagstat}
 				fi
 		
-				vcf=${base}.gatk.vcf.gz
-				if [ -f ${vcf} ] && [ ! -w ${vcf} ]  ; then
-					echo "${vcf} already exists, so skipping."
+
+				ctm=${base}.gatk.count_trinuc_muts.txt
+				if [ -f ${ctm} ] && [ ! -w ${ctm} ]  ; then
+					echo "Write-protected ${ctm} exists. Skipping step."
 				else
-					echo "Creating ${vcf} from ${bam}. Can take 24 hours."
+
+					ctmi=${base}.gatk.count_trinuc_muts.input
+					if [ -f ${ctmi} ] && [ ! -w ${ctmi} ]  ; then
+						echo "Write-protected ${ctmi} exists. Skipping step."
+					else
+
+						vcf=${base}.gatk.vcf.gz
+						if [ -f ${vcf} ] && [ ! -w ${vcf} ]  ; then
+							echo "${vcf} already exists, so skipping."
+						else
+							echo "Creating ${vcf} from ${bam}. Can take 24 hours."
 #	--max-reads-per-alignment-start:Integer
 #		Maximum number of reads to retain per alignment start position. Reads above this threshold
 #		will be downsampled. Set to 0 to disable.  Default value: 50. 
 
 #						--max-reads-per-alignment-start 0 \
-					gatk HaplotypeCaller --input ${bam} \
-						--output ${vcf} \
-						--native-pair-hmm-threads 40 \
-						--dbsnp /raid/refs/vcf/dbsnp_146.${reference}.vcf.gz \
-						--reference /raid/refs/fasta/${reference}.fa.gz > ${vcf}.out 2> ${vcf}.err
-					chmod a-w ${vcf}
+							gatk HaplotypeCaller --input ${bam} \
+								--output ${vcf} \
+								--native-pair-hmm-threads 40 \
+								--dbsnp /raid/refs/vcf/dbsnp_146.${reference}.vcf.gz \
+								--reference /raid/refs/fasta/${reference}.fa.gz > ${vcf}.out 2> ${vcf}.err
+							chmod a-w ${vcf}
+						fi
+
+						bcftools query --include 'TYPE="snp" && QD > 2 && FS < 60 && MQ > 40 && MQRankSum > -12.5 && ReadPosRankSum > -8.0' -f "%CHROM\t%POS\t%REF\t%ALT\t+\n" ${vcf} > ${ctmi}
+						chmod a-w ${ctmi}
+
+					fi
+
+					./count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38_num_noalts.fa ${ctmi}
+					mv ${ctmi}.*.count.txt ${ctm}
+					chmod a-w ${ctm}
+
+					#			#	/raid/refs/fasta/hg38.fa.gz contains chr prefix and chrM (not chrMT)
+					#			#	count_trinuc_muts_v8 DOES NOT work with gzipped reference
+					#	
+					#			#	for some reason existing /raid/refs/fasta/hg38.fa.index needs to be writable?
+					#			./count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38.fa ${base}.snps.txt
+
 				fi
+
 		
 				vcf=${base}.bcftools-c.vcf.gz
 				if [ -f ${vcf} ] && [ ! -w ${vcf} ]  ; then

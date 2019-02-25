@@ -27,7 +27,8 @@ for vcf in /raid/data/raw/CCLS/vcf/{GM_,}{268325,439338,63185,634370,983899}.out
 	if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 		echo "Write-protected ${f} exists. Skipping step."
 	else
-		./count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38_num_noalts.fa ${base}.count_trinuc_muts.input.txt > ${f}
+		./count_trinuc_muts_v8.pl vcf /raid/refs/fasta/hg38_num_noalts.fa ${base}.count_trinuc_muts.input.txt
+		mv ${base}.count_trinuc_muts.input.txt.*.count.txt ${f}
 		chmod a-w ${f}
 	fi
 
