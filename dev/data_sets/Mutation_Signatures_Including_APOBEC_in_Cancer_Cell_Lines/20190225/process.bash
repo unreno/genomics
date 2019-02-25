@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 
-#Need to change if strand -?
-#toupper(ref) 
+# I need to change if strand -
+#	Also use toupper(...) 
 
 awk 'BEGIN{FS="\t"; OFS="\t"; 
 	comp["A"]="T";
@@ -25,7 +25,7 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 		if( ref1 == ref2 ) {
 			print a[1], b[1], ref1, substr($18,length($18),1), $25, $5 > $5"-Step4.tsv"; seen[$24]++
 		}else{
-			print chr, pos, ref1, ref2;
+			print chr, pos, $25, ref1, ref2;
 		}
 	}
 }' CosmicCLP_MutantExport.tsv
