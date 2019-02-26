@@ -152,7 +152,31 @@ awk 'BEGIN{FS="\t"; OFS="\t"};{ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Su
 
 609662 CosmicCLP_MutantExport-Step3.tsv
 
-That's much less than expected.
+That's much less than expected. TRY AGAIN WITHOUT THE SEEN CHECK. GET TOTAL COUNT FOR EACH STEP.
+
+awk 'BEGIN{FS="\t"; OFS="\t"};{ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Substitution" && b[1] == b[2] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 } }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3noseen.tsv
+
+
+
+MOVE ALL STEP SCRIPTS INTO process.bash FOR TOTAL REPRODUCABILITY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 --------------------------------------------------
