@@ -34,10 +34,10 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 {
 	split($24,a,":");split(a[2],b,"-");
 	if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
-		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv";
+		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5
 		seen[$24]++ 
 	}
-}' CosmicCLP_MutantExport.tsv
+}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3_.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $5 in c ){
@@ -46,7 +46,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv";
 		seen[$24]++ 
 	}
-}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3_.tsv
+}' CosmicCLP_MutantExport.tsv
 
 for f in *-Step3a.tsv ; do n=${f/Step3a/Step3b}; sort -n $f > $n ;  done
 
@@ -59,6 +59,12 @@ wc -l *-Step3?.tsv
 # I need to change if strand -
 #	Also use toupper(...) 
 
+#}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step4.tsv
+
+
+
+
+echo "Creating CosmicCLP_MutantExport-NoSeen-Step4.tsv"
 awk 'BEGIN{FS="\t"; OFS="\t"; 
 	comp["A"]="T";
 	comp["T"]="A";
@@ -69,22 +75,54 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 }
 {
 	split($24,a,":");split(a[2],b,"-"); 
-	if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
+	if( $24 != "" && $20 ~ "Substitution" && b[1] == b[2] ){	#&& !seen[$24] ) {
 		chr=a[1];pos=b[1];
-		if(chr==23)chr="X";
-		if(chr==24)chr="Y";
+		if(chr==23) chr="X";
+		if(chr==24) chr="Y";
 		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 ";
 		cmd|getline ref1;
 		close(cmd);
-		ref2=substr($18,length($18)-2,1);
-		if( ref1 == ref2 ) {
-			print a[1], b[1], ref1, substr($18,length($18),1), $25, $5 > $5"-Step4.tsv"; seen[$24]++
-		}else{
-			print chr, pos, $25, ref1, ref2;
+#		if( ref1 == ">:-" ) print $0
+		if( length(ref1) != 1 ) print $0
+		ref2=toupper(substr($18,length($18)-2,1));
+		if($25 == "-") ref2=comp[ref2];
+		if( toupper(ref1) == ref2 ) {
+			print a[1], b[1], ref1, substr($18,length($18),1), $25, $5
+#			seen[$24]++
+		}
+	}
+}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-NoSeen-Step4.tsv
+
+
+echo "Creating CosmicCLP_MutantExport-Step4.tsv"
+awk 'BEGIN{FS="\t"; OFS="\t"; 
+	comp["A"]="T";
+	comp["T"]="A";
+	comp["C"]="G";
+	comp["G"]="C";
+	comp["N"]="N";
+	c["BC-3"]=c["BT-474"]=c["NALM-6"]=1
+}
+{
+	split($24,a,":");split(a[2],b,"-"); 
+	if( $24 != "" && $20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
+		chr=a[1];pos=b[1];
+		if(chr==23) chr="X";
+		if(chr==24) chr="Y";
+		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 ";
+		cmd|getline ref1;
+		close(cmd);
+		ref2=toupper(substr($18,length($18)-2,1));
+		if($25 == "-") ref2=comp[ref2];
+		if( toupper(ref1) == ref2 ) {
+			print a[1], b[1], ref1, substr($18,length($18),1), $25, $5
+			seen[$24]++
 		}
 	}
 }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step4.tsv
 
+
+echo "Creating CosmicCLP_MutantExport-Step4.tsv"
 awk 'BEGIN{FS="\t"; OFS="\t"; 
 	comp["A"]="T";
 	comp["T"]="A";
@@ -95,19 +133,26 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 }
 ( $5 in c ){ 
 	split($24,a,":");split(a[2],b,"-"); 
-	if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
+	if( $24 != "" && $20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
 		chr=a[1];pos=b[1];
-		if(chr==23)chr="X";
-		if(chr==24)chr="Y";
+		if(chr==23) chr="X";
+		if(chr==24) chr="Y";
 		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 ";
 		cmd|getline ref1;
 		close(cmd);
-		ref2=substr($18,length($18)-2,1);
-		if( ref1 == ref2 ) {
+		ref2=toupper(substr($18,length($18)-2,1));
+		if($25 == "-") ref2=comp[ref2];
+		if( toupper(ref1) == ref2 ) {
 			print a[1], b[1], ref1, substr($18,length($18),1), $25, $5 > $5"-Step4.tsv"; seen[$24]++
 		}else{
 			print chr, pos, $25, ref1, ref2;
 		}
 	}
 }' CosmicCLP_MutantExport.tsv
+
+wc -l *-Step4.tsv
+
+
+
+
 

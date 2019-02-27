@@ -138,6 +138,9 @@ I don't get how you could have a reference allele not matching the reference gen
 Ok. Awk script is way too complicated for a one liner. Now in process.bash
 
 
+The addition of "samtools faidx" makes this script take quite a while.
+
+
 
 
 
