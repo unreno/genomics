@@ -13,6 +13,8 @@ Github repo
 https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
 
 
+
+
 Gonna try to reproduce publication's analysis.
 
 BC-3, BT-474, and NALM-6
@@ -27,7 +29,9 @@ There are no comments so the condition is incorrect ($0 and not 0) and is unnece
 
 “CosmicCLP_MutantExport.tsv,” version 81, was downloaded on July 17, 2017, from the COSMIC cell line project (CLP) online database
 
-Register and download "COSMIC Mutation Data" (CosmicCLP_MutantExport.tsv.gz) from https://cancer.sanger.ac.uk/cosmic/download
+https://cog.sanger.ac.uk/cosmic/GRCh38/cell_lines/v87/CosmicCLP_MutantExport.tsv.gz
+
+Register and download "COSMIC Mutation Data" (CosmicCLP_MutantExport.tsv.gz) from https://cancer.sanger.ac.uk/cell_lines/download
 The paper used v81. v87 was available for me.
 
 
@@ -58,7 +62,8 @@ strand                     DNA strand (column 25)
 
 
 
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1};( $5 in c ){print $5, $18, $20, $23, $24, $25 > $5"-Step1.tsv" }' CosmicCLP_MutantExport.tsv
+awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
+( $5 in c ){print $5, $18, $20, $23, $24, $25 > $5"-Step1.tsv" }' CosmicCLP_MutantExport.tsv
 
 
 #
@@ -67,7 +72,10 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1};( $5 in c ){p
 
 Not all substitutions are 1 single-base, and not all single-base mutations are substitutions.
 
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1};( $5 in c ){ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Substitution" && b[1] == b[2] ) print $5, $18, $20, $23, $24, $25 > $5"-Step2.tsv" }' CosmicCLP_MutantExport.tsv
+awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
+( $5 in c ){ split($24,a,":");split(a[2],b,"-");
+	if($20 ~ "Substitution" && b[1] == b[2] ) print $5, $18, $20, $23, $24, $25 > $5"-Step2.tsv"
+}' CosmicCLP_MutantExport.tsv
 
 wc -l BC* BT* NALM-6*
   1538 BC-3-Step1.tsv
@@ -98,7 +106,10 @@ C
 
 I guess here were assuming that the mutation is the same?
 
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1};( $5 in c ){ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv"; seen[$24]++ } }' CosmicCLP_MutantExport.tsv
+awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
+( $5 in c ){ split($24,a,":");split(a[2],b,"-");
+	if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv"; seen[$24]++
+} }' CosmicCLP_MutantExport.tsv
 
 for f in *-Step3a.tsv ; do n=${f/Step3a/Step3b}; sort -n $f > $n ;  done
 
@@ -143,21 +154,21 @@ The addition of "samtools faidx" makes this script take quite a while.
 
 
 
-
-
-
-
-
-
-
-
-awk 'BEGIN{FS="\t"; OFS="\t"};{ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 ; seen[$24]++ } }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3.tsv
+awk 'BEGIN{FS="\t"; OFS="\t"}
+{ split($24,a,":");split(a[2],b,"-");
+if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
+	print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 ; seen[$24]++
+} }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3.tsv
 
 609662 CosmicCLP_MutantExport-Step3.tsv
 
 That's much less than expected. TRY AGAIN WITHOUT THE SEEN CHECK. GET TOTAL COUNT FOR EACH STEP.
 
-awk 'BEGIN{FS="\t"; OFS="\t"};{ split($24,a,":");split(a[2],b,"-"); if($20 ~ "Substitution" && b[1] == b[2] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 } }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3noseen.tsv
+awk 'BEGIN{FS="\t"; OFS="\t"}
+{ split($24,a,":");split(a[2],b,"-");
+if($20 ~ "Substitution" && b[1] == b[2] ) {
+	print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5
+} }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3noseen.tsv
 
 
 
