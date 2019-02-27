@@ -192,6 +192,7 @@ wc -l *-Step4.tsv
 echo "From https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/blob/master/README_mutation_processing_commands"
 
 
+echo "Producing Step 4 for all cell lines ..."
 
 # From the 5-field mutation file (chr, pos, ref, alt, sample):
 #
@@ -199,6 +200,44 @@ echo "From https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-C
 #
 # 1. Split file into each separate cell line, keeping the header
 #	awk  'NR==1 {h=$0; next} !seen[$5]++{ f="FILE_"FILENAME"_"$5".txt";print h > f } { print >> f; close(f)}' cosmic_mut.txt
+
+awk 'BEGIN{FS="\t"; OFS="\t"; 
+	comp["A"]="T";
+	comp["T"]="A";
+	comp["C"]="G";
+	comp["G"]="C";
+	comp["N"]="N";
+}
+( $24 != "" ){
+	split($24,a,":");split(a[2],b,"-"); 
+	if( $24 != "" && $20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
+		chr=a[1];pos=b[1];
+		if(chr==23) chr="X";
+		if(chr==24) chr="Y";
+		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 ";
+		cmd|getline ref1;
+		close(cmd);
+		ref1=toupper(ref1)
+		ref2=toupper(substr($18,length($18)-2,1));
+		if($25 == "-") ref2=comp[ref2];
+		alt=toupper(substr($18,length($18),1));
+		if($25 == "-") alt=comp[alt];
+		if( ref1 == ref2 ) {
+			if( alt == ref1 ){
+				print "Nonmutation?"
+				print chr, pos, $25, ref1, ref2, alt;
+			}else{
+				print chr, b[1], ref1, substr($18,length($18),1), $25, $5 > $5"-Step4a.tsv"; seen[$24]++
+			}
+		}else{
+			print "Nonmatching mutation?"
+			print chr, pos, $25, ref1, ref2, alt;
+		}
+	}
+}' CosmicCLP_MutantExport.tsv
+
+echo "Sorting ..."
+for f in *-Step4a.tsv ; do n=${f/Step4a/Step4b}; sort -n $f > $n ;  done
 
 
 #	This is off. The paper produces cosmic_mut.txt 
@@ -228,7 +267,10 @@ echo "From https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-C
 # 2. Run "count_trinuc_muts_v7.pl" script on every file
 #	for i in *.txt; do perl ../count_trinuc_muts_v7.pl pvcf ../hg38.fa $i; done
 
-for i in {BC-3,BT-474,NALM-6}-Step4.tsv; do ./count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa $i; done
+#for i in {BC-3,BT-474,NALM-6}-Step4.tsv; do ./count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa $i; done
+for i in *-Step4b.tsv; do ./count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa $i; done
+
+rename 's/tsv.\d*.count/count/' *-Step4b.tsv.*.count.txt
 
 
 
