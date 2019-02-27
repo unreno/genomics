@@ -204,42 +204,50 @@ echo "Producing Step 4 for all cell lines ..."
 # 1. Split file into each separate cell line, keeping the header
 #	awk  'NR==1 {h=$0; next} !seen[$5]++{ f="FILE_"FILENAME"_"$5".txt";print h > f } { print >> f; close(f)}' cosmic_mut.txt
 
-awk 'BEGIN{FS="\t"; OFS="\t"; 
-	comp["A"]="T";
-	comp["T"]="A";
-	comp["C"]="G";
-	comp["G"]="C";
-	comp["N"]="N";
+#awk: cmd. line:15: (FILENAME=CosmicCLP_MutantExport.tsv FNR=36042) fatal: cannot open pipe `samtools faidx /raid/refs/fasta/hg38_num_noalts.fa 1:170719880-170719880 | tail -1 ' (Too many open files)
+#	Gotta close the files every time we write to them, so we need to append them so we need to delete them first.
+
+\rm *-Step4a.tsv
+
+awk 'BEGIN{FS="\t"; OFS="\t"
+	comp["A"]="T"
+	comp["T"]="A"
+	comp["C"]="G"
+	comp["G"]="C"
+	comp["N"]="N"
 }
 ( $24 != "" ){
-	split($24,a,":");split(a[2],b,"-"); 
+	split($24,a,":");split(a[2],b,"-")
 	if( $24 != "" && $20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
-		chr=a[1];pos=b[1];
-		if(chr==23) chr="X";
-		if(chr==24) chr="Y";
-		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 ";
-		cmd|getline ref1;
-		close(cmd);
+		chr=a[1];pos=b[1]
+		if(chr==23) chr="X"
+		if(chr==24) chr="Y"
+		cmd="samtools faidx /raid/refs/fasta/hg38_num_noalts.fa "chr":"pos"-"pos" | tail -1 "
+		cmd|getline ref1
+		close(cmd)
 		ref1=toupper(ref1)
-		ref2=toupper(substr($18,length($18)-2,1));
-		if($25 == "-") ref2=comp[ref2];
-		alt=toupper(substr($18,length($18),1));
-		if($25 == "-") alt=comp[alt];
+		ref2=toupper(substr($18,length($18)-2,1))
+		if($25 == "-") ref2=comp[ref2]
+		alt=toupper(substr($18,length($18),1))
+		if($25 == "-") alt=comp[alt]
 		if( ref1 == ref2 ) {
 			if( alt == ref1 ){
 				print "Nonmutation?"
-				print chr, pos, $25, ref1, ref2, alt;
+				print chr, pos, $25, ref1, ref2, alt
 			}else{
 				file=$5
 				gsub("/","_",file)
-				print chr, b[1], ref1, substr($18,length($18),1), $25, $5 > file"-Step4a.tsv"; seen[$24]++
+				print chr, b[1], ref1, substr($18,length($18),1), $25, $5 >> file"-Step4a.tsv"
+				close(file"-Step4a.tsv"); seen[$24]++
 			}
 		}else{
 			print "Nonmatching mutation?"
-			print chr, pos, $25, ref1, ref2, alt;
+			print chr, pos, $25, ref1, ref2, alt
 		}
 	}
 }' CosmicCLP_MutantExport.tsv
+
+wc -l *-Step4a.tsv
 
 echo "Sorting ..."
 for f in *-Step4a.tsv ; do n=${f/Step4a/Step4b}; sort -n $f > $n ;  done
@@ -283,9 +291,8 @@ rename 's/tsv.\d*.count/count/' *-Step4b.tsv.*.count.txt
 #	head -1 *BA*count.txt > all.txt; tail -n +2 -q *count.txt >> all.txt
 
 
-#	That doesn't make any sense.
-#
-#	There is no *BA*count.txt, but I assume it is meant to extract a single header line.
+#	That doesn't make any sense, but I assume it is meant to extract a single header line and then append all the data.
+#	That's not what happens though as there are multiple *BA*count.txt files.
 #
 #	Not sure what "all.txt" is to be used for.
 #
