@@ -207,7 +207,7 @@ echo "Producing Step 4 for all cell lines ..."
 #awk: cmd. line:15: (FILENAME=CosmicCLP_MutantExport.tsv FNR=36042) fatal: cannot open pipe `samtools faidx /raid/refs/fasta/hg38_num_noalts.fa 1:170719880-170719880 | tail -1 ' (Too many open files)
 #	Gotta close the files every time we write to them, so we need to append them so we need to delete them first.
 
-\rm *-Step4a.tsv
+\rm -f *-Step4a.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"
 	comp["A"]="T"
