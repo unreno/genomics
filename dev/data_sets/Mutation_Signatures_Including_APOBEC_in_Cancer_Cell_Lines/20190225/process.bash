@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e  # exit if any command fails
+set -u  # Error on usage of unset variables
+set -o pipefail
 
 
 wc -l CosmicCLP_MutantExport.tsv
@@ -227,7 +230,9 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 				print "Nonmutation?"
 				print chr, pos, $25, ref1, ref2, alt;
 			}else{
-				print chr, b[1], ref1, substr($18,length($18),1), $25, $5 > $5"-Step4a.tsv"; seen[$24]++
+				file=$5
+				gsub("/","_",file)
+				print chr, b[1], ref1, substr($18,length($18),1), $25, $5 > file"-Step4a.tsv"; seen[$24]++
 			}
 		}else{
 			print "Nonmatching mutation?"
