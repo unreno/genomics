@@ -12,22 +12,10 @@ https://academic.oup.com/jncics/article/2/1/pky002/4942295
 Github repo
 https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts
 
-
-
-
 Gonna try to reproduce publication's analysis.
 
 BC-3, BT-474, and NALM-6
 
-#
-#	Step 1: Download, organize, and filter raw mutation data: The fields cell line name (column 5), mutation (column 18), mutation type (column 20), version of the reference genome (column 23), chromosome position of the mutation (column 24), and DNA strand (column 25) were extracted from the “CosmicCLP_MutantExport.tsv” file using the following command:
-#	
-#	awk ′BEGIN{FS="\t"; OFS="\t"}; 0 !∼ /^#/ {print $5, $18, $20, $23, $24, $25}′CosmicCLP_MutantExport.tsv > cosmic_mut.txt
-#	
-
-There are no comments so the condition is incorrect ($0 and not 0) and is unnecessary.
-
-“CosmicCLP_MutantExport.tsv,” version 81, was downloaded on July 17, 2017, from the COSMIC cell line project (CLP) online database
 
 https://cog.sanger.ac.uk/cosmic/GRCh38/cell_lines/v87/CosmicCLP_MutantExport.tsv.gz
 
@@ -61,201 +49,12 @@ Mutation genome position   chromosome position of the mutation (column 24)
 strand                     DNA strand (column 25)
 
 
+nohup ./process.bash &
+mkdir v81
+mv nohup.out *Step* v81/
 
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
-( $5 in c ){print $5, $18, $20, $23, $24, $25 > $5"-Step1.tsv" }' CosmicCLP_MutantExport.tsv
 
-
-#
-#	Step 2: Removal of all non-single-base substitution mutations: All mutations that are not single-base substitutions (eg, insertions, deletions, and complex multibase substitutions) were filtered out of the table, leaving single-base substitution mutations annotated as nonsense, missense, or coding silent substitutions. This essential filtering step reduced the number of mutations in BT-474, BC-3, and NALM-6 from 1595 to 1407, 1537 to 1371, and 3291 to 2962, respectively.
-#
-
-Not all substitutions are 1 single-base, and not all single-base mutations are substitutions.
-
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
-( $5 in c ){ split($24,a,":");split(a[2],b,"-");
-	if($20 ~ "Substitution" && b[1] == b[2] ) print $5, $18, $20, $23, $24, $25 > $5"-Step2.tsv"
-}' CosmicCLP_MutantExport.tsv
-
-wc -l BC* BT* NALM-6*
-  1538 BC-3-Step1.tsv
-  1371 BC-3-Step2.tsv
-  1595 BT-474-Step1.tsv
-  1407 BT-474-Step2.tsv
-  3291 NALM-6-Step1.tsv
-  2962 NALM-6-Step2.tsv
- 12164 total
-
-Count match.
-
-
-
-
-#
-#	Step 3: Additional filtering to remove nonunique chromosomal positions and file reformatting: All nonunique chromosome positions were filtered out of each cell line individually, which ensures that each mutation has only one associated chromosomal position within a cell line. A tab-separated file was created with chromosome number (eg, “chr1”), chromosomal position, reference allele, alternate (mutant) allele, strand of the substitution, and sample (cell line name) as columns. This table was reordered as follows for subsequent analyses: chr1-chr9, chrX, chrY, chr10-chr22, then by ascending chromosomal position, and it was then saved as a text file. This step reduced mutation numbers in BT-474, BC-3, and NALM-6 from 1407 to 1021, 1371 to 963, and 2962 to 2110, respectively.
-#
-
-Reference and Alternate are not in this file. Need to extract so will take time. Could parse from 
-parse($24)	parse($24)	parse($18) parse($18) $25	$5
-
-$ echo "c.2150C>T" | awk '{print substr($0,length($0),1)}'
-T
-$ echo "c.2150C>T" | awk '{print substr($0,length($0)-2,1)}'
-C
-
-
-I guess here were assuming that the mutation is the same?
-
-awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
-( $5 in c ){ split($24,a,":");split(a[2],b,"-");
-	if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) { print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv"; seen[$24]++
-} }' CosmicCLP_MutantExport.tsv
-
-for f in *-Step3a.tsv ; do n=${f/Step3a/Step3b}; sort -n $f > $n ;  done
-
-
-These use chromosome "23" and "24". I'll have to figure out what these are. X and Y I'm guessing.
-
-
-wc -l BC* BT* NALM-6*
-   1538 BC-3-Step1.tsv
-   1371 BC-3-Step2.tsv
-    961 BC-3-Step3a.tsv
-    961 BC-3-Step3b.tsv
-   1595 BT-474-Step1.tsv
-   1407 BT-474-Step2.tsv
-   1020 BT-474-Step3a.tsv
-   1020 BT-474-Step3b.tsv
-   3291 NALM-6-Step1.tsv
-   2962 NALM-6-Step2.tsv
-   2109 NALM-6-Step3a.tsv
-   2109 NALM-6-Step3b.tsv
-
-
-
-Sadly, the counts are off by 1 or 2. 1 may be the header, the additional one may be due to newer file.
-
-
-
-
-#
-#	Step 4: Filter out “nonmutations” and “nonmatching mutations”: The hg38 reference genome (FastA file, GCA_000001405.2) was used to filter out nonmutations and nonmatching mutations (downloaded from http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/ on July 16, 2017). Nonmutations are instances in which the alternate (mutant) allele matches the reference genome at that position. Nonmatching mutations are instances in which the reference allele does not match the reference genome at that position. These anomalies were filtered out of the single-base substitution mutation data set. This step caused a modest reduction in mutation numbers in a small number of cell lines. For instance, the numbers above for BT-474 and BC-3 were unchanged, but the number for NALM-6 reduced from 2110 to 2108. These single-base substation numbers were used to plot medians in Figure 1, and raw values are listed for each trinucleotide context in Supplementary Table 1 (available online). Following the filtering steps described above, the total single-base substitution mutation count across all cell lines was 663 075.
-#
-
-
-I don't get how you could have a reference allele not matching the reference genome.
-
-
-Ok. Awk script is way too complicated for a one liner. Now in process.bash
-
-
-The addition of "samtools faidx" makes this script take quite a while.
-
-
-
-
-awk 'BEGIN{FS="\t"; OFS="\t"}
-{ split($24,a,":");split(a[2],b,"-");
-if($20 ~ "Substitution" && b[1] == b[2] && !seen[$24] ) {
-	print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 ; seen[$24]++
-} }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3.tsv
-
-609662 CosmicCLP_MutantExport-Step3.tsv
-
-That's much less than expected. TRY AGAIN WITHOUT THE SEEN CHECK. GET TOTAL COUNT FOR EACH STEP.
-
-awk 'BEGIN{FS="\t"; OFS="\t"}
-{ split($24,a,":");split(a[2],b,"-");
-if($20 ~ "Substitution" && b[1] == b[2] ) {
-	print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5
-} }' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3noseen.tsv
-
-
-
-MOVE ALL STEP SCRIPTS INTO process.bash FOR TOTAL REPRODUCABILITY
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------
-
-Now things get wrong.
-
-
-
-The github analysis seems quite bogus as well.
-
-From https://github.com/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/blob/master/README_mutation_processing_commands
-
-
-Confused, as the above parsing DOES NOT PRODUCE THESE 5 FIELDS
-Which also explains the upcoming confusion as well.
-# From the 5-field mutation file (chr, pos, ref, alt, sample):
-
-
-# 1. Split file into each separate cell line, keeping the header
-awk  'NR==1 {h=$0; next} !seen[$5]++{ f="FILE_"FILENAME"_"$5".txt";print h > f } { print >> f; close(f)}' cosmic_mut.txt
-
-I don't think this is correct.
-The field separator isn't defined and the data has spaces so won't parse correctly.
-Also, and perhaps more important, $5 IS NOT THE CELL LINE NAME.
-And lastly, the coding is wrong. f will be incorrectly set to the last cell line.
-More, some $1 contain slashes which can't be in files.
-
-awk -F"\t" 'NR==1 {h=$0; next}{f="FILE_"FILENAME"_"$1".txt";gsub("/","_",f)} !seen[$1]++{print h > f }{print >> f; close(f)}' cosmic_mut.txt
-
-That worked, but still don't know if correct.
-
-
-
-
-#
-# 2. Run "count_trinuc_muts_v7.pl" script on every file
-for i in *.txt; do perl ../count_trinuc_muts_v7.pl pvcf ../hg38.fa $i; done
-
-I don't have access to v7 of this script, but v8 won't work.
-The expected format and the format of these files are way different.
-
-for i in *.txt; do echo $i; perl ../count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38.fa $i; done
-
-
-
-
-
-# 3. Concatenate files together, and check that the file has the same number of mutations as the initial mutation file
-head -1 *BA*count.txt > all.txt; tail -n +2 -q *count.txt >> all.txt
-
-That doesn't make any sense.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+----------------------------------------------------------------------------------------------------
 
 
 

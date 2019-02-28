@@ -5,7 +5,10 @@ set -u  # Error on usage of unset variables
 set -o pipefail
 
 
-wc -l /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+cosmic_file=/raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+
+
+wc -l ${cosmic_file}
 
 
 echo "From https://academic.oup.com/jncics/article/2/1/pky002/4942295"
@@ -16,11 +19,14 @@ echo "Step 1: Download, organize, and filter raw mutation data: The fields cell 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
 	print $5, $18, $20, $23, $24, $25 > $5"-Step1.tsv"
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+}' ${cosmic_file}
 wc -l *-Step1.tsv
 
 
 echo "Step 2: Removal of all non-single-base substitution mutations: All mutations that are not single-base substitutions (eg, insertions, deletions, and complex multibase substitutions) were filtered out of the table, leaving single-base substitution mutations annotated as nonsense, missense, or coding silent substitutions. This essential filtering step reduced the number of mutations in BT-474, BC-3, and NALM-6 from 1595 to 1407, 1537 to 1371, and 3291 to 2962, respectively."
+
+echo 
+echo "Not all substitutions are 1 single-base, and not all single-base mutations are substitutions."
 
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
@@ -28,14 +34,14 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 	split($24,a,":");split(a[2],b,"-")
 	if($20 ~ "Substitution" && b[1] == b[2] )
 		print $5, $18, $20, $23, $24, $25
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step2.tsv
+}' ${cosmic_file} > CosmicCLP_MutantExport-Step2.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
 	split($24,a,":");split(a[2],b,"-")
 	if($20 ~ "Substitution" && b[1] == b[2] )
 		print $5, $18, $20, $23, $24, $25 > $5"-Step2.tsv"
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+}' ${cosmic_file}
 
 wc -l *-Step2.tsv
 
@@ -43,6 +49,13 @@ wc -l *-Step2.tsv
 echo "Step 3: Additional filtering to remove nonunique chromosomal positions and file reformatting: All nonunique chromosome positions were filtered out of each cell line individually, which ensures that each mutation has only one associated chromosomal position within a cell line. A tab-separated file was created with chromosome number (eg, “chr1”), chromosomal position, reference allele, alternate (mutant) allele, strand of the substitution, and sample (cell line name) as columns. This table was reordered as follows for subsequent analyses: chr1-chr9, chrX, chrY, chr10-chr22, then by ascending chromosomal position, and it was then saved as a text file. This step reduced mutation numbers in BT-474, BC-3, and NALM-6 from 1407 to 1021, 1371 to 963, and 2962 to 2110, respectively."
 
 
+echo 
+echo "I guess here were assuming that the mutation is the same?"
+
+#	TODO
+
+echo "This doesn't seem correct."
+echo
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" ){
@@ -51,7 +64,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5
 		seen[$24]++ 
 	}
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step3_.tsv
+}' ${cosmic_file} > CosmicCLP_MutantExport-Step3_.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
@@ -60,11 +73,12 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv";
 		seen[$24]++ 
 	}
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+}' ${cosmic_file}
 
 for f in *-Step3a.tsv ; do n=${f/Step3a/Step3b}; sort -n $f > $n ;  done
 
 wc -l *-Step3?.tsv
+
 
 
 
@@ -75,11 +89,11 @@ echo "I don't get how you could have a reference allele not matching the referen
 echo "The addition of 'samtools faidx' makes this script take quite a while."
 
 
+echo 
+echo "These use chromosome "23" and "24". I'll have to figure out what these are. X and Y I'm guessing."
+echo
 
-# I need to change if strand -
-#	Also use toupper(...) 
 
-#}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step4.tsv
 
 echo "Creating Step4.tsv files"
 awk 'BEGIN{FS="\t"; OFS="\t"; 
@@ -116,7 +130,7 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 			print chr, pos, $25, ref1, ref2, alt;
 		}
 	}
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+}' ${cosmic_file}
 
 wc -l *-Step4.tsv
 
@@ -155,7 +169,7 @@ wc -l *-Step4.tsv
 #	#			seen[$24]++
 #			}
 #		}
-#	}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-NoSeen-Step4.tsv
+#	}' ${cosmic_file} > CosmicCLP_MutantExport-NoSeen-Step4.tsv
 #	
 #	wc -l *-Step4.tsv
 #	
@@ -185,7 +199,7 @@ wc -l *-Step4.tsv
 #				seen[$24]++
 #			}
 #		}
-#	}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step4.tsv
+#	}' ${cosmic_file} > CosmicCLP_MutantExport-Step4.tsv
 #	
 #	wc -l *-Step4.tsv
 #	
@@ -203,6 +217,37 @@ echo "Producing Step 4 for all cell lines ..."
 #
 # 1. Split file into each separate cell line, keeping the header
 #	awk  'NR==1 {h=$0; next} !seen[$5]++{ f="FILE_"FILENAME"_"$5".txt";print h > f } { print >> f; close(f)}' cosmic_mut.txt
+
+
+#	This is off. The paper produces cosmic_mut.txt 
+#
+#	The field separator isn't defined and the data has spaces so won't parse correctly.
+#	Also, and perhaps more important, $5 IS NOT THE CELL LINE NAME.
+#	And lastly, the coding is wrong. f will be incorrectly set to the last cell line.
+#	More, some $1 contain slashes which can't be in files.
+#
+#	awk ′BEGIN{FS="\t"; OFS="\t"}; 0 !∼ /^#/ {print $5, $18, $20, $23, $24, $25}′CosmicCLP_MutantExport.tsv > cosmic_mut.txt
+#
+#	Sample name                cell line name (column 5)
+#	Mutation CDS               mutation (column 18)
+#	Mutation Description       mutation type (column 20)
+#	GRCh                       version of the reference genome (column 23)
+#	Mutation genome position   chromosome position of the mutation (column 24)
+#	strand                     DNA strand (column 25)
+#
+#	That is NOT (chr, pos, ref, alt, sample)
+#
+#	So, I assume that the output of this step are the output to the previous process's Step 4.
+#
+#	In addition, count_trinuc_muts_v8.pl does not appear to want the header line.
+#
+#
+#	And the Step 4 files contain the strand column.
+#	Can I just remove it?
+#	Should I complement the reference and alternates if -?
+#
+
+
 
 #awk: cmd. line:15: (FILENAME=CosmicCLP_MutantExport.tsv FNR=36042) fatal: cannot open pipe `samtools faidx /raid/refs/fasta/hg38_num_noalts.fa 1:170719880-170719880 | tail -1 ' (Too many open files)
 #	Gotta close the files every time we write to them, so we need to append them so we need to delete them first.
@@ -245,7 +290,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"
 			print chr, pos, $25, ref1, ref2, alt
 		}
 	}
-}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
+}' ${cosmic_file}
 
 wc -l *-Step4a.tsv
 
@@ -253,28 +298,17 @@ echo "Sorting ..."
 for f in *-Step4a.tsv ; do n=${f/Step4a/Step4b}; sort -n $f > $n ;  done
 
 
-#	This is off. The paper produces cosmic_mut.txt 
+
 #
-#	The field separator isn't defined and the data has spaces so won't parse correctly.
-#	Also, and perhaps more important, $5 IS NOT THE CELL LINE NAME.
-#	And lastly, the coding is wrong. f will be incorrectly set to the last cell line.
-#	More, some $1 contain slashes which can't be in files.
+#	cosmic_mut.txt does not include the strand column so I will use awk to remove it
 #
-#	awk ′BEGIN{FS="\t"; OFS="\t"}; 0 !∼ /^#/ {print $5, $18, $20, $23, $24, $25}′CosmicCLP_MutantExport.tsv > cosmic_mut.txt
+#	TODO May need to complement the associated reference and alternates.
 #
-#	Sample name                cell line name (column 5)
-#	Mutation CDS               mutation (column 18)
-#	Mutation Description       mutation type (column 20)
-#	GRCh                       version of the reference genome (column 23)
-#	Mutation genome position   chromosome position of the mutation (column 24)
-#	strand                     DNA strand (column 25)
-#
-#	That is NOT (chr, pos, ref, alt, sample)
-#
-#	So, I assume that the output of this step are the output to the previous process's Step 4.
-#
-#	In addition, count_trinuc_muts_v8.pl does not appear to want the header line.
-#
+
+cat *-Step4b.tsv | awk 'BEGIN{FS=OFS="\t"}{print $1,$2,$3,$4,$6}' > cosmic_mut.txt
+
+
+
 
 
 # 2. Run "count_trinuc_muts_v7.pl" script on every file
@@ -287,8 +321,10 @@ rename 's/tsv.\d*.count/count/' *-Step4b.tsv.*.count.txt
 
 
 
+
 # 3. Concatenate files together, and check that the file has the same number of mutations as the initial mutation file
 #	head -1 *BA*count.txt > all.txt; tail -n +2 -q *count.txt >> all.txt
+
 
 
 #	That doesn't make any sense, but I assume it is meant to extract a single header line and then append all the data.
@@ -297,7 +333,13 @@ rename 's/tsv.\d*.count/count/' *-Step4b.tsv.*.count.txt
 #	Not sure what "all.txt" is to be used for.
 #
 #	Previously, I've noticed that count_trinuc_muts_v8.pl filters out some lines to the output count didn't match the input count. Perhaps 
+#
 
+#	R script is expecting a cosmic_mut_all_sort.txt which seems like this "all.txt"
+
+
+head -1 $( ls *count.txt | head -1 ) > cosmic_mut_all_sort.txt
+tail -n +2 -q *count.txt >> cosmic_mut_all_sort.txt
 
 
 
