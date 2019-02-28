@@ -5,6 +5,18 @@ message("My Modified Mutation Signatures Script.")
 message()
 
 
+#	list.of.packages <- c("MALDIquant","MALDIquantForeign","xgboost","optparse")
+#	new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#	
+#	#	Use Bioconductor to install packages
+#	if(length(new.packages)) {
+#		source("https://bioconductor.org/biocLite.R")
+#		biocLite( new.packages )
+#	}
+
+
+
+
 ###
 ### Final analysis/visualization script for Jarvis et al., 2017, JNCI-CS
 ###
