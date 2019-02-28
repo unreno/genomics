@@ -5,7 +5,7 @@ set -u  # Error on usage of unset variables
 set -o pipefail
 
 
-wc -l CosmicCLP_MutantExport.tsv
+wc -l /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 
 
 echo "From https://academic.oup.com/jncics/article/2/1/pky002/4942295"
@@ -16,7 +16,7 @@ echo "Step 1: Download, organize, and filter raw mutation data: The fields cell 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
 	print $5, $18, $20, $23, $24, $25 > $5"-Step1.tsv"
-}' CosmicCLP_MutantExport.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 wc -l *-Step1.tsv
 
 
@@ -28,14 +28,14 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 	split($24,a,":");split(a[2],b,"-")
 	if($20 ~ "Substitution" && b[1] == b[2] )
 		print $5, $18, $20, $23, $24, $25
-}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step2.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step2.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
 	split($24,a,":");split(a[2],b,"-")
 	if($20 ~ "Substitution" && b[1] == b[2] )
 		print $5, $18, $20, $23, $24, $25 > $5"-Step2.tsv"
-}' CosmicCLP_MutantExport.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 
 wc -l *-Step2.tsv
 
@@ -51,7 +51,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5
 		seen[$24]++ 
 	}
-}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step3_.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step3_.tsv
 
 awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 ( $24 != "" && $5 in c ){
@@ -60,7 +60,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"; c["BC-3"]=c["BT-474"]=c["NALM-6"]=1}
 		print a[1], b[1], substr($18,length($18)-2,1), substr($18,length($18),1), $25, $5 > $5"-Step3a.tsv";
 		seen[$24]++ 
 	}
-}' CosmicCLP_MutantExport.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 
 for f in *-Step3a.tsv ; do n=${f/Step3a/Step3b}; sort -n $f > $n ;  done
 
@@ -79,7 +79,7 @@ echo "The addition of 'samtools faidx' makes this script take quite a while."
 # I need to change if strand -
 #	Also use toupper(...) 
 
-#}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step4.tsv
+#}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step4.tsv
 
 echo "Creating Step4.tsv files"
 awk 'BEGIN{FS="\t"; OFS="\t"; 
@@ -116,7 +116,7 @@ awk 'BEGIN{FS="\t"; OFS="\t";
 			print chr, pos, $25, ref1, ref2, alt;
 		}
 	}
-}' CosmicCLP_MutantExport.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 
 wc -l *-Step4.tsv
 
@@ -155,7 +155,7 @@ wc -l *-Step4.tsv
 #	#			seen[$24]++
 #			}
 #		}
-#	}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-NoSeen-Step4.tsv
+#	}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-NoSeen-Step4.tsv
 #	
 #	wc -l *-Step4.tsv
 #	
@@ -185,7 +185,7 @@ wc -l *-Step4.tsv
 #				seen[$24]++
 #			}
 #		}
-#	}' CosmicCLP_MutantExport.tsv > CosmicCLP_MutantExport-Step4.tsv
+#	}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv > CosmicCLP_MutantExport-Step4.tsv
 #	
 #	wc -l *-Step4.tsv
 #	
@@ -245,7 +245,7 @@ awk 'BEGIN{FS="\t"; OFS="\t"
 			print chr, pos, $25, ref1, ref2, alt
 		}
 	}
-}' CosmicCLP_MutantExport.tsv
+}' /raid/refs/cosmic/CosmicCLP_MutantExport_v81.tsv
 
 wc -l *-Step4a.tsv
 

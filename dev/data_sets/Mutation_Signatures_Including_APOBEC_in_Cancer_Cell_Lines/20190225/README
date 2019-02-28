@@ -32,7 +32,7 @@ There are no comments so the condition is incorrect ($0 and not 0) and is unnece
 https://cog.sanger.ac.uk/cosmic/GRCh38/cell_lines/v87/CosmicCLP_MutantExport.tsv.gz
 
 Register and download "COSMIC Mutation Data" (CosmicCLP_MutantExport.tsv.gz) from https://cancer.sanger.ac.uk/cell_lines/download
-The paper used v81. v87 was available for me.
+The paper used v81. v87 was available for me. I think that I was also able to download v81.
 
 
 gunzip CosmicCLP_MutantExport.tsv.gz
