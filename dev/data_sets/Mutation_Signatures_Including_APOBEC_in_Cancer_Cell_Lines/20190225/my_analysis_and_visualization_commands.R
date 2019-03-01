@@ -128,6 +128,10 @@ output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
 output.sigs.final$sample <- rownames(output.sigs.final)
 rownames(output.sigs.final) <- NULL
 
+#	JAKE - added
+message("output.sigs.final")
+head(output.sigs.final)
+
 
 
 #	need to load some of the tissue type code around line 300
@@ -157,12 +161,20 @@ cosmic_tissue_type <- cosmic_tissue_type[,c(1:2)]
 colnames(cosmic_tissue_type) <- c("sample", "tissue")
 cosmic_tissue_type <- unique(cosmic_tissue_type)
 
+#	JAKE - added
+message("cosmic_tissue_type")
+head(cosmic_tissue_type)
+
 message("Combine tissue and mutation information")
 cosmic_mut_tissue <- merge(cosmic_mut_all_sort, cosmic_tissue_type, by = "sample", all.x = T)
 cell_line_mutload <- as.data.frame(table(cosmic_mut_tissue$sample))
 colnames(cell_line_mutload) <- c("sample", "mut_tot")
 cell_line_mutload <- merge(cell_line_mutload, cosmic_tissue_type, by = "sample", all.x = T)
 cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
+
+#	JAKE - added
+message("cell_line_mutload")
+head(cell_line_mutload)
 
 
 
@@ -172,6 +184,9 @@ cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
 sigs_tissues <- merge(output.sigs.final, cell_line_mutload, by = "sample") 
 
 
+#	JAKE - added
+message("sigs_tissues")
+head(sigs_tissues)
 
 
 
@@ -183,9 +198,23 @@ message(" and running through the ggplot command (through line 134). Note that a
 sigs_individual <- subset(sigs_tissues, tissue == "large_intestine")
 sigs_individual <- sigs_individual[,-c(32)]
 
+#	JAKE - added
+message("sigs_individual")
+head(sigs_individual)
+
 #	JAKE - added reshape for melt function
 require(reshape)
 sigs_melt <- melt(sigs_individual, id = "sample")
+
+
+
+#Error in data.frame(ids, x, data[, x]) : 
+#  arguments imply differing number of rows: 0, 1
+#Calls: melt ... melt.data.frame -> do.call -> lapply -> FUN -> data.frame
+#Execution halted
+
+
+
 colnames(sigs_melt) <- c("sample", "sig", "value")
 sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
 
