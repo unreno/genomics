@@ -152,6 +152,10 @@ head(output.sigs.final)
 #diff cosmic_tissue_type.txt-1 cosmic_tissue_type.txt-3
 #	Cool. All the same.
 
+#	This tissue file has more human readable tissues, L. Intestine rather than large_intestine
+#	So either need to change several lines in this script or the tissues in the tissue file.
+
+
 
 #	JAKE - moved this code here from below
 message("Format the tissue type info")
@@ -196,7 +200,10 @@ sigs_tissues <- sigs_tissues[,-c(3,14,34)]
 message("5. Each mutation plot was created separatly by replaceing the tissue variable name in line 79, ")
 message(" and running through the ggplot command (through line 134). Note that a lettering scheme is applied to individuals ")
 # signatures to allow for correct sorting.
-sigs_individual <- subset(sigs_tissues, tissue == "large_intestine")
+#sigs_individual <- subset(sigs_tissues, tissue == "large_intestine")
+
+#	JAKE - my extracts tissues have "L. Intestine"
+sigs_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 sigs_individual <- sigs_individual[,-c(32)]
 
 #	JAKE - added
@@ -378,7 +385,11 @@ message("FIGURE_1: Median mutations in each cell line (uses columns 5 and 8 from
 
 message("Replace the tissue variable in line 218 with each tissue type sequentially and iteratively run through line 220")
 message("to generate a complete quantile table")
-mut_sub <- subset(cell_line_mutload, tissue == "endometrium")
+
+#mut_sub <- subset(cell_line_mutload, tissue == "endometrium")
+#	JAKE - my tissue list has Endometrium
+mut_sub <- subset(cell_line_mutload, tissue == "Endometrium")
+
 x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
 mut_med_quantiles <- rbind(mut_med_quantiles, x)
 
@@ -427,7 +438,9 @@ ggplot(number, aes(tissue, freq)) +
 
 message("FIGURE_2: Plotting mutload vs cell line order (model lines with shaded intervals)")
 
-sigs_tissues_individual <- subset(sigs_tissues, tissue == "large_intestine")
+#sigs_tissues_individual <- subset(sigs_tissues, tissue == "large_intestine")
+#	JAKE - my tissue list has L. Intestine
+sigs_tissues_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 
 sigs_tissues_individual_1 <- sigs_tissues_individual[order(sigs_tissues_individual$zAPOBEC.Sig),]
 rownames(sigs_tissues_individual_1) <- c(1:nrow(sigs_tissues_individual_1))
