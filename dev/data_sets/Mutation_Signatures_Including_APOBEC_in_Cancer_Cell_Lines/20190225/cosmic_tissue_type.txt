@@ -1,0 +1,1020 @@
+201T	Lung
+22RV1	Prostate
+23132-87	Stomach
+42-MG-BA	CNS
+451Lu	Skin
+5637	Bladder
+639-V	Bladder
+647-V	Bladder
+697	WBC
+769-P	Kidney
+786-0	Kidney
+8-MG-BA	CNS
+8305C	Thyroid
+8505C	Thyroid
+A101D	Skin
+A172	CNS
+A204	Soft Tissue
+A2058	Skin
+A253	Salivary Gland
+A2780	Ovary
+A3-KAW	WBC
+A375	Skin
+A388	Skin
+A4-Fuk	WBC
+A427	Lung
+A431	Skin
+A498	Kidney
+A549	Lung
+A673	Bone
+A704	Kidney
+ABC-1	Lung
+ACHN	Kidney
+ACN	Autonomic Ganglia
+AGS	Stomach
+ALL-PO	WBC
+ALL-SIL	WBC
+AM-38	CNS
+AMO-1	WBC
+AN3-CA	Endometrium
+ARH-77	WBC
+ASH-3	Thyroid
+ATN-1	WBC
+AU565	Breast
+AsPC-1	Pancreas
+BALL-1	WBC
+BB30-HNC	Upper Aerodigestive Tract
+BB49-HNC	Upper Aerodigestive Tract
+BB65-RCC	Kidney
+BC-1	WBC
+BC-3	WBC
+BCPAP	Thyroid
+BE-13	WBC
+BE2-M17	Autonomic Ganglia
+BEN	Lung
+BFTC-905	Bladder
+BFTC-909	Kidney
+BHT-101	Thyroid
+BHY	Upper Aerodigestive Tract
+BICR10	Upper Aerodigestive Tract
+BICR22	Upper Aerodigestive Tract
+BICR31	Upper Aerodigestive Tract
+BICR78	Upper Aerodigestive Tract
+BL-41	WBC
+BL-70	WBC
+BONNA-12	WBC
+BPH-1	Prostate
+BT-20	Breast
+BT-474	Breast
+BT-483	Breast
+BT-549	Breast
+BV-173	WBC
+Becker	CNS
+BxPC-3	Pancreas
+C-33-A	Cervix
+C-4-I	Cervix
+C2BBe1	L. Intestine
+C32	Skin
+C3A	Liver
+CA46	WBC
+CADO-ES1	Bone
+CAKI-1	Kidney
+CAL-120	Breast
+CAL-12T	Lung
+CAL-148	Breast
+CAL-27	Upper Aerodigestive Tract
+CAL-29	Bladder
+CAL-33	Upper Aerodigestive Tract
+CAL-39	Vulva
+CAL-51	Breast
+CAL-54	Kidney
+CAL-62	Thyroid
+CAL-72	Bone
+CAL-78	Bone
+CAL-85-1	Breast
+CAMA-1	Breast
+CAPAN-1	Pancreas
+CAS-1	CNS
+CCF-STTG1	CNS
+CCK-81	L. Intestine
+CCRF-CEM	WBC
+CESS	WBC
+CFPAC-1	Pancreas
+CGTH-W-1	Thyroid
+CHL-1	Skin
+CHP-126	Autonomic Ganglia
+CHP-134	Autonomic Ganglia
+CHP-212	Autonomic Ganglia
+CHSA0011	Bone
+CHSA0108	Bone
+CHSA8926	Bone
+CL-11	L. Intestine
+CL-34	L. Intestine
+CL-40	L. Intestine
+CMK	WBC
+CML-T1	WBC
+COLO-205	L. Intestine
+COLO-320-HSR	L. Intestine
+COLO-668	Lung
+COLO-678	L. Intestine
+COLO-679	Skin
+COLO-680N	Oesophagus
+COLO-684	Endometrium
+COLO-741	L. Intestine
+COLO-783	Skin
+COLO-792	Skin
+COLO-800	Skin
+COLO-824	Breast
+COLO-829	Skin
+COR-L105	Lung
+COR-L23	Lung
+COR-L279	Lung
+COR-L303	Lung
+COR-L311	Lung
+COR-L32	Lung
+COR-L321	NS
+COR-L88	Lung
+COR-L95	Lung
+CP50-MEL-B	Skin
+CP66-MEL	Skin
+CP67-MEL	Skin
+CPC-N	Lung
+CRO-AP2	WBC
+CRO-AP3	NS
+CS1	Bone
+CTB-1	WBC
+CTV-1	WBC
+CW-2	L. Intestine
+Ca-Ski	Cervix
+Ca9-22	Upper Aerodigestive Tract
+CaR-1	L. Intestine
+Calu-3	Lung
+Calu-6	Lung
+Caov-3	Ovary
+Caov-4	Ovary
+Capan-2	Pancreas
+ChaGo-K-1	Lung
+D-245MG	CNS
+D-247MG	CNS
+D-263MG	CNS
+D-283MED	CNS
+D-336MG	CNS
+D-392MG	CNS
+D-423MG	CNS
+D-502MG	CNS
+D-542MG	CNS
+D-566MG	CNS
+DAN-G	Pancreas
+DB	WBC
+DBTRG-05MG	CNS
+DEL	WBC
+DG-75	WBC
+DIFI	L. Intestine
+DJM-1	Skin
+DK-MG	CNS
+DMS-114	Lung
+DMS-273	Lung
+DMS-53	Lung
+DMS-79	Lung
+DND-41	WBC
+DOHH-2	WBC
+DOK	Upper Aerodigestive Tract
+DOV13	Ovary
+DSH1	Bladder
+DU-145	Prostate
+DU-4475	Breast
+Daoy	CNS
+Daudi	WBC
+Detroit562	Upper Aerodigestive Tract
+DoTc2-4510	Cervix
+EB-3	WBC
+EB2	WBC
+EBC-1	Lung
+EC-GI-10	Oesophagus
+ECC10	Stomach
+ECC12	Stomach
+EFM-19	Breast
+EFM-192A	Breast
+EFO-21	Ovary
+EFO-27	Ovary
+EGI-1	Biliary Tract
+EHEB	WBC
+EJM	WBC
+EKVX	Lung
+EM-2	WBC
+EMC-BAC-1	Lung
+EMC-BAC-2	Lung
+EN	Endometrium
+EPLC-272H	Lung
+ES-2	Ovary
+ES1	Bone
+ES3	Bone
+ES4	Bone
+ES5	Bone
+ES6	Bone
+ES7	Bone
+ES8	Bone
+ESO26	Oesophagus
+ESO51	Oesophagus
+ESS-1	Endometrium
+ETK-1	Biliary Tract
+EVSA-T	Breast
+EW-1	Bone
+EW-11	Bone
+EW-12	Bone
+EW-13	Bone
+EW-16	Bone
+EW-18	Bone
+EW-22	Bone
+EW-24	Bone
+EW-3	Bone
+EW-7	Bone
+EoL-1-cell	WBC
+FADU	Upper Aerodigestive Tract
+FLO-1	Oesophagus
+FTC-133	Thyroid
+FU-OV-1	Ovary
+FU97	Stomach
+Farage	WBC
+G-292_Clone_A141B1	Bone
+G-361	Skin
+G-401	Soft Tissue
+G-402	Soft Tissue
+G-MEL	Skin
+GA-10	WBC
+GAK	Skin
+GAMG	CNS
+GB-1	CNS
+GCIY	Stomach
+GCT	Soft Tissue
+GDM-1	WBC
+GEO	L. Intestine
+GI-1	CNS
+GI-ME-N	Autonomic Ganglia
+GMS-10	CNS
+GOTO	Autonomic Ganglia
+GP5d	L. Intestine
+GR-ST	WBC
+GRANTA-519	WBC
+H-EMC-SS	Bone
+H2369	Pleura
+H2373	Pleura
+H2461	Pleura
+H2591	Pleura
+H2595	Pleura
+H2722	Pleura
+H2731	Pleura
+H2795	Pleura
+H2803	Pleura
+H2804	Pleura
+H2810	Pleura
+H2818	Pleura
+H2869	Pleura
+H290	Pleura
+H3118	Upper Aerodigestive Tract
+H3255	Lung
+H4	CNS
+H513	Pleura
+H9	WBC
+HA7-RCC	Kidney
+HAL-01	WBC
+HARA	Lung
+HC-1	WBC
+HCC-15	Lung
+HCC-33	Lung
+HCC-366	Lung
+HCC-44	Lung
+HCC-56	L. Intestine
+HCC-78	Lung
+HCC-827	Lung
+HCC1143	Breast
+HCC1187	Breast
+HCC1395	Breast
+HCC1419	Breast
+HCC1428	Breast
+HCC1500	Breast
+HCC1569	Breast
+HCC1599	Breast
+HCC1806	Breast
+HCC1937	Breast
+HCC1954	Breast
+HCC202	Breast
+HCC2157	Breast
+HCC2218	Breast
+HCC2998	L. Intestine
+HCC38	Breast
+HCC70	Breast
+HCE-4	Oesophagus
+HCT-116	L. Intestine
+HCT-15	L. Intestine
+HD-MY-Z	WBC
+HDLM-2	WBC
+HDQ-P1	Breast
+HEC-1	Endometrium
+HEL	WBC
+HGC-27	Stomach
+HH	WBC
+HL-60	WBC
+HLE	Liver
+HMV-II	Skin
+HN	Upper Aerodigestive Tract
+HO-1-N-1	Salivary Gland
+HO-1-u-1	Upper Aerodigestive Tract
+HOP-62	Lung
+HOP-92	Lung
+HOS	Bone
+HPAC	Pancreas
+HPAF-II	Pancreas
+HSC-2	Upper Aerodigestive Tract
+HSC-3	Upper Aerodigestive Tract
+HSC-39	Stomach
+HSC-4	Upper Aerodigestive Tract
+HT	WBC
+HT-1080	Soft Tissue
+HT-115	L. Intestine
+HT-1197	Bladder
+HT-1376	Bladder
+HT-144	Skin
+HT-29	L. Intestine
+HT-3	Cervix
+HT55	L. Intestine
+HTC-C3	Thyroid
+HUH-6-clone5	Liver
+HUTU-80	S. Intestine
+HeLa	Cervix
+Hep_3B2_1-7	NS
+Hey	Ovary
+Hs-445	WBC
+Hs-578-T	Breast
+Hs633T	Soft Tissue
+Hs683	CNS
+Hs746T	Stomach
+Hs766T	Pancreas
+Hs939-T	Skin
+Hs940-T	Skin
+HuCCT1	Biliary Tract
+HuH-7	Liver
+HuO-3N1	Bone
+HuO9	Bone
+HuP-T3	Pancreas
+HuP-T4	Pancreas
+IA-LM	Lung
+IGR-1	Skin
+IGR-37	Skin
+IGROV-1	Ovary
+IHH-4	Thyroid
+IM-9	WBC
+IM-95	Stomach
+IMR-5	Autonomic Ganglia
+IPC-298	Skin
+IST-MEL1	Skin
+IST-MES1	Pleura
+IST-SL1	Lung
+IST-SL2	Lung
+J82	Bladder
+JAR	Placenta
+JEG-3	Placenta
+JEKO-1	WBC
+JHH-1	Liver
+JHH-2	Liver
+JHH-4	Liver
+JHH-6	Liver
+JHH-7	Liver
+JHOS-2	Ovary
+JHOS-3	Ovary
+JHOS-4	Ovary
+JHU-011	Upper Aerodigestive Tract
+JHU-022	Upper Aerodigestive Tract
+JHU-029	Upper Aerodigestive Tract
+JIMT-1	Breast
+JJN-3	WBC
+JM1	WBC
+JSC-1	WBC
+JURL-MK1	WBC
+JVM-2	WBC
+JVM-3	WBC
+JiyoyeP-2003	WBC
+Jurkat	WBC
+K-562	WBC
+K2	Skin
+K5	Thyroid
+KALS-1	CNS
+KARPAS-1106P	WBC
+KARPAS-231	WBC
+KARPAS-299	WBC
+KARPAS-422	WBC
+KARPAS-45	WBC
+KARPAS-620	WBC
+KASUMI-1	WBC
+KATOIII	Stomach
+KCL-22	WBC
+KE-37	WBC
+KELLY	Autonomic Ganglia
+KG-1	WBC
+KGN	Ovary
+KINGS-1	CNS
+KLE	Endometrium
+KM-H2	WBC
+KM12	L. Intestine
+KMH-2	Thyroid
+KMOE-2	WBC
+KMRC-1	Kidney
+KMRC-20	Kidney
+KMS-11	WBC
+KMS-12-BM	WBC
+KNS-42	CNS
+KNS-62	Lung
+KNS-81-FD	CNS
+KO52	WBC
+KON	Upper Aerodigestive Tract
+KOPN-8	WBC
+KOSC-2	Upper Aerodigestive Tract
+KP-1N	Pancreas
+KP-2	Pancreas
+KP-3	Pancreas
+KP-4	Pancreas
+KP-N-RT-BM-1	Autonomic Ganglia
+KP-N-YN	Autonomic Ganglia
+KP-N-YS	Autonomic Ganglia
+KS-1	CNS
+KU-19-19	Bladder
+KU812	WBC
+KURAMOCHI	Ovary
+KY821	WBC
+KYAE-1	Oesophagus
+KYM-1	Soft Tissue
+KYSE-140	Oesophagus
+KYSE-150	Oesophagus
+KYSE-180	Oesophagus
+KYSE-220	Oesophagus
+KYSE-270	Oesophagus
+KYSE-410	Oesophagus
+KYSE-450	Oesophagus
+KYSE-50	Oesophagus
+KYSE-510	Oesophagus
+KYSE-520	Oesophagus
+KYSE-70	Oesophagus
+L-1236	WBC
+L-363	WBC
+L-428	WBC
+L-540	WBC
+LAMA-84	WBC
+LAN-6	Autonomic Ganglia
+LB1047-RCC	Kidney
+LB2241-RCC	Kidney
+LB2518-MEL	Skin
+LB373-MEL-D	Skin
+LB647-SCLC	Lung
+LB771-HNC	Upper Aerodigestive Tract
+LB831-BLC	Bladder
+LB996-RCC	Kidney
+LC-1-sq	Lung
+LC-2-ad	Lung
+LC4-1	WBC
+LCLC-103H	Lung
+LCLC-97TM1	Lung
+LIM1215	L. Intestine
+LK-2	Lung
+LN-18	CNS
+LN-229	CNS
+LN-405	CNS
+LNCaP-Clone-FGC	Prostate
+LNZTA3WT4	CNS
+LOU-NH91	Lung
+LOUCY	WBC
+LOXIMVI	Skin
+LP-1	WBC
+LS-1034	L. Intestine
+LS-123	L. Intestine
+LS-180	L. Intestine
+LS-411N	L. Intestine
+LS-513	L. Intestine
+LU-134-A	Lung
+LU-135	Lung
+LU-139	Lung
+LU-165	Lung
+LU-65	Lung
+LU-99A	Lung
+LXF-289	Lung
+LoVo	L. Intestine
+M059J	CNS
+M14	Skin
+MC-1010	WBC
+MC-CAR	WBC
+MC-IXC	Autonomic Ganglia
+MC116	WBC
+MCC13	Skin
+MCC26	Skin
+MCF7	Breast
+MDA-MB-157	Breast
+MDA-MB-175-VII	Breast
+MDA-MB-231	Breast
+MDA-MB-330	Breast
+MDA-MB-361	Breast
+MDA-MB-415	Breast
+MDA-MB-436	Breast
+MDA-MB-453	Breast
+MDA-MB-468	Breast
+MDST8	L. Intestine
+ME-1	WBC
+ME-180	Cervix
+MEG-01	WBC
+MEL-HO	Skin
+MEL-JUSO	Skin
+MES-SA	Soft Tissue
+MFE-280	Endometrium
+MFE-296	Endometrium
+MFE-319	Endometrium
+MFH-ino	Soft Tissue
+MFM-223	Breast
+MG-63	Bone
+MHH-CALL-2	WBC
+MHH-CALL-4	WBC
+MHH-ES-1	Bone
+MHH-NB-11	Autonomic Ganglia
+MHH-PREB-1	WBC
+MIA-PaCa-2	Pancreas
+MKN1	Stomach
+MKN28	Stomach
+MKN45	Stomach
+MKN7	Stomach
+ML-1	Thyroid
+ML-2	WBC
+MLMA	WBC
+MM1S	WBC
+MMAC-SF	Skin
+MN-60	WBC
+MOG-G-CCM	CNS
+MOG-G-UVW	CNS
+MOLM-13	WBC
+MOLM-16	WBC
+MOLP-8	WBC
+MOLT-13	WBC
+MOLT-16	WBC
+MOLT-4	WBC
+MONO-MAC-6	WBC
+MPP-89	Pleura
+MRK-nu-1	Breast
+MS-1	Lung
+MS751	Cervix
+MSTO-211H	Pleura
+MV-4-11	WBC
+MY-M12	WBC
+MZ1-PC	Pancreas
+MZ2-MEL	Skin
+MZ7-mel	Skin
+Mewo	Skin
+Mo-T	WBC
+NALM-6	WBC
+NAMALWA	WBC
+NB(TU)1-10	Autonomic Ganglia
+NB-4	WBC
+NB1	Autonomic Ganglia
+NB10	Autonomic Ganglia
+NB12	Autonomic Ganglia
+NB13	Autonomic Ganglia
+NB14	Autonomic Ganglia
+NB17	Autonomic Ganglia
+NB5	Autonomic Ganglia
+NB6	Autonomic Ganglia
+NB69	Autonomic Ganglia
+NB7	Autonomic Ganglia
+NBsusSR	Autonomic Ganglia
+NCC010	Kidney
+NCC021	Kidney
+NCCIT	Testis
+NCI-H1048	Lung
+NCI-H1092	Lung
+NCI-H1105	Lung
+NCI-H1155	Lung
+NCI-H128	Lung
+NCI-H1299	Lung
+NCI-H1304	Lung
+NCI-H1341	Lung
+NCI-H1355	Lung
+NCI-H1395	Lung
+NCI-H1417	Lung
+NCI-H1435	Lung
+NCI-H1436	Lung
+NCI-H1437	Lung
+NCI-H146	Lung
+NCI-H1563	Lung
+NCI-H1568	Lung
+NCI-H1573	Lung
+NCI-H1581	Lung
+NCI-H1623	Lung
+NCI-H1648	Lung
+NCI-H1650	Lung
+NCI-H1651	Lung
+NCI-H1666	Lung
+NCI-H1688	Lung
+NCI-H1693	Lung
+NCI-H1694	Lung
+NCI-H1703	Lung
+NCI-H1734	Lung
+NCI-H1755	Lung
+NCI-H1770	Lung
+NCI-H1781	Lung
+NCI-H1792	Lung
+NCI-H1793	Lung
+NCI-H1836	Lung
+NCI-H1838	Lung
+NCI-H1869	Lung
+NCI-H187	Lung
+NCI-H1876	Lung
+NCI-H1915	Lung
+NCI-H1944	Lung
+NCI-H196	Lung
+NCI-H1963	Lung
+NCI-H1975	Lung
+NCI-H1993	Lung
+NCI-H2009	Lung
+NCI-H2023	Lung
+NCI-H2029	Lung
+NCI-H2030	Lung
+NCI-H2052	Pleura
+NCI-H2066	Lung
+NCI-H2081	Lung
+NCI-H2085	Lung
+NCI-H2087	Lung
+NCI-H209	Lung
+NCI-H211	Lung
+NCI-H2110	Lung
+NCI-H2122	Lung
+NCI-H2126	Lung
+NCI-H2135	Lung
+NCI-H2141	Lung
+NCI-H2170	Lung
+NCI-H2171	Lung
+NCI-H2172	Lung
+NCI-H2196	Lung
+NCI-H2227	Lung
+NCI-H2228	Lung
+NCI-H226	Lung
+NCI-H2291	Lung
+NCI-H23	Lung
+NCI-H2342	Lung
+NCI-H2347	Lung
+NCI-H2405	Lung
+NCI-H2444	Lung
+NCI-H2452	Pleura
+NCI-H250	Lung
+NCI-H28	Pleura
+NCI-H292	Lung
+NCI-H3122	Lung
+NCI-H322M	Lung
+NCI-H345	Lung
+NCI-H358	Lung
+NCI-H378	Lung
+NCI-H441	Lung
+NCI-H446	Lung
+NCI-H460	Lung
+NCI-H508	L. Intestine
+NCI-H510A	Lung
+NCI-H520	Lung
+NCI-H522	Lung
+NCI-H524	Lung
+NCI-H526	Lung
+NCI-H596	Lung
+NCI-H630	L. Intestine
+NCI-H64	Lung
+NCI-H647	Lung
+NCI-H650	Lung
+NCI-H660	Prostate
+NCI-H661	Lung
+NCI-H69	Lung
+NCI-H716	L. Intestine
+NCI-H720	Lung
+NCI-H727	Lung
+NCI-H740	Lung
+NCI-H747	L. Intestine
+NCI-H748	Lung
+NCI-H810	Lung
+NCI-H82	Lung
+NCI-H835	Lung
+NCI-H838	Lung
+NCI-H841	Lung
+NCI-H847	Lung
+NCI-H929	WBC
+NCI-N87	Stomach
+NCI-SNU-1	Stomach
+NCI-SNU-16	Stomach
+NCI-SNU-5	Stomach
+NEC8	Testis
+NH-12	Autonomic Ganglia
+NK-92MI	WBC
+NKM-1	WBC
+NMC-G1	CNS
+NOMO-1	WBC
+NOS-1	Bone
+NTERA-2_cl_D1	Testis
+NU-DUL-1	WBC
+NUGC-3	Stomach
+NUGC-4	Stomach
+NY	Bone
+OACM5-1	Oesophagus
+OACp4C	Oesophagus
+OAW-28	Ovary
+OAW-42	Ovary
+OC-314	Ovary
+OCI-AML2	WBC
+OCI-AML3	WBC
+OCI-AML5	WBC
+OCI-LY-19	WBC
+OCI-LY7	WBC
+OCI-M1	WBC
+OCUB-M	Breast
+OCUM-1	Stomach
+OE19	Oesophagus
+OE21	Oesophagus
+OE33	Oesophagus
+OMC-1	Cervix
+ONS-76	CNS
+OPM-2	WBC
+OS-RC-2	Kidney
+OSC-19	Upper Aerodigestive Tract
+OSC-20	Upper Aerodigestive Tract
+OV-17R	Ovary
+OV-56	Ovary
+OV-7	Ovary
+OV-90	Ovary
+OVCA420	Ovary
+OVCA433	Ovary
+OVCAR-3	Ovary
+OVCAR-4	Ovary
+OVCAR-5	Ovary
+OVCAR-8	Ovary
+OVISE	Ovary
+OVK-18	Ovary
+OVKATE	Ovary
+OVMIU	Ovary
+OVTOKO	Ovary
+P12-ICHIKAWA	WBC
+P30-OHK	WBC
+P31-FUJ	WBC
+P32-ISH	WBC
+PA-1	Ovary
+PA-TU-8902	Pancreas
+PA-TU-8988T	Pancreas
+PANC-02-03	Pancreas
+PANC-03-27	Pancreas
+PANC-04-03	Pancreas
+PANC-08-13	Pancreas
+PANC-10-05	Pancreas
+PC-14	Lung
+PC-3	Prostate
+PC-3_[JPC-3]	Lung
+PCI-15A	Upper Aerodigestive Tract
+PCI-30	Upper Aerodigestive Tract
+PCI-38	Upper Aerodigestive Tract
+PCI-4B	Upper Aerodigestive Tract
+PCI-6A	Upper Aerodigestive Tract
+PE/CA-PJ15	Upper Aerodigestive Tract
+PEO1	Ovary
+PF-382	WBC
+PFSK-1	CNS
+PL-21	WBC
+PL18	Pancreas
+PL4	Pancreas
+PSN1	Pancreas
+PWR-1E	Prostate
+QGP-1	Pancreas
+QIMR-WIL	WBC
+RC-K8	WBC
+RCC-AB	Kidney
+RCC-ER	Kidney
+RCC-FG2	Kidney
+RCC-JF	Kidney
+RCC-JW	Kidney
+RCC-MF	Kidney
+RCC10RGB	Kidney
+RCH-ACV	WBC
+RCM-1	L. Intestine
+RD	Soft Tissue
+REH	WBC
+RERF-GC-1B	Stomach
+RERF-LC-FM	Lung
+RERF-LC-KJ	Lung
+RERF-LC-MS	Lung
+RERF-LC-Sq1	Lung
+RF-48	Stomach
+RH-1	Soft Tissue
+RH-18	Soft Tissue
+RH-41	Soft Tissue
+RKN	Ovary
+RKO	L. Intestine
+RL	WBC
+RL95-2	Endometrium
+RMG-I	Ovary
+RO82-W-1	Thyroid
+ROS-50	WBC
+RPMI-2650	Upper Aerodigestive Tract
+RPMI-6666	WBC
+RPMI-7951	Skin
+RPMI-8226	WBC
+RPMI-8402	WBC
+RPMI-8866	WBC
+RS4-11	WBC
+RT-112	Bladder
+RT4	Bladder
+RVH-421	Skin
+RXF393	Kidney
+Raji	WBC
+Ramos-2G6-4C10	WBC
+S-117	Soft Tissue
+SAS	Upper Aerodigestive Tract
+SAT	Upper Aerodigestive Tract
+SBC-1	Lung
+SBC-3	Lung
+SBC-5	Lung
+SC-1	WBC
+SCC-15	Upper Aerodigestive Tract
+SCC-25	Upper Aerodigestive Tract
+SCC-3	WBC
+SCC-4	Upper Aerodigestive Tract
+SCC-9	Upper Aerodigestive Tract
+SCC90	Upper Aerodigestive Tract
+SCH	Stomach
+SCaBER	Bladder
+SF126	CNS
+SF268	CNS
+SF295	CNS
+SF539	CNS
+SH-4	Skin
+SHP-77	Lung
+SIG-M5	WBC
+SIMA	Autonomic Ganglia
+SISO	Cervix
+SJRH30	Soft Tissue
+SJSA-1	Bone
+SK-CO-1	L. Intestine
+SK-ES-1	Bone
+SK-GT-2	Stomach
+SK-GT-4	Oesophagus
+SK-HEP-1	Liver
+SK-LMS-1	Soft Tissue
+SK-LU-1	Lung
+SK-MEL-1	Skin
+SK-MEL-2	Skin
+SK-MEL-24	Skin
+SK-MEL-28	Skin
+SK-MEL-3	Skin
+SK-MEL-30	Skin
+SK-MEL-31	Skin
+SK-MEL-5	Skin
+SK-MES-1	Lung
+SK-MG-1	CNS
+SK-MM-2	WBC
+SK-N-AS	Autonomic Ganglia
+SK-N-DZ	Autonomic Ganglia
+SK-N-FI	Autonomic Ganglia
+SK-N-SH	Autonomic Ganglia
+SK-NEP-1	Kidney
+SK-OV-3	Ovary
+SK-PN-DW	Bone
+SK-UT-1	Soft Tissue
+SKG-IIIa	Cervix
+SKM-1	WBC
+SKN	Soft Tissue
+SKN-3	Upper Aerodigestive Tract
+SLVL	WBC
+SN12C	Kidney
+SNB75	CNS
+SNG-M	Endometrium
+SNU-1040	L. Intestine
+SNU-175	L. Intestine
+SNU-182	Liver
+SNU-283	L. Intestine
+SNU-387	Liver
+SNU-398	Liver
+SNU-407	L. Intestine
+SNU-423	Liver
+SNU-449	Liver
+SNU-475	Liver
+SNU-61	L. Intestine
+SNU-81	L. Intestine
+SNU-C1	L. Intestine
+SNU-C2B	L. Intestine
+SNU-C5	L. Intestine
+SR	WBC
+ST486	WBC
+STS-0421	Soft Tissue
+SU-DHL-1	WBC
+SU-DHL-10	WBC
+SU-DHL-16	WBC
+SU-DHL-4	WBC
+SU-DHL-5	WBC
+SU-DHL-6	WBC
+SU-DHL-8	NS
+SU8686	Pancreas
+SUIT-2	Pancreas
+SUP-B15	WBC
+SUP-B8	WBC
+SUP-HD1	WBC
+SUP-M2	WBC
+SUP-T1	WBC
+SW1088	CNS
+SW1116	L. Intestine
+SW1271	Lung
+SW13	Adrenal Gland
+SW1417	L. Intestine
+SW1463	L. Intestine
+SW156	Kidney
+SW1573	Lung
+SW1710	Bladder
+SW1783	CNS
+SW1990	Pancreas
+SW403	L. Intestine
+SW48	L. Intestine
+SW620	L. Intestine
+SW626	Ovary
+SW684	Soft Tissue
+SW756	Cervix
+SW780	Bladder
+SW837	L. Intestine
+SW872	Soft Tissue
+SW900	Lung
+SW948	L. Intestine
+SW954	Vulva
+SW962	Vulva
+SW982	Soft Tissue
+Saos-2	Bone
+Sarc9371	Bone
+Set2	WBC
+SiHa	Cervix
+T-24	Bladder
+T-T	Oesophagus
+T47D	Breast
+T84	L. Intestine
+T98G	CNS
+TALL-1	WBC
+TASK1	Bone
+TC-71	Bone
+TC-YIK	Cervix
+TCCSUP	Bladder
+TE-1	Oesophagus
+TE-10	Oesophagus
+TE-11	Oesophagus
+TE-12	Oesophagus
+TE-15	Oesophagus
+TE-4	Oesophagus
+TE-441-T	Soft Tissue
+TE-5	Oesophagus
+TE-6	Oesophagus
+TE-8	Oesophagus
+TE-9	Oesophagus
+TGBC11TKB	Stomach
+TGBC1TKB	Biliary Tract
+TGBC24TKB	Biliary Tract
+TGW	Autonomic Ganglia
+THP-1	WBC
+TK	WBC
+TK10	Kidney
+TMK-1	Stomach
+TOV-112D	Ovary
+TOV-21G	Ovary
+TT	Thyroid
+TT2609-C02	Thyroid
+TUR	WBC
+TYK-nu	Ovary
+U-118-MG	CNS
+U-2-OS	Bone
+U-266	WBC
+U-698-M	WBC
+U-87-MG	CNS
+U-CH2	Bone
+U031	Kidney
+U251	CNS
+UACC-257	Skin
+UACC-62	Skin
+UACC-812	Breast
+UACC-893	Breast
+UDSCC2	Upper Aerodigestive Tract
+UM-UC-3	Bladder
+UMC-11	Lung
+UWB1_289	Ovary
+VA-ES-BJ	Bone
+VAL	WBC
+VCaP	Prostate
+VM-CUB-1	Bladder
+VMRC-LCD	Lung
+VMRC-MELG	Skin
+VMRC-RCW	Kidney
+VMRC-RCZ	Kidney
+WIL2-NS	WBC
+WM-115	Skin
+WM1552C	Skin
+WM278	Skin
+WM35	Skin
+WM793B	Skin
+WSU-DLCL2	WBC
+WSU-NHL	WBC
+YAPC	Pancreas
+YH-13	CNS
+YKG-1	CNS
+YMB-1-E	Breast
+YT	WBC
+ZR-75-30	Breast
+huH-1	Liver
+no-10	CNS
+no-11	CNS
