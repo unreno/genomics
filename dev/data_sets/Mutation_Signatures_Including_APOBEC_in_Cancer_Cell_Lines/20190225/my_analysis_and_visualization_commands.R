@@ -113,6 +113,7 @@ output.sigs.final <- as.data.frame(whichSignatures(context,
 		signatures.cosmic,
 		contexts.needed = F))
 for(i in (1:nrow(context))) {
+	message(i," - ",nrow(context))
 	output.sigs <- as.data.frame(whichSignatures(context,
 			sample.id = rownames(context[i,]),
 			signatures.cosmic,
@@ -206,6 +207,9 @@ head(sigs_individual)
 require(reshape)
 sigs_melt <- melt(sigs_individual, id = "sample")
 
+#	JAKE - added
+message("sigs_melt 1")
+head(sigs_melt)
 
 
 #Error in data.frame(ids, x, data[, x]) : 
@@ -216,6 +220,11 @@ sigs_melt <- melt(sigs_individual, id = "sample")
 
 
 colnames(sigs_melt) <- c("sample", "sig", "value")
+
+#	JAKE - added
+message("sigs_melt 2")
+head(sigs_melt)
+
 sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
 
 sigs_melt[,"sig"] <- gsub("Signature.10", "I", sigs_melt[,"sig"])
