@@ -5,16 +5,14 @@ message("My Modified Mutation Signatures Script.")
 message()
 
 
-#	list.of.packages <- c("MALDIquant","MALDIquantForeign","xgboost","optparse")
-#	new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-#	
-#	#	Use Bioconductor to install packages
-#	if(length(new.packages)) {
-#		source("https://bioconductor.org/biocLite.R")
-#		biocLite( new.packages )
-#	}
-
-
+#	JAKE - added automatic package installation
+list.of.packages <- c("deconstructSigs","ggplot2","BSgenome.Hsapiens.UCSC.hg38","reshape","stringr","plyr","gridExtra")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#	Use Bioconductor to install packages
+if(length(new.packages)) {
+	source("https://bioconductor.org/biocLite.R")
+	biocLite( new.packages )
+}
 
 
 
@@ -185,6 +183,8 @@ message(" and running through the ggplot command (through line 134). Note that a
 sigs_individual <- subset(sigs_tissues, tissue == "large_intestine")
 sigs_individual <- sigs_individual[,-c(32)]
 
+#	JAKE - added reshape for melt function
+require(reshape)
 sigs_melt <- melt(sigs_individual, id = "sample")
 colnames(sigs_melt) <- c("sample", "sig", "value")
 sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
