@@ -160,8 +160,8 @@ head(output.sigs.final)
 #	JAKE - moved this code here from below
 message("Format the tissue type info")
 #cosmic_tissue_type <- read.table(file = "cosmic_tissue_type.txt", header = T, stringsAsFactors = F, fill = T)
-#	JAKE - no header in my version
-cosmic_tissue_type <- read.table(file = "/home/jake/.github/unreno/genomics/dev/data_sets/Mutation_Signatures_Including_APOBEC_in_Cancer_Cell_Lines/20190225/cosmic_tissue_type.txt", header = F, stringsAsFactors = F, fill = T)
+#	JAKE - no header in my version, and as the tissue type has spaces, need to specify sep as tab
+cosmic_tissue_type <- read.table(file = "/home/jake/.github/unreno/genomics/dev/data_sets/Mutation_Signatures_Including_APOBEC_in_Cancer_Cell_Lines/20190225/cosmic_tissue_type.txt", header = F, stringsAsFactors = F, fill = T, sep="\t")
 cosmic_tissue_type <- cosmic_tissue_type[,c(1:2)]
 colnames(cosmic_tissue_type) <- c("sample", "tissue")
 cosmic_tissue_type <- unique(cosmic_tissue_type)
@@ -175,7 +175,10 @@ cosmic_mut_tissue <- merge(cosmic_mut_all_sort, cosmic_tissue_type, by = "sample
 cell_line_mutload <- as.data.frame(table(cosmic_mut_tissue$sample))
 colnames(cell_line_mutload) <- c("sample", "mut_tot")
 cell_line_mutload <- merge(cell_line_mutload, cosmic_tissue_type, by = "sample", all.x = T)
-cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
+
+#cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
+#	JAKE - my tissue list has "Upper Aerodigestive Tract"
+cell_line_mutload[775,3] <- "Upper Aerodigestive Tract"
 
 #	JAKE - added
 message("cell_line_mutload")
@@ -204,10 +207,15 @@ message(" and running through the ggplot command (through line 134). Note that a
 
 #	JAKE - my extracts tissues have "L. Intestine"
 sigs_individual <- subset(sigs_tissues, tissue == "L. Intestine")
+
+#	JAKE - added
+message("sigs_individual 1")
+head(sigs_individual)
+
 sigs_individual <- sigs_individual[,-c(32)]
 
 #	JAKE - added
-message("sigs_individual")
+message("sigs_individual 2")
 head(sigs_individual)
 
 #	JAKE - added reshape for melt function
@@ -295,10 +303,31 @@ library(plyr)
 #	JAKE - think this should be cosmic_mut_all_sort so moving to beginning
 #colnames(test) <- c("chr", "pos", "5_tetnuc", "3_tetnuc", "trinuc", "mut", "trinuc_mut", "strand", "context", "C_count", "TC_count", "TCA_count", "TCT_count", "YTCA_count", "RTCA_count", "sample")
 
-enrich_pre <- rbind(enrich1, enrich2)
-enrich_post <- rbind(enrich3, enrich4)
-enrich_tot <- rbind(enrich_pre, enrich_post)
-enrich_tot <- unique(enrich_tot)
+
+
+
+
+
+
+
+
+
+
+
+#	Error in eval(quote(list(...)), env) : object 'enrich1' not found
+#	Calls: rbind -> standardGeneric -> eval -> eval -> eval
+#	Execution halted
+
+#	JAKE - STUCK HERE - Where do enrich1, enrich2, enrich3 and enrich4 come from?
+
+#enrich_pre <- rbind(enrich1, enrich2)
+#enrich_post <- rbind(enrich3, enrich4)
+#enrich_tot <- rbind(enrich_pre, enrich_post)
+#enrich_tot <- unique(enrich_tot)
+#	JAKE - guessing here
+enrich_tot <- unique(cosmic_mut_all_sort)
+
+
 
 enrich_tot$Mut_TCW <- "0"
 enrich_tot$Mut_C <- "0"
@@ -413,13 +442,18 @@ ggplot(mut_med_quantiles, aes(tissue, med)) +
 		panel.grid.minor = element_blank(), 
 		axis.line = element_line(colour = "black")) +
 	scale_fill_gradient(low = "blue", high = "red") +
-	scale_x_discrete(limits = c("pleura","bone","kidney","prostate","pancreas",
-		"central_nervous_system","vulva","small_intestine","soft_tissue","upper_aerodigestive_tract",
-		"autonomic_ganglia","urinary_tract","breast","thyroid","ovary",
-		"testis","NS","haematopoietic_and_lymphoid_tissue","salivary_gland","liver",
-		"biliary_tract","adrenal_gland","cervix", "stomach","large_intestine",
-		"lung","oesophagus","skin","placenta","endometrium")) +
+#	scale_x_discrete(limits = c("pleura","bone","kidney","prostate","pancreas",
+#		"central_nervous_system","vulva","small_intestine","soft_tissue","upper_aerodigestive_tract",
+#		"autonomic_ganglia","urinary_tract","breast","thyroid","ovary",
+#		"testis","NS","haematopoietic_and_lymphoid_tissue","salivary_gland","liver",
+#		"biliary_tract","adrenal_gland","cervix", "stomach","large_intestine",
+#		"lung","oesophagus","skin","placenta","endometrium")) +
+	scale_x_discrete(limits = c("Adrenal Gland","Autonomic Ganglia","Biliary Tract","Bladder","Bone","Breast","Cervix","CNS","Endometrium","Kidney","L. Intestine","Liver","Lung","NS","Oesophagus","Ovary","Pancreas","Placenta","Pleura","Prostate","Salivary Gland","S. Intestine","Skin","Soft Tissue","Stomach","Testis","Thyroid","Upper Aerodigestive Tract","Vulva","WBC")) +
 	ggtitle("Median Mutations by Tissue Type")
+
+#	JAKE - replaced tissue list with mine
+#awk 'BEGIN{FS="\t"}{print $2}'  ../cosmic_tissue_type.txt | sort | uniq | paste -sd "," | sed 's/,/","/g'
+#"Adrenal Gland","Autonomic Ganglia","Biliary Tract","Bladder","Bone","Breast","Cervix","CNS","Endometrium","Kidney","L. Intestine","Liver","Lung","NS","Oesophagus","Ovary","Pancreas","Placenta","Pleura","Prostate","Salivary Gland","S. Intestine","Skin","Soft Tissue","Stomach","Testis","Thyroid","Upper Aerodigestive Tract","Vulva","WBC"
 
 message("FIGURE_1: Dots for cell numbers")
 
@@ -428,12 +462,13 @@ colnames(number) <- c("tissue", "freq")
 ggplot(number, aes(tissue, freq)) +
 	geom_point(size = 4) +
 	ylim(0,200) +
-	scale_x_discrete(limits = c("pleura","bone","kidney","prostate","pancreas",
-		"central_nervous_system","vulva","small_intestine","soft_tissue","upper_aerodigestive_tract",
-		"autonomic_ganglia","urinary_tract","breast","thyroid","ovary",
-		"testis","NS","haematopoietic_and_lymphoid_tissue","salivary_gland","liver",
-		"biliary_tract","adrenal_gland","cervix", "stomach","large_intestine",
-		"lung","oesophagus","skin","placenta","endometrium"))
+	scale_x_discrete(limits = c("Adrenal Gland","Autonomic Ganglia","Biliary Tract","Bladder","Bone","Breast","Cervix","CNS","Endometrium","Kidney","L. Intestine","Liver","Lung","NS","Oesophagus","Ovary","Pancreas","Placenta","Pleura","Prostate","Salivary Gland","S. Intestine","Skin","Soft Tissue","Stomach","Testis","Thyroid","Upper Aerodigestive Tract","Vulva","WBC"))
+#	scale_x_discrete(limits = c("pleura","bone","kidney","prostate","pancreas",
+#		"central_nervous_system","vulva","small_intestine","soft_tissue","upper_aerodigestive_tract",
+#		"autonomic_ganglia","urinary_tract","breast","thyroid","ovary",
+#		"testis","NS","haematopoietic_and_lymphoid_tissue","salivary_gland","liver",
+#		"biliary_tract","adrenal_gland","cervix", "stomach","large_intestine",
+#		"lung","oesophagus","skin","placenta","endometrium"))
 
 
 message("FIGURE_2: Plotting mutload vs cell line order (model lines with shaded intervals)")
