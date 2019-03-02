@@ -420,9 +420,27 @@ message("to generate a complete quantile table")
 mut_sub <- subset(cell_line_mutload, tissue == "Endometrium")
 
 x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
-mut_med_quantiles <- rbind(mut_med_quantiles, x)
 
-rownames(mut_med_quantiles) <- a
+
+
+
+#Error in eval(quote(list(...)), env) : 
+#  object 'mut_med_quantiles' not found
+#Calls: rbind -> standardGeneric -> eval -> eval -> eval
+
+#mut_med_quantiles <- rbind(mut_med_quantiles, x)
+#	JAKE - guessing here
+mut_med_quantiles <- x
+
+
+
+#Error: object 'a' not found
+
+#	JAKE - Guessin
+#	rownames(mut_med_quantiles) <- a
+
+
+
 mut_med_quantiles$tissue <- rownames(mut_med_quantiles)
 colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "tissue")
 
@@ -477,9 +495,39 @@ message("FIGURE_2: Plotting mutload vs cell line order (model lines with shaded 
 #	JAKE - my tissue list has L. Intestine
 sigs_tissues_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 
+#	JAKE - added
+message("sigs_tissues_individual")
+head(sigs_tissues_individual)
+
 sigs_tissues_individual_1 <- sigs_tissues_individual[order(sigs_tissues_individual$zAPOBEC.Sig),]
+
+#	JAKE - added
+message("sigs_tissues_individual_1")
+head(sigs_tissues_individual_1)
+
 rownames(sigs_tissues_individual_1) <- c(1:nrow(sigs_tissues_individual_1))
+
+#	JAKE - added
+message("sigs_tissues_individual_1")
+head(sigs_tissues_individual_1)
+
 sigs_tissues_individual_1[,"order"] <- rownames(sigs_tissues_individual_1)
+
+#	JAKE - added
+message("sigs_tissues_individual_1")
+head(sigs_tissues_individual_1)
+
+
+
+#	missing column??
+
+#FIGURE_2: Plotting mutload vs cell line order (model lines with shaded intervals)
+#Error in FUN(X[[i]], ...) : object 'mut_tot' not found
+#Calls: <Anonymous> ... ggplot_build.ggplot -> by_layer -> f -> <Anonymous> -> f -> lapply -> FUN
+
+
+
+
 
 ggplot(sigs_tissues_individual_1, aes(as.numeric(order), mut_tot)) +
 	geom_point(shape = 18, size = 4) +
