@@ -176,9 +176,18 @@ cell_line_mutload <- as.data.frame(table(cosmic_mut_tissue$sample))
 colnames(cell_line_mutload) <- c("sample", "mut_tot")
 cell_line_mutload <- merge(cell_line_mutload, cosmic_tissue_type, by = "sample", all.x = T)
 
+
+
+
 #cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
 #	JAKE - my tissue list has "Upper Aerodigestive Tract"
-cell_line_mutload[775,3] <- "Upper Aerodigestive Tract"
+#	JAKE - what? Why?
+#	JAKE - this doesn't to anything. It assigns the same value that is already set? Commenting out.
+#message("cell_line_mutload[775,3]")
+#message(cell_line_mutload[775,3])
+#cell_line_mutload[775,3] <- "Upper Aerodigestive Tract"
+#message(cell_line_mutload[775,3])
+
 
 #	JAKE - added
 message("cell_line_mutload")
@@ -193,12 +202,18 @@ sigs_tissues <- merge(output.sigs.final, cell_line_mutload, by = "sample")
 
 
 #	JAKE - added
-message("sigs_tissues")
+message("sigs_tissues 1")
 head(sigs_tissues)
 
+#	JAKE - WHAT?
+#	JAKE - this removes colums 3, 14 and 34. WHY?
+#	JAKE - I'm guessing moving things around could be mucking things up. 
+#	sigs_tissues <- sigs_tissues[,-c(3,14,34)]
+#	
+#	JAKE - added
+#	message("sigs_tissues 2")
+#	head(sigs_tissues)
 
-
-sigs_tissues <- sigs_tissues[,-c(3,14,34)]
 
 message("5. Each mutation plot was created separatly by replaceing the tissue variable name in line 79, ")
 message(" and running through the ggplot command (through line 134). Note that a lettering scheme is applied to individuals ")
@@ -212,11 +227,13 @@ sigs_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 message("sigs_individual 1")
 head(sigs_individual)
 
-sigs_individual <- sigs_individual[,-c(32)]
-
+#	JAKE - What? This removes column 32. WHY?
+#	sigs_individual <- sigs_individual[,-c(32)]
+#	
 #	JAKE - added
-message("sigs_individual 2")
-head(sigs_individual)
+#	message("sigs_individual 2")
+#	head(sigs_individual)
+
 
 #	JAKE - added reshape for melt function
 require(reshape)
@@ -419,6 +436,10 @@ message("to generate a complete quantile table")
 #	JAKE - my tissue list has Endometrium
 mut_sub <- subset(cell_line_mutload, tissue == "Endometrium")
 
+#	JAKE - added
+message("mut_sub")
+head(mut_sub)
+
 x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
 
 
@@ -433,6 +454,12 @@ x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
 mut_med_quantiles <- x
 
 
+#	JAKE - added
+message("mut_med_quantiles")
+head(mut_med_quantiles)
+
+
+
 
 #Error: object 'a' not found
 
@@ -443,6 +470,10 @@ mut_med_quantiles <- x
 
 mut_med_quantiles$tissue <- rownames(mut_med_quantiles)
 colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "tissue")
+
+#	JAKE - added
+message("mut_med_quantiles")
+head(mut_med_quantiles)
 
 ggplot(mut_med_quantiles, aes(tissue, med)) +
 	geom_col() +
