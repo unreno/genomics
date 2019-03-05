@@ -13,7 +13,7 @@ if(length(new.packages)) {
 	source("https://bioconductor.org/biocLite.R")
 	biocLite( new.packages )
 }
-
+#	biocLite("BiocUpgrade")
 
 
 message("Final analysis/visualization script for Jarvis et al., 2017, JNCI-CS")
@@ -22,9 +22,19 @@ message("Final analysis/visualization script for Jarvis et al., 2017, JNCI-CS")
 message("ANALYSIS: Mutational Signatures")
 require(deconstructSigs)
 require(ggplot2)
+#	JAKE - added reshape for melt function and moved to top
+require(reshape)
+#	JAKE - changed from "library" to "require" and moved to top
+require(stringr)
+require(plyr)
+require(gridExtra)
 
 require(BSgenome.Hsapiens.UCSC.hg38)
 hg38 <- BSgenome.Hsapiens.UCSC.hg38
+
+
+
+
 
 message("1. Read in and start formatting the dataframe")
 
@@ -40,7 +50,10 @@ head(cosmic_mut)
 
 cosmic_mut_sort <- with(cosmic_mut, cosmic_mut[order(cosmic_mut[,"sample"]),])
 
+#	JAKE - doesn't appear to be needed
 rownames(cosmic_mut_sort) <- NULL
+
+#	JAKE - don't know what this is for
 cosmic_mut_sort$sample <- as.factor(cosmic_mut_sort$sample)
 
 #	JAKE - added
@@ -63,34 +76,48 @@ head(cosmic_mut_all_sort)
 #  replacement has 0 rows, data has 609605
 #Calls: $<- -> $<-.data.frame
 
-deconstructSigs_input <- cosmic_mut_all_sort[,c(1:2,6,16)]
-deconstructSigs_input$ref <- substr(deconstructSigs_input$mut, 1, 1) 
-deconstructSigs_input$alt <- substr(deconstructSigs_input$mut, 3, 3) 
+#	JAKE - selecting these columns by index is unclear
+#deconstructSigs_input <- cosmic_mut_all_sort[,c(1:2,6,16)]
+#	JAKE - clarifying
+#deconstructSigs_input <- cosmic_mut_all_sort[,match(c("chr","pos","mut","sample"),colnames(cosmic_mut_all_sort))]
+deconstructSigs_input <- subset(cosmic_mut_all_sort, select = c("chr", "pos", "mut", "sample"))
+
+#	JAKE - the mut column is C>A, G>T, ... Parsing it out here
+deconstructSigs_input$ref <- substr(deconstructSigs_input$mut, 1, 1)
+deconstructSigs_input$alt <- substr(deconstructSigs_input$mut, 3, 3)
 deconstructSigs_input <- subset(deconstructSigs_input, select = c("chr", "pos", "ref", "alt", "sample"))
 
 
-message("1a. Due to the size of the dataframe, we must split it into 3 discrete sections so the matricies can be created")
-message("efficiently. Be sure not to split up mutations within a cell line between different files.")
-message("Beyond that requirement, breakpoints for files are arbitrary.")
-deconstructSigs_input_1 <- deconstructSigs_input[c(1:224680),]
-deconstructSigs_input_2 <- deconstructSigs_input[c(224681:443115),]
-deconstructSigs_input_3 <- deconstructSigs_input[c(443116:663075),]
+
+message("Trying without splitting")
+mut.counts <- mut.to.sigs.input(mut.ref = deconstructSigs_input, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
 
 
-message("2. Create nx96 matrix, mapping number of trinucleotide muts to each sample (cell line)")
-mut.counts_1 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_1, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
-mut.counts_2 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_2, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
-mut.counts_3 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_3, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+#message("1a. Due to the size of the dataframe, we must split it into 3 discrete sections so the matricies can be created")
+#message("efficiently. Be sure not to split up mutations within a cell line between different files.")
+#message("Beyond that requirement, breakpoints for files are arbitrary.")
+#deconstructSigs_input_1 <- deconstructSigs_input[c(1:224680),]
+#deconstructSigs_input_2 <- deconstructSigs_input[c(224681:443115),]
+#deconstructSigs_input_3 <- deconstructSigs_input[c(443116:663075),]
+#
+#message("2. Create nx96 matrix, mapping number of trinucleotide muts to each sample (cell line)")
+#mut.counts_1 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_1, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+#mut.counts_2 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_2, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+#mut.counts_3 <- mut.to.sigs.input(mut.ref = deconstructSigs_input_3, sample.id = "sample", chr = "chr", pos = "pos", ref = "ref", alt = "alt", bsg = hg38)
+#
+#mut.counts_12 <- rbind(mut.counts_1, mut.counts_2)
+#mut.counts <- rbind(mut.counts_12, mut.counts_3)
 
-mut.counts_12 <- rbind(mut.counts_1, mut.counts_2)
-mut.counts <- rbind(mut.counts_12, mut.counts_3)
+
+
 
 message("3. Match sample mutations to known signature mutational profiles:")
 message("3a. Load the reference signature file first")
 #signatures.nature2013 <- load("~/Desktop/RCRH Sequence Analysis/signatures.nature2013.rda") #If this doesn't work, load from the 'Files' tab in the view panel (if file is in the wd)
 
 #	JAKE - changed location of this file
-signatures.nature2013 <- load("/home/jake/.github/raerose01/deconstructSigs/data/signatures.nature2013.rda")
+#signatures.nature2013 <- load("/home/jake/.github/raerose01/deconstructSigs/data/signatures.nature2013.rda")
+signatures.nature2013 <- load("signatures.nature2013.rda")
 
 
 message("3b. Get sigature context for file")
@@ -122,10 +149,21 @@ for(i in (1:nrow(context))) {
 }
 
 
-output.sigs.final <- output.sigs.final[-c(1021),]
+#	JAKE - I really don't like these index references
+#	JAKE - above, the output dataframe was initially created, then appended
+#	JAKE - The last is the same as the first, so it is removed.
+#	JAKE - I'd've done it differently, but same result
+#	JAKE - I only know this as there are 1020 tissue types. Should remove last, or unique or something.
+#	output.sigs.final <- output.sigs.final[-c(1021),]
+#	JAKE - Trying
+output.sigs.final <- head(output.sigs.final,-1)
+
+#	JAKE - don't know what Signature.2 or Signature.13 is.
 output.sigs.final$zAPOBEC.Sig <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
 
+#	JAKE - More selection?
 output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
+
 output.sigs.final$sample <- rownames(output.sigs.final)
 rownames(output.sigs.final) <- NULL
 
@@ -161,10 +199,16 @@ head(output.sigs.final)
 message("Format the tissue type info")
 #cosmic_tissue_type <- read.table(file = "cosmic_tissue_type.txt", header = T, stringsAsFactors = F, fill = T)
 #	JAKE - no header in my version, and as the tissue type has spaces, need to specify sep as tab
-cosmic_tissue_type <- read.table(file = "/home/jake/.github/unreno/genomics/dev/data_sets/Mutation_Signatures_Including_APOBEC_in_Cancer_Cell_Lines/20190225/cosmic_tissue_type.txt", header = F, stringsAsFactors = F, fill = T, sep="\t")
-cosmic_tissue_type <- cosmic_tissue_type[,c(1:2)]
+cosmic_tissue_type <- read.table(file = "cosmic_tissue_type.txt", header = F, stringsAsFactors = F, fill = T, sep="\t")
+
+#	JAKE - my version only has 2 columns
+#cosmic_tissue_type <- cosmic_tissue_type[,c(1:2)]
+
 colnames(cosmic_tissue_type) <- c("sample", "tissue")
+
+#	JAKE - unique is unnecessary, but I'm leaving it
 cosmic_tissue_type <- unique(cosmic_tissue_type)
+
 
 #	JAKE - added
 message("cosmic_tissue_type")
@@ -182,7 +226,7 @@ cell_line_mutload <- merge(cell_line_mutload, cosmic_tissue_type, by = "sample",
 #cell_line_mutload[775,3] <- "upper_aerodigestive_tract"
 #	JAKE - my tissue list has "Upper Aerodigestive Tract"
 #	JAKE - what? Why?
-#	JAKE - this doesn't to anything. It assigns the same value that is already set? Commenting out.
+#	JAKE - this doesn't do anything. It assigns the same value that is already set? Commenting out.
 #message("cell_line_mutload[775,3]")
 #message(cell_line_mutload[775,3])
 #cell_line_mutload[775,3] <- "Upper Aerodigestive Tract"
@@ -227,16 +271,22 @@ sigs_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 message("sigs_individual 1")
 head(sigs_individual)
 
-#	JAKE - What? This removes column 32. WHY?
-#	sigs_individual <- sigs_individual[,-c(32)]
-#	
+
+#	JAKE - added
+colnames(sigs_individual)
+
+#	JAKE - added
+colnames(sigs_individual)[32]
+
+#	JAKE - What? This removes column 32. WHY? What is column 32?
+sigs_individual <- sigs_individual[,-c(32)]
+
+
 #	JAKE - added
 #	message("sigs_individual 2")
 #	head(sigs_individual)
 
 
-#	JAKE - added reshape for melt function
-require(reshape)
 sigs_melt <- melt(sigs_individual, id = "sample")
 
 #	JAKE - added
@@ -310,8 +360,6 @@ ggplot(sigs_melt, aes(sample, value, fill = sig)) +
 		axis.line = element_line(colour = "black"))
 
 message("Enrichment Score Calculations (uses file created by the 'count_trinuc_muts.pl' script)")
-library(stringr)
-library(plyr)
 
 #	JAKE - Need to read this file much earlier
 #cosmic_mut_all_sort <- read.table(file = "cosmic_mut_all_sort.txt", header = T, sep = "\t", stringsAsFactors = T)
@@ -576,7 +624,6 @@ ggplot(sigs_tissues_individual_1, aes(as.numeric(order), mut_tot)) +
 
 message("FIGURE_3: TCW, enrichment, and APOBEC sig correlation plots")
 
-library(gridExtra)
 sigs_enrich <- merge(sigs_tissues, enrich_final, by = "sample")
 sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
 
