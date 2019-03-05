@@ -7,8 +7,8 @@ set -o pipefail
 
 #	really should've done this
 
-#for sample in GM_983899 983899 ; do
-for sample in GM_983899 ; do
+for sample in GM_983899 983899 ; do
+#for sample in GM_983899 ; do
 	echo "Processing sample ${sample}"
 
 	for reference in hg38_chr_alts hg38_num_noalts ; do
