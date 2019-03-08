@@ -33,16 +33,40 @@ for sample in GM_983899 983899 ; do
 				fi
 
 				if [ $f1 == $f2 ] ; then
-					echo "f1 and f2 are the same. Skipping."
-				else
-					b1=${f1%%.vcf.gz}
-					b1=${b1##${sample}.${reference}.}
-					b2=${f2%%.vcf.gz}
-					b2=${b2##${sample}.${reference}.}
-					echo $b1 $b2
-					echo "bcftools isec -p ${sample}-${b1}-${b2} $f1 $f2"
-					bcftools isec -p ${b1}-${b2} $f1 $f2
+					echo "f1 and f2 are the same. Not comparing. Continuing."
+					continue
 				fi
+
+				b1=${f1%%.vcf.gz}
+				b1=${b1##${sample}.${reference}.}
+				b2=${f2%%.vcf.gz}
+				b2=${b2##${sample}.${reference}.}
+				echo $b1 $b2
+				outdir=${sample}-${reference}-${b1}-${b2}
+				if [ -d ${outdir} ] && [ ! -w ${outdir} ] ; then
+					echo "${outdir} already exists, so skipping."
+				else
+					cmd="bcftools isec -p ${sample}-${reference}-${b1}-${b2} $f1 $f2"
+					echo ${cmd}
+					${cmd}
+					chmod a-w ${outdir}
+				fi
+
+				counts="${outdir}.txt"
+				if [ -f ${counts} ] && [ ! -w ${counts} ] ; then
+					echo "${counts} already exists, so skipping."
+				else
+					echo "Counting intersection results."
+					c1=$( bcftools query -i 'TYPE="SNP"' -f '\n' ${outdir}/0000.vcf | wc -l )
+					c2=$( bcftools query -i 'TYPE="SNP"' -f '\n' ${outdir}/0001.vcf | wc -l )
+					cboth=$( bcftools query -i 'TYPE="SNP"' -f '\n' ${outdir}/0002.vcf | wc -l )
+					echo "${b1}	${c1}"  > ${counts}
+					echo "${b2}	${c2}" >> ${counts}
+					echo "Both	${cboth}" >> ${counts}
+
+					chmod a-w ${counts}
+				fi
+
 
 			done
 		done
