@@ -10,3 +10,10 @@ rsync -avz --progress --include=README --include="*fna.gz" --include="*gtf.gz" -
 rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/H_sapiens/RefSeqGene/ RefSeqGene/
 
 
+rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/viral/ viral/
+
+rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/fungi/ fungi/
+
+rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/bacteria/ bacteria/
+
+

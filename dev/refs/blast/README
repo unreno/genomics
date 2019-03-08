@@ -14,3 +14,70 @@ makeblastdb -dbtype nucl -in ../fasta/HHV6a.fasta -out HHV6a -title HHV6a -parse
 makeblastdb -dbtype nucl -in ../fasta/HHV6b.fasta -out HHV6b -title HHV6b -parse_seqids
 
 
+
+
+List entire contents of viral database.
+
+blastdbcmd -db viral -entry all
+
+update_blastdb.pl --decompress nr
+update_blastdb.pl --decompress nt
+
+
+blastdbcmd -db viral -entry all -outfmt "%a %g %o %i %t %h %T %X %e %L %C %S %N %B %K %P"
+
+
+
+blastdbcmd -db nt -entry all -outfmt "%K" | sort | uniq -c
+
+  445176 Archaea
+ 8741524 Bacteria
+43886375 Eukaryota
+  934064 N/A
+ 2758266 Viruses
+
+No explicit fungal
+
+
+
+blastdbcmd -db nt -entry all -outfmt "%g,%K" | awk -F, '{ print $1 > $2".gilist" }'
+
+wc -l *.gilist
+   445176 Archaea.gilist
+  8741524 Bacteria.gilist
+ 43886375 Eukaryota.gilist
+   934064 N_A.gilist
+  2758266 Viruses.gilist
+ 56765405 total
+
+
+zcat /raid/refs/refseq/viral/viral.* | makeblastdb -dbtype nucl -out viral.genomic -title viral.genomic -parse_seqids
+zcat /raid/refs/refseq/fungi/fungi.* | makeblastdb -dbtype nucl -out fungi.genomic -title fungi.genomic -parse_seqids
+zcat /raid/refs/refseq/bacteria/bacteria.* | makeblastdb -dbtype nucl -out bacteria.genomic -title bacteria.genomic -parse_seqids
+
+
+
+blastdbcmd -db other_genomic -entry all -outfmt "%K" | sort | uniq -c
+    351 Archaea
+  33840 Bacteria
+ 162936 Eukaryota
+    468 N/A
+   9245 Viruses
+
+
+blastdbcmd -db refseq_genomic -entry all -outfmt "%K" | sort | uniq -c
+   46485 Archaea
+15850187 Bacteria
+14846303 Eukaryota
+      23 N/A
+   10119 Viruses
+
+
+blastdbcmd -db viral -entry all > viral.fasta &
+blastdbcmd -db viral.genomic -entry all > viral.genomic.fasta &
+
+using gilist just seems problematic.
+Keeps crashing during use?
+
+
+

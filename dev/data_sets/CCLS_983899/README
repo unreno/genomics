@@ -32,3 +32,76 @@ Sample.Reference.Alignment.Caller.vcf.gz
 
 nohup ./process.bash &
 
+update_blastdb.pl --decompress nt
+update_blastdb.pl --decompress refseq_genomic
+
+other_genomic.*tar.gz         | RefSeq chromosome records (NC_######) for non-human organisms
+
+refseq_genomic.*tar.gz        | NCBI genomic reference sequences
+
+nt.*tar.gz                    | Partially non-redundant nucleotide sequences from 
+                                all traditional divisions of GenBank, EMBL, and DDBJ 
+                                excluding GSS,STS, PAT, EST, HTG, and WGS.
+
+
+
+
+
+blastn -db viral -query <( zcat 983899.1.fastq.gz | sed -n '1~4s/^@/>/p;2~4p' ) | more
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+blastn -num_threads 10 -outfmt 6 -db viral -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.viral.txt &
+done
+
+Want a better viral database. Found out that you can filter with gilist.
+
+blastn -num_threads 40 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query <( zcat 983899.1.fastq.gz | sed -n '1~4s/^@/>/p;2~4p' ) | more
+
+
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+blastn -num_threads 10 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.Viruses.10.txt &
+done
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+blastn -num_threads 40 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.Viruses.40.txt &
+done
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+blastn -num_threads 80 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.Viruses.80.txt 2> $b.Viruses.80.err &
+done
+
+
+10x more alignments in smaller viral database than the Viruses subset of nt???
+No. blastn kept crashing?
+
+
+
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+nohup blastn -num_threads 80 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.Viruses.txt 2> $b.Viruses.err &
+done
+
+
+for f in *.fastq.gz ; do
+b=$( basename $f .fastq.gz )
+echo $f $b
+blastn -num_threads 80 -outfmt 6 -db viral.genomic -query <( zcat $f | sed -n '1~4s/^@/>/p;2~4p' ) -out $b.viral.genomic.txt 2> $b.viral.genomic.err &
+done
+
+
+
+
+
+
+
