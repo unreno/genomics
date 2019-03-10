@@ -101,6 +101,30 @@ done
 
 
 
+Sometimes, I get this and then all blastns quit?????
+Warning: [blastn] lcl|Query_2590 E00368R:279:HJHMJCCXY:2:1101:10084:2: Warning: Sequence contains no data 
+
+Can't find thie sequence in either??
+
+nohup fastqToFa <( zcat 983899.1.fastq.gz ) 983899.1.fa &
+nohup fastqToFa <( zcat 983899.2.fastq.gz ) 983899.2.fa &
+nohup fastqToFa <( zcat GM_983899.1.fastq.gz ) GM_983899.1.fa &
+nohup fastqToFa <( zcat GM_983899.2.fastq.gz ) GM_983899.2.fa &
+wc -l *fa
+  1364473172 983899.1.fa
+  1364473172 983899.2.fa
+   789764678 GM_983899.1.fa
+   789764678 GM_983899.2.fa
+
+
+
+for f in *.fa ; do
+b=$( basename $f .fa )
+echo $f $b
+nohup blastn -num_threads 80 -outfmt 6 -db nt -gilist /raid/refs/blast/Viruses.gilist -query $f -out $b.Viruses.txt 2> $b.Viruses.err &
+nohup blastn -num_threads 80 -outfmt 6 -db viral.genomic -query $f -out $b.viral.genomic.txt 2> $b.viral.genomic.err &
+nohup blastn -num_threads 80 -outfmt 6 -db viral -query $f -out $b.viral.txt 2> $b.viral.err &
+done
 
 
 
