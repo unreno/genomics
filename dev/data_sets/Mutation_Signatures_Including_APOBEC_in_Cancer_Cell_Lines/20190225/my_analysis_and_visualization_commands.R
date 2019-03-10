@@ -11,9 +11,11 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 #	Use Bioconductor to install packages
 if(length(new.packages)) {
 	source("https://bioconductor.org/biocLite.R")
-	biocLite( new.packages )
+	# deprecated ... biocLite( new.packages )
+	BiocManager::install( new.packages )
 }
-#	biocLite("BiocUpgrade")
+#	deprecated ... biocLite("BiocUpgrade")
+#	BiocManager::install()
 
 
 message("Final analysis/visualization script for Jarvis et al., 2017, JNCI-CS")

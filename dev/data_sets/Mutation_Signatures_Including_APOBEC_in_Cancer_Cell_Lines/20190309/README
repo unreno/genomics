@@ -1,0 +1,23 @@
+
+
+./configure
+make
+sudo make install
+
+
+R
+
+
+update.packages(checkBuilt = TRUE, ask = FALSE)	
+
+list.of.packages <- c("deconstructSigs","ggplot2","BSgenome.Hsapiens.UCSC.hg38","reshape","stringr","plyr","gridExtra")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+
+	source("https://bioconductor.org/biocLite.R")
+	BiocManager::install()
+if(length(new.packages)) {
+	BiocManager::install( new.packages )
+}
+
+
+
