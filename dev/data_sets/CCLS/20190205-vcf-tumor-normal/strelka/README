@@ -270,3 +270,22 @@ done
 
 
 ll /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/983899.local/results/variants/somatic.snvs.vcf.gz /raid/data/raw/CCLS/vcf/983899.output-HC.vcf.gz
+
+
+bcftools isec 983899.hg38_num_noalts.e2e_PP/results/variants/somatic.snvs.filtered.vcf.gz 983899.hg38_num_noalts.e2e/results/variants/somatic.snvs.filtered.vcf.gz -p 983899.hg38_num_noalts.e2e_PP_e2e
+bcftools isec 983899.hg38_num_noalts.loc_PP/results/variants/somatic.snvs.filtered.vcf.gz 983899.hg38_num_noalts.loc/results/variants/somatic.snvs.filtered.vcf.gz -p 983899.hg38_num_noalts.loc_PP_loc
+
+bgzip 983899.hg38_num_noalts.e2e_PP_e2e/0003.vcf
+bcftools index 983899.hg38_num_noalts.e2e_PP_e2e/0003.vcf.gz
+bgzip 983899.hg38_num_noalts.loc_PP_loc/0003.vcf
+bcftools index 983899.hg38_num_noalts.loc_PP_loc/0003.vcf.gz
+
+bcftools isec 983899.hg38_num_noalts.e2e_PP_e2e/0003.vcf.gz 983899.hg38_num_noalts.loc_PP_loc/0003.vcf.gz -p 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc
+
+bgzip 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc/0003.vcf 
+bcftools index 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc/0003.vcf.gz 
+
+bcftools isec 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc/0003.vcf.gz /raid/data/raw/CCLS/vcf/983899.output-HC.vcf.gz -p 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc_raw
+
+
+

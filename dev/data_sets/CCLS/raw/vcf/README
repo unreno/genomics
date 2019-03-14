@@ -117,3 +117,51 @@ ll *983899*{loc,e2e}*vcf.gz
 
 
 
+
+for f in *983899.output-HC.vcf.gz ; do
+echo $f
+echo -n "ALL : "
+bcftools query -f '\n' $f | wc -l
+echo -n "+ SNP : "
+bcftools query -i 'TYPE="SNP"' -f '\n' $f | wc -l
+echo -n "+ DP : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200' -f '\n' $f | wc -l
+echo -n "+ MQ : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35' -f '\n' $f | wc -l
+echo -n "+ QD : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2' -f '\n' $f | wc -l
+echo -n "+ FS : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60' -f '\n' $f | wc -l
+echo -n "+ MQRankSum : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5' -f '\n' $f | wc -l
+echo -n "+ ReadPosRankSum : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0' -f '\n' $f | wc -l
+echo -n "+ DB : "
+bcftools query -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' -f '\n' $f | wc -l
+done
+
+                        #       SNPs:
+                        #       • QD  < 2.0         
+                        #       • FS  >  60.0         
+                        #       • MQ  <  40.0   
+                        #       • MQRankSum  <  -12.5 
+                        #       • ReadPosRankSum  <  -8.0
+                        #       
+        
+
+
+
+
+
+
+
+for f in *983899.output-HC.vcf.gz ; do
+b=$( basename $f .output-HC.vcf.gz )
+echo $b $f
+bcftools view -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' -O z -o $b.20190313.dbfiltered.vcf.gz $f
+bcftools index $b.20190313.dbfiltered.vcf.gz
+bcftools view -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0' -O z -o $b.20190313.filtered.vcf.gz $f
+bcftools index $b.20190313.filtered.vcf.gz
+done
+
+

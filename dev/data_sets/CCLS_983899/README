@@ -104,7 +104,7 @@ done
 Sometimes, I get this and then all blastns quit?????
 Warning: [blastn] lcl|Query_2590 E00368R:279:HJHMJCCXY:2:1101:10084:2: Warning: Sequence contains no data 
 
-Can't find thie sequence in either??
+Can't find this sequence in either??
 
 nohup fastqToFa <( zcat 983899.1.fastq.gz ) 983899.1.fa &
 nohup fastqToFa <( zcat 983899.2.fastq.gz ) 983899.2.fa &
@@ -126,6 +126,89 @@ nohup blastn -num_threads 80 -outfmt 6 -db viral.genomic -query $f -out $b.viral
 nohup blastn -num_threads 80 -outfmt 6 -db viral -query $f -out $b.viral.txt 2> $b.viral.err &
 done
 
+Finally got'em all working. Took 3-5 days each! Don't do the inline unzip fastq to fasta conversion.
+Ridiculous! Not maxed on memory, io or cpu?
+
+nt contains A LOT of repetitive sequences for complete to partial.
+viral appears to be an older version of viral.genomic
+How to make it process much faster?
+(moved query first so viewable in htop)
+
+3/11 8:40AM
+for f in *.fa ; do
+b=$( basename $f .fa )
+echo $f $b
+nohup blastn -query $f -num_threads 400 -outfmt 6 -db viral.genomic -out $b.viral.genomic.txt 2> $b.viral.genomic.err &
+done
+
+Still REALLY slow. Does have a higher load average but looks like most processes sleeping?
+Even with 400 threads, little difference in speed. Apparently, its not actually parallel threading.
+
+faSplit sequence 983899.1.fa 40 983899.1.test
+That didn't work right. Did about 10 files, then 29 empty, then everything went in the last file?
+
+grep -c "^>" 983899.1.fa
+682236586
+echo "682236586/40" | bc
+17055914
+echo | awk '{printf("%d\n",682236586/40 + 0.5)}'  
+17055915
+
+/home/jake/.github/ccls/sequencing/rins_ccls/fasta_read_split.sh 17055915 983899.1.fa &
+Splitting took about 20-30 minutes.
 
 
+repeat masker
+
+
+Mar 11, 230pm
+cd 983899.1.20190311130139.pieces.nobackup
+for f in *.fasta ; do
+b=$( basename $f .fasta )
+echo $f $b
+nohup blastn -query $f -num_threads 4 -outfmt 6 -db viral.masked -out $b.viral.masked.txt 2> $b.viral.masked.err &
+done
+
+This appears to be working and has pegged cpu usage and over loaded load averge. May want to use 2 instead of 4 threads.
+Uses about 0.25GB memory per call. Minimal IO impact.
+If works well, likely better to create many even smaller fasta files and run them with parallel.
+It only took a few hours. Awesome!
+
+
+16:16
+ls *fasta | parallel --no-notice --joblog ~/parallel.log -j40 blastn -query {} -num_threads 2 -outfmt 6 -db viral.masked -out {}.viral.masked.txt 2\> {}.viral.masked.err &
+17:53 ( less than 2 hours! )
+
+
+20:22
+ls *fasta | parallel --no-notice --joblog ~/parallel.log -j40 blastn -query {} -num_threads 2 -outfmt 6 -db viral.genomic -out {}.viral.genomic.txt 2\> {}.viral.genomic.err &
+22:01 ( about the same time )
+
+
+'qaccver saccver pident length mismatch gapopen qstart qend sstart send evalue bitscore'
+
+   	   qaccver means Query accesion.version
+   	   saccver means Subject accession.version
+   	    pident means Percentage of identical matches
+   	    length means Alignment length
+   	  mismatch means Number of mismatches
+   	   gapopen means Number of gap openings
+   	    qstart means Start of alignment in query
+   	      qend means End of alignment in query
+   	    sstart means Start of alignment in subject
+   	      send means End of alignment in subject
+   	    evalue means Expect value
+   	  bitscore means Bit score
+
+
+
+
+bcftools isec -p 983899.20190313.filtered.strelka.isec /raid/data/raw/CCLS/vcf/983899.20190313.filtered.vcf.gz /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/983899.hg38_num_noalts.loc/results/variants/somatic.snvs.PASS.vcf.gz
+bcftools query -f '\n' 983899.20190313.filtered.strelka.isec/0000.vcf | wc -l
+bcftools query -f '\n' 983899.20190313.filtered.strelka.isec/0001.vcf | wc -l
+bcftools query -f '\n' 983899.20190313.filtered.strelka.isec/0002.vcf | wc -l
+bcftools isec -p 983899.20190313.dbfiltered.strelka.isec /raid/data/raw/CCLS/vcf/983899.20190313.dbfiltered.vcf.gz /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/983899.hg38_num_noalts.loc/results/variants/somatic.snvs.PASS.vcf.gz
+bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0000.vcf | wc -l
+bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0001.vcf | wc -l
+bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0002.vcf | wc -l
 
