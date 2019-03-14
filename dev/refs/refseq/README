@@ -17,3 +17,13 @@ rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.g
 rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/bacteria/ bacteria/
 
 
+
+Mask viral references for repeats prior to creating a blast database.
+For some reason the source file needs to be writable so when it is copied it is writeable. Weak kung fu.
+gunzip -k viral*fna.gz
+cat viral*fna > viral.fa
+RepeatMasker -pa 40 viral.fa
+
+
+
+

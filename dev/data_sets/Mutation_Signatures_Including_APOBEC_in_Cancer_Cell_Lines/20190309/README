@@ -21,3 +21,9 @@ if(length(new.packages)) {
 
 
 
+
+nohup ./Mutation-Signatures-v81-cosmic.r > Mutation-Signatures-v81-cosmic.out 2> Mutation-Signatures-v81-cosmic.err &
+nohup ./Mutation-Signatures-v81-nature2013.r > Mutation-Signatures-v81-nature2013.out 2> Mutation-Signatures-v81-nature2013.err &
+nohup ./Mutation-Signatures-v87-cosmic.r > Mutation-Signatures-v87-cosmic.out 2> Mutation-Signatures-v87-cosmic.err &
+nohup ./Mutation-Signatures-v87-nature2013.r > Mutation-Signatures-v87-nature2013.out 2> Mutation-Signatures-v87-nature2013.err &
+

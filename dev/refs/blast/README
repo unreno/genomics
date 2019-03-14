@@ -80,4 +80,5 @@ using gilist just seems problematic.
 Keeps crashing during use?
 
 
+makeblastdb -in /raid/refs/refseq/viral.fa.masked -dbtype nucl -out viral.masked -title viral.masked -parse_seqids
 
