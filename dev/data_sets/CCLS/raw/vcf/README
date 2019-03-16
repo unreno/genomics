@@ -165,3 +165,10 @@ bcftools index $b.20190313.filtered.vcf.gz
 done
 
 
+
+
+
+bcftools view -i 'TYPE="SNP"' 983899.output-HC.vcf.gz | wc -l
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | wc -l
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk | wc -l
+
