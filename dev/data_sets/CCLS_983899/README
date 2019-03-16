@@ -212,3 +212,10 @@ bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0000.vcf | wc -l
 bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0001.vcf | wc -l
 bcftools query -f '\n' 983899.20190313.dbfiltered.strelka.isec/0002.vcf | wc -l
 
+
+7:49 am
+ls *fasta | parallel --no-notice --joblog ~/parallel.1.log -j40 blastn -query {} -num_threads 1 -outfmt 6 -db viral.masked -out {}.viral.masked.1.txt 2\> {}.viral.masked.1.err &
+920 (1.5  hours)
+
+
+
