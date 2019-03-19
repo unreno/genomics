@@ -1,0 +1,10 @@
+
+
+nohup ./process.bash &
+
+
+
+head -1 -q *count_trinuc_muts.txt | head -1 > mut_all_sort.txt
+tail -n +2 *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> mut_all_sort.txt
+
+

@@ -99,19 +99,19 @@ ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.bcftools-m.vcf.gz    GM_98
 ln -s ../../CCLS_983899/GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz           GM_983899.hg38_num_noalts.e2e.gatk.vcf.gz
 
 ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz    983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38_chr_alts.gatk.vcf.gz           983899.hg38_chr_alts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e.gatk.vcf.gz           983899.hg38_chr_alts.e2e.gatk.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.gatk.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.gatk.vcf.gz        GM_983899.hg38_chr_alts.e2e.gatk.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e.gatk.vcf.gz        GM_983899.hg38_chr_alts.e2e.gatk.vcf.gz
 
 ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz    983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38_chr_alts.bcftools-c.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.bcftools-c.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.bcftools-c.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-c.vcf.gz
 
 ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz    983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/983899.hg38_chr_alts.bcftools-m.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz           983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
 ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz GM_983899.hg38_chr_alts.e2e_PP.bcftools-m.vcf.gz
-ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.bcftools-m.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
+ln -s ../../CCLS_983899/GM_983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz        GM_983899.hg38_chr_alts.e2e.bcftools-m.vcf.gz
 
 ll *983899*{loc,e2e}*vcf.gz
 
@@ -171,4 +171,17 @@ done
 bcftools view -i 'TYPE="SNP"' 983899.output-HC.vcf.gz | wc -l
 bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | wc -l
 bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk | wc -l
+
+
+
+
+for f in *.output-HC.vcf.gz ; do
+b=$( basename $f .output-HC.vcf.gz )
+echo $b $f
+bcftools view -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' -O z -o $b.dbfiltered.vcf.gz $f
+bcftools index $b.dbfiltered.vcf.gz
+bcftools view -i 'TYPE="SNP" && DP>5 && DP<200 && MQ>35 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0' -O z -o $b.filtered.vcf.gz $f
+bcftools index $b.filtered.vcf.gz
+done
+
 
