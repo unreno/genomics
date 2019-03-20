@@ -44,9 +44,9 @@ if [ -f ${f} ] && [ ! -w ${f} ]  ; then
 	echo "Write-protected ${f} exists. Skipping step."
 else
 	echo "Head *count_trinuc_muts.txt"
-	head -1 -q *count_trinuc_muts.txt | head -1 > ${f}
+	head -n 1 -q *count_trinuc_muts.txt | head -1 > ${f}
 	echo "Combining and sorting *count_trinuc_muts.txt"
-	tail -n +2 *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
+	tail -n +2 -q *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
 	chmod a-w ${f}
 fi
 
