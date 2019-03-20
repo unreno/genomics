@@ -1,0 +1,124 @@
+
+
+Possible software pipelines to hybrid assembly
+
+
+Masurca - https://github.com/alekseyzimin/masurca
+
+
+Cerulean - https://sourceforge.net/projects/ceruleanassembler/
+
+https://sourceforge.net/projects/ceruleanassembler/files/Cerulean_v_0_1.tar.gz
+
+
+Canu
+https://canu.readthedocs.io/en/latest/
+
+
+Atlas ?
+https://www.hgsc.bcm.edu/software/atlas-whole-genome-assembly-suite
+
+
+http://seq.cs.iastate.edu/
+
+
+
+
+------
+
+20180828 - Masurca seems most promising at the moment.
+
+https://github.com/nanopore-wgs-consortium/NA12878/blob/master/Genome.md
+
+
+
+Installing creates a sample config file.
+Editing the config file to match out data. Guessing where needed.
+
+The paired end data needs "mean" and "stddev".
+Guessing that this is for the insert size, but it does not specify.
+Left at original values of 180 and 20
+Aleksey suggests 500 100 is safe. Then why default of 180 20?
+
+
+samtools view -F 0x4 File.mapped.bam | awk '{if ($9 >0) {sum+=$9;sumsq+=$9*$9;N+=1}} END {print "mean = " sum/N " SD=" sqrt(sumsq/N - (sum/N)**2)}'
+
+samtools view -F 0x4 File.mapped.bam | awk '($9 >0) {sum+=$9;sumsq+=$9*$9;N+=1} END {print "mean = " sum/N " SD=" sqrt(sumsq/N - (sum/N)**2)}'
+
+
+
+samtools view -f 2 File.mapped.bam | awk '($9 >0) {sum+=$9;sumsq+=$9*$9;N+=1} END {print "mean = " sum/N " SD=" sqrt(sumsq/N - (sum/N)**2)}'
+
+
+I found occassionally that marked as PROPER PAIR whilst the mate is millions of bp away.
+
+samtools view -f 2 File.mapped.bam | awk '($9 > 0 && $9 < 2000) {sum+=$9;sumsq+=$9*$9;N+=1; print "mean = " sum/N " SD=" sqrt(sumsq/N - (sum/N)**2)}'
+
+
+samtools view -f 2 /raid/data/raw/1000genomes/phase3/data/NA12878/high_coverage_alignment/NA12878.mapped.ILLUMINA.bwa.CEU.high_coverage_pcr_free.20130906.bam | awk '($9 > 0 && $9 < 2000) {sum+=$9;sumsq+=$9*$9;N+=1; print "mean = " sum/N " SD=" sqrt(sumsq/N - (sum/N)**2)}'
+
+mean = 427.139 SD=149.464
+
+Going with 427 and 150
+
+I wonder if using 180 20 will have any impact, if it ever actually finishes.
+
+
+
+
+
+Estimated processing time is about a month!  Killed 
+
+
+
+
+
+
+
+cp rel3-nanopore-wgs-4045668814-FAB49164.fastq.gz /raid/data/working/CEPH-Hybrid-20180827/
+cp /raid/data/raw/1000genomes/phase3/data/NA12878/sequence_read/SRR622457_* /raid/data/working/CEPH-Hybrid-20180827/
+cp MaSuRCA-3.2.7/sr_config_example.txt /raid/data/working/CEPH-Hybrid-20180827/masura_config.txt
+
+cd /raid/data/working/CEPH-Hybrid-20180827/
+
+Edit masura_config.txt ( just for data files and number of threads. all others left to default )
+
+JF_SIZE likely needs to be HUGE ( 20 billion ish )
+
+
+~/hybrid/MaSuRCA-3.2.7/bin/masurca masura_config.txt
+
+nohup ./assemble.sh 1> assemble.STDOUT 2> assemble.STDERR &
+
+
+
+
+
+
+
+
+
+
+
+From the blog, they used the following to make the NA12878 contig
+
+PARAMETERS
+JF_SIZE=30000000000
+CA_PARAMETERS=frgCorrConcurrency=8 ovlCorrConcurrency=24
+USE_GRID=1
+GRID_BATCH_SIZE=1000000000
+GRID_QUEUE=all.q
+USE_LINKING_MATES=0
+LHE_COVERAGE=25
+NUM_THREADS=64
+END
+
+The Illumina data was from GIAB project, runs:
+
+131219_D00360_005_BH814YADXX 
+131219_D00360_006_AH81VLADXX 
+140115_D00360_0009_AH8962ADXX 
+140207_D00360_0013_AH8G92ADXX
+
+
+
