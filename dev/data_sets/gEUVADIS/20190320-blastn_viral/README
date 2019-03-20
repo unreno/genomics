@@ -2,6 +2,5 @@
 
 
 
-nohup ls /raid/data/raw/gEUVADIS/*fastq.gz | parallel --no-notice --joblog ./parallel.joblog -j20 ./process.bash > ./parallel.out 2> ./parallel.err &
-
+nohup ls /raid/data/raw/gEUVADIS/*fastq.gz | parallel --no-notice --joblog ./parallel.joblog -j40 ./process.bash > ./parallel.out 2> ./parallel.err &
 
