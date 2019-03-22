@@ -64,6 +64,7 @@ else
 		echo "Blasting $1 creating ${blast_out}" >> ${base}.log
 		zcat $1 | paste - - - - | cut -f 1,2 | sed 's/^@/>/' | tr "\t" "\n" | blastn -outfmt 6 -db viral.masked -out ${blast_out} 2> ${blast_err}
 		#chmod a-w ${blast_out}
+		chmod a-w ${blast_err}
 	fi
 
 	echo "gzipping ${blast_out}" >> ${base}.log
@@ -71,12 +72,12 @@ else
 	chmod a-w ${blast_out}.gz
 fi
 
-blast_err_count="${base}.viral.masked.err.count"
-if [ -f ${blast_err_count} ] && [ ! -w ${blast_err_count} ]  ; then
-	echo "${blast_err_count} already exists, so skipping." >> ${base}.log
-else
-	echo "Counting ${blast_err}" >> ${base}.log
-	wc -l ${blast_err} > ${blast_err_count}
-	chmod a-w ${blast_err_count}
-fi
+#	blast_err_count="${base}.viral.masked.err.count"
+#	if [ -f ${blast_err_count} ] && [ ! -w ${blast_err_count} ]  ; then
+#		echo "${blast_err_count} already exists, so skipping." >> ${base}.log
+#	else
+#		echo "Counting ${blast_err}" >> ${base}.log
+#		wc -l ${blast_err} > ${blast_err_count}
+#		chmod a-w ${blast_err_count}
+#	fi
 
