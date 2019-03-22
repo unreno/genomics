@@ -124,5 +124,8 @@ mv hg19-50bp-.fa hg19-50bp.fa
 bgzip hg19-50bp.fa
 samtools faidx hg19-50bp.fa.gz
 
+faSplit size BeAn_58058.fasta 50 BeAn_58058-50bp -oneFile
+nohup bowtie2 -x hg38 -f -U BeAn_58058-50bp.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp.hg38.sam &
 
+nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166-171.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp-166-171.hg38.sam &
 
