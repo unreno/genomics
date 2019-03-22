@@ -1,5 +1,7 @@
 #
-#	zcat GM_983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk 
+#	DESIGNED FOR SNPs ONLY
+#
+#	bcftools view -i "TYPE='SNP'" GM_983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk 
 #
 BEGIN{ FS=OFS="\t" }
 ( /^#/ ){ print; next; }
@@ -18,32 +20,18 @@ BEGIN{ FS=OFS="\t" }
 	split( info["AD"],INFO_AD,"," )
 
 	for( i=1;i<=length(INFO_GT);i++){
-		if( INFO_GT[i] == 0 ) ref_ad += INFO_AD[i]
-		if( INFO_GT[i] == 1 ) alt_ad1 += INFO_AD[i]
-		if( INFO_GT[i] == 2 ) alt_ad2 += INFO_AD[i]
-		if( INFO_GT[i] == 3 ) alt_ad3 += INFO_AD[i]
+		if( INFO_GT[i] == 0 ) ref_ad  = INFO_AD[1]
+		if( INFO_GT[i] == 1 ) alt_ad1 = INFO_AD[2]
+		if( INFO_GT[i] == 2 ) alt_ad2 = INFO_AD[3]
+		if( INFO_GT[i] == 3 ) alt_ad3 = INFO_AD[4]
 	}
 
-#if( alt_ad2 > 0 ){
-#	print( "Ref ratio ",ref_ad/info["DP"]," : Alt1 ratio ", alt_ad1/info["DP"]," : Alt2 ratio ", alt_ad2/info["DP"]," : Alt3 ratio ", alt_ad3/info["DP"])
-#}
+#	DP can be 0 ????
+#	3	185399649	.	A	G	64.28	.	AC=2;AF=1;AN=2;DP=0;ExcessHet=3.0103;FS=0;MLEAC=2;MLEAF=1;MQ=0;SOR=0.693	GT:AD:DP:GQ:PL	1/1:0,0:0:9:92,9,0
 
 	if( ( info["DP"] > 10 ) && ( ( alt_ad1 > 3 && alt_ad1/info["DP"] <= 0.45 ) || ( alt_ad2 > 3 && alt_ad2/info["DP"] <= 0.45 ) || ( alt_ad3 > 3 && alt_ad3/info["DP"] <= 0.45 ) ) )
 		print
 
 #This brings up another important point. I saw you have been using a DP threshold of 5. I think it is more common to use a DP of at least 8, and given the high sequencing coverage in our data I would suggest a DP threshold of 10. Along with that, we should also use a minimum AD_ALT threshold of 3, i.e. a mutation has to be called in at least 3 reads out of 10.
-
-
-	
-
-#	sometimes GT is 1/1. Merge them
-#	1	0	9	0
-#	1	9	9	1
-#	1	0	3	0
-#	1	3	3	1
-#	1	0	5	0
-#	1	5	5	1
-#	0	67	80	0.8375
-#	1	13	80	0.1625
 
 }
