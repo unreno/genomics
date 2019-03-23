@@ -185,3 +185,31 @@ bcftools index $b.filtered.vcf.gz
 done
 
 
+
+
+
+
+
+
+
+
+
+bcftools view -i 'TYPE="SNP"' 983899.output-HC.vcf.gz | awk -f ./vcf_to_allele_ratios.awk > 983899.allele_ratios.csv &
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>40 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | awk -f ./vcf_to_allele_ratios.awk > 983899.filtered.allele_ratios.csv &
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>40 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' 983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk | awk -f ./vcf_to_allele_ratios.awk > 983899.allele_filtered.allele_ratios.csv &
+bcftools view -i 'TYPE="SNP"' GM_983899.output-HC.vcf.gz | awk -f ./vcf_to_allele_ratios.awk > GM_983899.allele_ratios.csv &
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>40 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' GM_983899.output-HC.vcf.gz | awk -f ./vcf_to_allele_ratios.awk > GM_983899.filtered.allele_ratios.csv &
+bcftools view -i 'TYPE="SNP" && DP>8 && DP<200 && MQ>40 && QD>2 && FS<60 && MQRankSum>-12.5 && ReadPosRankSum > -8.0 && DB=0' GM_983899.output-HC.vcf.gz | awk -f ./vcf_filter.awk | awk -f ./vcf_to_allele_ratios.awk > GM_983899.allele_filtered.allele_ratios.csv &
+
+
+mkdir 983899.strelka
+bcftools +split /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/983899.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz -Oz -o 983899.strelka
+
+bcftools view -i 'TYPE="SNP"' 983899.strelka/NORMAL.vcf.gz | awk -f ./strelka_vcf_to_allele_ratios.awk
+bcftools view -i 'FILTER="PASS" && TYPE="SNP"' 983899.strelka/NORMAL.vcf.gz | awk -f ./strelka_vcf_to_allele_ratios.awk
+
+bcftools view -i 'TYPE="SNP"' 983899.strelka/TUMOR.vcf.gz | awk -f ./strelka_vcf_to_allele_ratios.awk
+bcftools view -i 'FILTER="PASS" && TYPE="SNP"' 983899.strelka/TUMOR.vcf.gz | awk -f ./strelka_vcf_to_allele_ratios.awk
+
+
+
