@@ -125,15 +125,33 @@ bgzip hg19-50bp.fa
 samtools faidx hg19-50bp.fa.gz
 
 faSplit size BeAn_58058.fasta 50 BeAn_58058-50bp -oneFile
-nohup bowtie2 -x hg38 -f -U BeAn_58058-50bp.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp.hg38.sam &
+nohup bowtie2 -x hg38 -f -U BeAn_58058-50bp.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp.hg38.loc.sam &
 
 
 I really don't get what is taking this so long. 3 hours now to align 6 reads! Running since about 2PM
-nohup bowtie2 --threads 6 --all -x hg38 -f -U BeAn_58058-50bp-166-171.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp-166-171.hg38.sam &
+nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166.167.168.169.170.171.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp-166.167.168.169.170.171.hg38.loc.sam &
 
 psme | grep bowtie | grep -vs grep | awk '{print "renice -n -20 -p "$2}' |bash
 psme | grep blastn | grep -vs grep | awk '{print "renice -n 19 -p "$2}' |bash
 
+7 hours later
+
+samtools view BeAn_58058-50bp-166.167.168.169.170.171.hg38.loc.sam  | awk '{print $1}' | sort | uniq -c
+ 128714 BeAn_58058-50bp0166
+ 196489 BeAn_58058-50bp0167
+ 268098 BeAn_58058-50bp0168
+  69855 BeAn_58058-50bp0169
+ 263634 BeAn_58058-50bp0170
+ 448858 BeAn_58058-50bp0171
 
 
+#	started 9pm - 7am STILL GOING! 1 read!
+nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166-171.fa --very-sensitive-local --no-unal -S BeAn_58058-50bp-166-171.hg38.loc.sam &
+
+
+nohup bowtie2 -x hg38 -f -U BeAn_58058-50bp.fa --very-sensitive --no-unal -S BeAn_58058-50bp.hg38.e2e.sam &
+
+nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166.167.168.169.170.171.fa --very-sensitive --no-unal -S BeAn_58058-50bp-166.167.168.169.170.171.hg38.e2e.sam &
+
+nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166-171.fa --very-sensitive --no-unal -S BeAn_58058-50bp-166-171.hg38.e2e.sam &
 
