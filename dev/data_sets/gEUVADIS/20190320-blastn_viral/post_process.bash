@@ -4,19 +4,24 @@ set -e	#	exit if any command fails
 set -u	#	Error on usage of unset variables
 set -o pipefail
 
-outfile="geuvadis.viral.masked.csv"
+data_source="geuvadis"
+molecule="RNA"
 
+for database in viral.masked viral.genomic ; do
 
-echo -e "source\tmolecule\tsample\tsubject\tread_count\tblast_err_count\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore" > ${outfile}
+	outfile="${source}.${database}.csv"
 
-#for f in {HG,NA}*.viral.masked.txt.gz ; do
-for f in *.viral.masked.txt.gz ; do
-	base=$(basename $f .viral.masked.txt.gz )
-	subject=${base%%.*}
-	fastq_count=$( cat ${base}.fastq_count )
-	blast_err_count=$( cat ${base}.viral.masked.err | wc -l )
-	zcat $f | sed "s/^/geuvadis\tRNA\t${base}\t${subject}\t${fastq_count}\t${blast_err_count}\t/"
-done >> ${outfile}
+	echo -e "source\tmolecule\tsample\tsubject\tread_count\tblast_err_count\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore" > ${outfile}
 
-#gzip ${outfile}
+	for f in *.${database}.txt.gz ; do
+		base=$(basename $f .${database}.txt.gz )
+		subject=${base%%.*}
+		fastq_count=$( cat ${base}.fastq_count )
+		blast_err_count=$( cat ${base}.${database}.err | wc -l )
+		zcat $f | sed "s/^/${data_source}\t${molecule}\t${base}\t${subject}\t${fastq_count}\t${blast_err_count}\t/"
+	done >> ${outfile}
+
+	#gzip ${outfile}
+
+done
 

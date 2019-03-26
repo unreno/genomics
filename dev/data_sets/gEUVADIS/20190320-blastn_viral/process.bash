@@ -81,3 +81,23 @@ fi
 #		chmod a-w ${blast_err_count}
 #	fi
 
+blast_out="${base}.viral.genomic.txt"
+blast_err="${base}.viral.genomic.err"
+if [ -f ${blast_out}.gz ] && [ ! -w ${blast_out}.gz ]  ; then
+	echo "${blast_out}.gz already exists, so skipping." >> ${base}.log
+else
+
+	if [ -f ${blast_out} ] && [ ! -w ${blast_out} ]  ; then
+		echo "${blast_out} already exists, so skipping." >> ${base}.log
+	else
+		echo "Blasting $1 creating ${blast_out}" >> ${base}.log
+		zcat $1 | paste - - - - | cut -f 1,2 | sed 's/^@/>/' | tr "\t" "\n" | blastn -outfmt 6 -db viral.genomic -out ${blast_out} 2> ${blast_err}
+		#chmod a-w ${blast_out}
+		chmod a-w ${blast_err}
+	fi
+
+	echo "gzipping ${blast_out}" >> ${base}.log
+	gzip --best --force ${blast_out}
+	chmod a-w ${blast_out}.gz
+fi
+
