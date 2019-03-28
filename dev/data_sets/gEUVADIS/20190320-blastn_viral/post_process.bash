@@ -9,7 +9,7 @@ molecule="RNA"
 
 for database in viral.masked viral.genomic ; do
 
-	outfile="${source}.${database}.csv"
+	outfile="${data_source}.${database}.csv"
 
 	echo -e "source\tmolecule\tsample\tsubject\tread_count\tblast_err_count\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore" > ${outfile}
 

@@ -20,3 +20,8 @@ Assume that the counts files is sorted properly, aggregate by subject ...
 
 subject	virus	summed_count	summed_corrected_read_count
 
+
+
+nohup ./report.py > report.out &
+
+
