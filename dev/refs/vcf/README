@@ -115,3 +115,12 @@ bcftools index dbsnp_146.hg38.num.MT.vcf.gz
 gatk IndexFeatureFile -F dbsnp_146.hg38.num.MT.vcf.gz &
 
 
+
+
+
+gnomAD
+
+https://storage.googleapis.com/gnomad-public/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz
+
+https://storage.googleapis.com/gnomad-public/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz.tbi
+

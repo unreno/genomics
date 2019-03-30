@@ -952,3 +952,65 @@ nohup samtools view -f 1 -F 3840 186069.recaled.name.bam | gawk -v base=186069 -
 
 
 
+
+
+
+20190329
+
+FORMAT and INFO tags for AD, ADF and ADR appear to be the same so only need to use one, if any.
+
+nohup bcftools mpileup --max-depth 999999 --min-MQ 30 --annotate 'FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP' --regions 1 --output 983899.recaled.mpileup.vcf.gz --output-type z --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam &
+bcftools index 983899.recaled.mpileup.vcf.gz
+
+Perhaps do this separately (parallel) by each chromosome as regions to speed things up as it is SLOW.
+May want to pipe directly through filters as well as the files are getting HUGE.
+
+
+
+
+
+
+Filter this mpileup on ...
+
+
+bcftools view -i "TYPE='SNP' && DP>10 && DP<100" 983899.recaled.mpileup.vcf.gz
+
+Once created, I could then select on SNPs, perhaps DP>8 and DP<100, AD> (AD/DP)> 10% and (AD/DP)<45% as well as any of the following tags
+
+##INFO=<ID=IDV,Number=1,Type=Integer,Description="Maximum number of reads supporting an indel">
+##INFO=<ID=IMF,Number=1,Type=Float,Description="Maximum fraction of reads supporting an indel">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw read depth">
+##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
+##INFO=<ID=RPB,Number=1,Type=Float,Description="Mann-Whitney U test of Read Position Bias (bigger is better)">
+##INFO=<ID=MQB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality Bias (bigger is better)">
+##INFO=<ID=BQB,Number=1,Type=Float,Description="Mann-Whitney U test of Base Quality Bias (bigger is better)">
+##INFO=<ID=MQSB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)">
+##INFO=<ID=SGB,Number=1,Type=Float,Description="Segregation based metric.">
+##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
+
+
+
+
+
+nohup bcftools query -f "\n" 983899.recaled.mpileup.vcf.gz | wc -l > 983899.recaled.mpileup.vcf.gz.count &
+nohup bcftools query -i "TYPE='SNP'" -f "\n" 983899.recaled.mpileup.vcf.gz | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.count &
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "\n" 983899.recaled.mpileup.vcf.gz | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.count &
+
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.2 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.2.count &
+
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.15 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.15.count &
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.25 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.25.count &
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.30 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.30.count &
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.35 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.35.count &
+nohup bcftools query -i "TYPE='SNP' && DP>10 && DP<100" -f "%LINE" 983899.recaled.mpileup.vcf.gz | awk -v min=0.05 -v max=0.40 -f mpileup_vcf_allele_filter.awk | wc -l > 983899.recaled.mpileup.vcf.gz.SNP.DP.awk.05-.40.count &
+
+
+
+nohup bcftools isec -c all -n =2 -w 2 -r 1 -p 983899.recaled.mpileup-strelka ../vcf/983899.hg38_num_noalts.loc.strelka.filtered/TUMOR.vcf.gz 983899.recaled.mpileup.vcf.gz &
+
+
+nohup bcftools mpileup --max-depth 999999 --min-MQ 30 --annotate 'FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP,INFO/AC,INFO/AN' --regions 1 --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam &
+
+
+bcftools view -i "TYPE='SNP'" 983899.recaled.mpileup-strelka/0001.vcf.gz | awk -f mpileup_vcf_allele_specs.awk
+
