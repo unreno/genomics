@@ -1014,3 +1014,69 @@ nohup bcftools mpileup --max-depth 999999 --min-MQ 30 --annotate 'FORMAT/AD,FORM
 
 bcftools view -i "TYPE='SNP'" 983899.recaled.mpileup-strelka/0001.vcf.gz | awk -f mpileup_vcf_allele_specs.awk
 
+nohup bcftools mpileup --max-depth 999999 --min-MQ 40 --annotate 'FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP' --regions 1 --output 983899.recaled.mpileup.MQ40.vcf.gz --output-type z --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam &
+
+nohup bcftools mpileup --max-depth 999999 --min-MQ 50 --annotate 'FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP' --regions 1 --output 983899.recaled.mpileup.MQ50.vcf.gz --output-type z --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam &
+
+nohup bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/ADF,FORMAT/ADR,FORMAT/DP,FORMAT/SP' --regions 1 --output 983899.recaled.mpileup.MQ60.vcf.gz --output-type z --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam &
+
+
+
+nohup bcftools query -f "\n" 983899.recaled.mpileup.MQ40.vcf.gz | wc -l > 983899.recaled.mpileup.MQ40.vcf.gz.count &
+nohup bcftools query -f "\n" 983899.recaled.mpileup.MQ50.vcf.gz | wc -l > 983899.recaled.mpileup.MQ50.vcf.gz.count &
+nohup bcftools query -f "\n" 983899.recaled.mpileup.MQ60.vcf.gz | wc -l > 983899.recaled.mpileup.MQ60.vcf.gz.count &
+
+
+
+
+bcftools view -i "TYPE='SNP'" 983899.recaled.mpileup-strelka/0001.vcf.gz | awk -f mpileup_vcf_allele_specs.awk 
+
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools view -i "TYPE='SNP' && DP>10 && DP<100" | awk -v min=0.03 -v max=0.20 -f mpileup_vcf_allele_filter.awk | bgzip > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.awk.03-.20.vcf.gz &
+done
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools query -f "\n" 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.awk.03-.20.vcf.gz | wc -l > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.awk.03-.20.vcf.count &
+done
+
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools mpileup --max-depth 999999 --min-MQ 50 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools view -i "TYPE='SNP' && DP>10 && DP<100" | awk -v min=0.03 -v max=0.20 -f mpileup_vcf_allele_filter.awk | bgzip > 983899.recaled.mpileup.${chr}.MQ50.SNP.DP.awk.03-.20.vcf.gz &
+done
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools query -f "\n" 983899.recaled.mpileup.${chr}.MQ50.SNP.DP.awk.03-.20.vcf.gz | wc -l > 983899.recaled.mpileup.${chr}.MQ50.SNP.DP.awk.03-.20.vcf.count &
+done
+
+
+
+
+##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
+##INFO=<ID=RPB,Number=1,Type=Float,Description="Mann-Whitney U test of Read Position Bias (bigger is better)">
+##INFO=<ID=MQB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality Bias (bigger is better)">
+##INFO=<ID=BQB,Number=1,Type=Float,Description="Mann-Whitney U test of Base Quality Bias (bigger is better)">
+##INFO=<ID=MQSB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)">
+##INFO=<ID=SGB,Number=1,Type=Float,Description="Segregation based metric.">
+##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools view -i "TYPE='SNP' && DP>10 && DP<100 && VDB>0.5 && RPB>0.5 && MQB>0.5 && BQB>0.5 && MQSB>0.5 && MQ0F<0.5" | awk -v min=0.03 -v max=0.20 -f mpileup_vcf_allele_filter.awk | bgzip > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.vcf.gz &
+done
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools query -f "\n" 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.vcf.gz | wc -l > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.vcf.count &
+done
+
+
+
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools mpileup --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools view -i "TYPE='SNP' && DP>10 && DP<100 && VDB>0.5 && RPB>0.5 && MQB>0.5 && BQB>0.5 && MQSB>0.5 && MQ0F<0.5" | awk -v min=0.03 -v max=0.20 -f mpileup_vcf_allele_filter.awk | bgzip > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.NOMAXDEPTH.vcf.gz &
+done
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y ; do
+bcftools query -f "\n" 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.NOMAXDEPTH.vcf.gz | wc -l > 983899.recaled.mpileup.${chr}.MQ60.SNP.DP.Biases.awk.03-.20.NOMAXDEPTH.vcf.count &
+done
+
+Mostly the same calls without setting --max-depth, but with minor differences in the numbers.
