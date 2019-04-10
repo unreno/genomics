@@ -1,0 +1,15 @@
+
+
+
+
+nohup ./process.bash &
+
+Appears to be working but not sure if correct.
+
+First steps were extracting from a bam and as the paired reads aren't truly in sync, likely incorrect. 
+
+
+
+
+
+
