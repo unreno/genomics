@@ -34,7 +34,7 @@ BEGIN{
 
 #		ref_ad  = INFO_AD[1]
 		alt_ad1 = INFO_AD[2]
-#		alt_ad2 = INFO_AD[3]
+		alt_ad2 = INFO_AD[3]
 #		alt_ad3 = INFO_AD[4]
 
 #		print info["DP"]
@@ -44,7 +44,7 @@ BEGIN{
 
 #	DP can be 0, but realistically, I filter on it before this
 
-	if( ( info["DP"] > 10 ) && ( ( alt_ad1 >= 3 && alt_ad1/info["DP"] >= min && alt_ad1/info["DP"] <= max ) ) )
+	if( ( info["DP"] > 10 ) && ( ( alt_ad1 >= 3 && alt_ad1/info["DP"] >= min && alt_ad1/info["DP"] <= max ) || ( alt_ad2 >= 3 && alt_ad2/info["DP"] >= min && alt_ad2/info["DP"] <= max )) )
 		print
 
 #	if( ( info["DP"] > 10 ) && ( ( alt_ad1 > 3 && alt_ad1/info["DP"] <= 0.45 ) || ( alt_ad2 > 3 && alt_ad2/info["DP"] <= 0.45 ) || ( alt_ad3 > 3 && alt_ad3/info["DP"] <= 0.45 ) ) )

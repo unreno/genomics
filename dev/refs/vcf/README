@@ -118,9 +118,24 @@ gatk IndexFeatureFile -F dbsnp_146.hg38.num.MT.vcf.gz &
 
 
 
-gnomAD
+gnomAD ( sadly they are sticking with hg19 and HUGE, nearly 500GB )
 
 https://storage.googleapis.com/gnomad-public/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz
 
 https://storage.googleapis.com/gnomad-public/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz.tbi
+
+
+pip install gsutil
+gsutil ls gs://gnomad-public/release/2.0.2/vcf/genomes/liftover_grch38/
+
+gsutil rsync -x gnomad.genomes.r2.0.2.sites.liftover.b38.autosomes_and_X.vcf.gz gs://gnomad-public/release/2.0.2/vcf/genomes/liftover_grch38/ gnomad.genomes.r2.0.2.sites.liftover.b38/
+
+
+Oddly, this version is on 89GB
+The individual 2.1.1 files are almost 800 GB!
+
+gsutil -m rsync -x gnomad.genomes.r2.1.1.sites.vcf.bg* -x gnomad.genomes.r2.1.1.exome_calling_intervals.sites.vcf.bg* gs://gnomad-public/release/2.1.1/vcf/genomes/ gnomad.genomes.r2.1.1.sites/
+
+
+
 
