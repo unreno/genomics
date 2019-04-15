@@ -1,0 +1,4 @@
+
+nohup chimera.bash --human hg38.num.fa --viral HERVK113 --threads 40 /raid/data/raw/CCLS_983899/983899.1.fa /raid/data/raw/CCLS_983899/983899.2.fa &
+
+

@@ -11,11 +11,16 @@ wd=$PWD
 #	or maybe that's just these perl scripts?
 #	regardless, the Human and TE files need to be indexed in the same dir.
 
+#	Seems that the human reference MUST NOT BE COMPRESSED
+
+#	-T /home/jake/.github/jakewendt/ERVcaller/Database/HERVK.fa \
+#	-T /raid/refs/fasta/SVAs_and_HERVs_KWHE.fasta \
+
 /home/jake/.github/jakewendt/ERVcaller/ERVcaller_v1.4.pl \
 	-i 983899.recaled \
 	-f .bam \
-	-H /raid/refs/fasta/hg38.num.fa.gz \
-	-T /home/jake/.github/jakewendt/ERVcaller/Database/HERVK.fa \
+	-H /raid/refs/fasta/hg38.num.fa \
+	-T /raid/refs/fasta/HERVK113.fasta \
 	-I /raid/data/raw/CCLS/bam/ \
 	-O /raid/data/working/CCLS/20190405-ERVCaller/ \
 	-t 40 -S 20 -BWA_MEM
