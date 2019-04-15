@@ -22,8 +22,7 @@ else
 	chmod a-w $f
 fi
 
-echo $f > report.txt
-samtools view $f  | awk '{print $1}' | sort | uniq -c >> report.txt
+samtools view $f  | awk '{print $1}' | sort | uniq -c >> $f.txt
 
 date
 
@@ -38,8 +37,7 @@ else
 	chmod a-w $f
 fi
 
-echo $f >> report.txt
-samtools view $f  | awk '{print $1}' | sort | uniq -c >> report.txt
+samtools view $f  | awk '{print $1}' | sort | uniq -c >> $f.txt
 
 date
 
@@ -54,8 +52,7 @@ else
 	chmod a-w $f
 fi
 
-echo $f >> report.txt
-samtools view $f  | awk '{print $1}' | sort | uniq -c >> report.txt
+samtools view $f  | awk '{print $1}' | sort | uniq -c >> $f.txt
 
 date
 
@@ -70,8 +67,7 @@ else
 	chmod a-w $f
 fi
 
-echo $f >> report.txt
-samtools view $f  | awk '{print $1}' | sort | uniq -c >> report.txt
+samtools view $f  | awk '{print $1}' | sort | uniq -c >> $f.txt
 
 date
 
