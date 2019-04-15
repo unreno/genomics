@@ -24,8 +24,8 @@ fi
 
 chr=$1
 
-mkdir -p 983899.germline
-cd 983899.germline
+mkdir -p 983899.default
+cd 983899.default
 
 #	Currently in development and keeping all, which will make first output large.
 
@@ -75,5 +75,5 @@ bcftools concat -Oz -o 983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz 983899.rec
 bcftools index 983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz
 
 
-bcftools isec -p 983899.recaled.germline.somatic /raid/data/raw/CCLS/bam/983899.germline/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz /raid/data/raw/CCLS/bam/983899.somatic/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz
+bcftools isec -p 983899.recaled.default.somatic /raid/data/raw/CCLS/bam/983899.default/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz /raid/data/raw/CCLS/bam/983899.somatic/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz
 
