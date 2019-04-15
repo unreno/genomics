@@ -1107,116 +1107,21 @@ done
 
 
 
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools call --keep-alts --multiallelic-caller | bcftools annotate -a /raid/refs/vcf/gnomad.genomes.r2.0.2.sites.liftover.b38/gnomad.genomes.r2.0.2.sites.chr${chr}.liftover.b38.vcf.gz --columns ID,INFO/AC,INFO/AN,INFO/AF | bcftools view -i "TYPE='SNP' && DP>10 && DP<100" -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.annotate.SNP.DP.vcf.gz &
-done
-
-Annotate input needs to be compressed and indexed so separate steps.
---variants-only will remove many that I'd like to keep
-#bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools call --variants-only --keep-alts --multiallelic-caller -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.vcf.gz &
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' --regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa 983899.recaled.bam | bcftools call --keep-alts --multiallelic-caller -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.vcf.gz &
-done
-
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools index 983899.recaled.${chr}.mpileup.MQ60.call.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.vcf.count &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools view -i "TYPE='SNP' && DP>10 && DP<100" -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz 983899.recaled.${chr}.mpileup.MQ60.call.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.count &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools index 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools annotate -a /raid/refs/vcf/gnomad.genomes.r2.0.2.sites.liftover.b38/gnomad.genomes.r2.0.2.sites.chr${chr}.liftover.b38.vcf.gz --columns ID,GNOMAD_AC:=AC,GNOMAD_AN:=AN,GNOMAD_AF:=AF -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.count &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools index 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz &
-done
 
 
 
 
-       ·   array subscripts (0-based), "*" for any element, "-" to indicate a range. Note that for querying FORMAT
-           vectors, the colon ":" can be used to select a sample and an element of the vector, as shown in the
-           examples below
-
-               INFO/AF[0] > 0.3             .. first AF value bigger than 0.3
-               FORMAT/AD[0:0] > 30          .. first AD value of the first sample bigger than 30
-               FORMAT/AD[0:1]               .. first sample, second AD value
-               FORMAT/AD[1:0]               .. second sample, first AD value
-               DP4[*] == 0                  .. any DP4 value
-               FORMAT/DP[0]   > 30         .. DP of the first sample bigger than 30
-               FORMAT/DP[1-3] > 10         .. samples 2-4
-               FORMAT/DP[1-]  < 7          .. all samples but the first
-               FORMAT/DP[0,2-4] > 20       .. samples 1, 3-5
-               FORMAT/AD[0:1]              .. first sample, second AD field
-               FORMAT/AD[0:*], AD[0:] or AD[0] .. first sample, any AD field
-               FORMAT/AD[*:1] or AD[:1]        .. any sample, second AD field
-               (DP4[0]+DP4[1])/(DP4[2]+DP4[3]) > 0.3
-               CSQ[*] ~ "missense_variant.*deleterious"
 
 
 
-Filter on POPULATION Allele Frequency, NOT individual's allele frequency?  So not --max-af
-GNOMAD_AD == '' || GNOMAD_AF < 0.001
-Not all are in the GNOMAD database
 
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools view -i "GNOMAD_AF == '' || GNOMAD_AF < 0.001" -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.vcf.gz 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.vcf.count &
-done
-
-#for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-#bcftools view -i "GNOMAD_AF < 0.001" -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz &
-#done
-#
-#for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-#bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.count &
-#done
-
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools view -i '(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.05 && (FMT/AD[0:1]/FMT/DP) <= 0.25 ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.05 && (FMT/AD[0:2]/FMT/DP) <= 0.25 ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.05 && (FMT/AD[0:3]/FMT/DP) <= 0.25 )' -Oz -o 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz &
-done
-
-for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-bcftools query -f "\n" 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz  | wc -l > 983899.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.count &
-done
-
-
-Putting all of above in script
 
 
 for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
 nohup ./create_somatic_vcfs.bash $chr &
 done
 
-
-
 cat *mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.count | awk '{s+=$1}END{print s}'
-
 
 bcftools concat -Oz -o 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz 983899.recaled.[1-9].mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz 983899.recaled.1?.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz 983899.recaled.2?.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz 983899.recaled.X.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz
 
@@ -1227,4 +1132,20 @@ mkdir 983899.recaled.mpileup.filtered-strelka
 bcftools isec -c all -n =2 -w 2 -r 1 -p 983899.recaled.mpileup.filtered-strelka ../vcf/983899.hg38_num_noalts.loc.strelka.filtered/TUMOR.vcf.gz 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz
 
 bcftools isec -p 983899.recaled.mpileup.filtered-strelka ../vcf/983899.hg38_num_noalts.loc.strelka.filtered/TUMOR.vcf.gz 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.gz
+
+
+
+
+
+
+20190415
+
+Compare ALL called SNPs to those "variants only" called SNPs.
+
+nohup bcftools concat -Oz -o 983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz 983899.recaled.[1-9].mpileup.MQ60.call.SNP.DP.vcf.gz 983899.recaled.1?.mpileup.MQ60.call.SNP.DP.vcf.gz 983899.recaled.2?.mpileup.MQ60.call.SNP.DP.vcf.gz 983899.recaled.X.mpileup.MQ60.call.SNP.DP.vcf.gz &
+
+bcftools isec -p
+983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz
+983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz
+
 
