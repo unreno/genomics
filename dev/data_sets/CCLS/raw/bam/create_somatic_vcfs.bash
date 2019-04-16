@@ -269,7 +269,8 @@ done	#	sample
 for AF in $( seq 0.40 0.01 0.50 ) ; do
 
 	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
-	if [ -f $f ] && [ ! -w $f ] ; then
+	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
+	if [ -d $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
