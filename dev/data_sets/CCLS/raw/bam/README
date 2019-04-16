@@ -1118,7 +1118,7 @@ done
 
 
 for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-nohup ./create_somatic_vcfs.bash 983899 $chr &
+nohup ./create_somatic_vcfs.bash $chr &
 done
 
 cat *mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF2.AD.vcf.count | awk '{s+=$1}END{print s}'
@@ -1156,6 +1156,18 @@ ll /raid/data/raw/CCLS/bam/983899.germline/983899.recaled.mpileup.MQ60.call.SNP.
 
 nohup bcftools isec --output-type z --prefix 983899.recaled.germline.somatic /raid/data/raw/CCLS/bam/983899.germline/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz /raid/data/raw/CCLS/bam/983899.somatic/983899.recaled.mpileup.MQ60.call.SNP.DP.vcf.gz &
 
+
+##################################################
+
+20190415
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
+nohup ./create_somatic_vcfs.bash 983899 $chr &
+done
+
+for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
+nohup ./create_somatic_vcfs.bash GM_983899 $chr &
+done
 
 
 
