@@ -256,6 +256,44 @@ for sample in ${base_sample} GM_${base_sample} ; do
 done	#	sample
 
 
+
+for AF in $( seq 0.40 0.01 0.50 ) ; do
+
+	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
+
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+
+		mkdir -p $f
+		bcftools isec --regions ${chr} \
+			--output-type z \
+			--prefix ${f} \
+			${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
+			GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
+
+		chmod a-w $f
+	fi
+	
+done	#	AF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 exit
 
 
