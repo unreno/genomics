@@ -269,7 +269,6 @@ done	#	sample
 for AF in $( seq 0.40 0.01 0.50 ) ; do
 
 	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
-
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
@@ -282,9 +281,32 @@ for AF in $( seq 0.40 0.01 0.50 ) ; do
 			${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
 			GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
 
-		chmod a-w $f
+
+		chmod -R a-w $f
 	fi
 	
+	for i in 0000 0001 0002 0003 ; do
+
+		f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.${i}.count
+
+#Using the following file names:
+#0000.vcf.gz	for records private to	FIRST sample
+#0001.vcf.gz	for records private to	SECOND sample
+#0002.vcf.gz	for records from FIRST sample shared by both
+#0003.vcf.gz	for records from SECOND sample shared by both
+
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			bcftools query -f "\n" \
+				${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}/${i}.vcf.gz \
+				| wc -l > $f
+			chmod a-w $f
+		fi
+
+	done
+
 done	#	AF
 
 
