@@ -238,6 +238,15 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 		
+		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz.csi
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			bcftools index $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz
+			chmod a-w $f
+		fi
+		
 		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.count
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
