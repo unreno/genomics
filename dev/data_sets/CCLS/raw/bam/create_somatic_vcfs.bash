@@ -243,7 +243,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools index $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz
+			bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz
 			chmod a-w $f
 		fi
 		
