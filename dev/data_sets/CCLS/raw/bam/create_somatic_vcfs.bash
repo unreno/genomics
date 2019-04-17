@@ -288,14 +288,12 @@ for AF in $( seq 0.40 0.01 0.50 ) ; do
 	
 	for i in 0000 0001 0002 0003 ; do
 
+		#0000.vcf.gz	for records private to	FIRST sample
+		#0001.vcf.gz	for records private to	SECOND sample
+		#0002.vcf.gz	for records from FIRST sample shared by both
+		#0003.vcf.gz	for records from SECOND sample shared by both
+
 		f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.${i}.count
-
-#Using the following file names:
-#0000.vcf.gz	for records private to	FIRST sample
-#0001.vcf.gz	for records private to	SECOND sample
-#0002.vcf.gz	for records from FIRST sample shared by both
-#0003.vcf.gz	for records from SECOND sample shared by both
-
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
