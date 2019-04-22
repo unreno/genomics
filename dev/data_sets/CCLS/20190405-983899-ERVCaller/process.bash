@@ -16,14 +16,32 @@ wd=$PWD
 #	-T /home/jake/.github/jakewendt/ERVcaller/Database/HERVK.fa \
 #	-T /raid/refs/fasta/SVAs_and_HERVs_KWHE.fasta \
 
+
+output_dir=/raid/data/working/CCLS/20190405-983899-ERVCaller/HERVK113-bam/
+mkdir -p $output_dir
 /home/jake/.github/jakewendt/ERVcaller/ERVcaller_v1.4.pl \
+	-I /raid/data/raw/CCLS/bam/ \
 	-i 983899.recaled \
 	-f .bam \
+	-O ${output_dir} \
 	-H /raid/refs/fasta/hg38.num.fa \
 	-T /raid/refs/fasta/HERVK113.fasta \
-	-I /raid/data/raw/CCLS/bam/ \
-	-O /raid/data/working/CCLS/20190405-ERVCaller/ \
-	-t 40 -S 20 -BWA_MEM
+	-t 40 -S 20 -BWA_MEM &
+
+
+#/raid/data/raw/CCLS_983899/983899_1.fastq.gz
+# MUST BE _1 and _2
+
+output_dir=/raid/data/working/CCLS/20190405-983899-ERVCaller/HERVK113-fastq/
+mkdir -p $output_dir
+/home/jake/.github/jakewendt/ERVcaller/ERVcaller_v1.4.pl \
+	-I /raid/data/raw/CCLS_983899/ \
+	-i 983899 \
+	-f .fastq.gz \
+	-O ${output_dir} \
+	-H /raid/refs/fasta/hg38.num.fa \
+	-T /raid/refs/fasta/HERVK113.fasta \
+	-t 40 -S 20 -BWA_MEM &
 
 
 #	Step 2 seems to be finding (-f 4 -F 264)
@@ -74,6 +92,3 @@ wd=$PWD
 #       -B|BWA_MEM				If the bam file is generated using aligner BWA_MEM. Default: Not specified
 #       -G|Genotype				Genotyping function (input bam file need to be indexed). Default: not specified
 #       -h|help					Print this help
-
-
-

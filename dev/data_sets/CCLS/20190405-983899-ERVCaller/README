@@ -12,4 +12,7 @@ First steps were extracting from a bam and as the paired reads aren't truly in s
 
 
 
+awk 'BEGIN{FS=OFS="\t"}( !/^#/ ){print $1,$2}' 983899.recaled.vcf | sort -k 1n,1 -k 2n,2 > 983899.recaled.vcf.txt 
+
+
 
