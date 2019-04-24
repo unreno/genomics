@@ -3,7 +3,18 @@
 Chimera of "sickle" trimmed data
 
 
-/raid/data/working/20190423-chimera.bash MS-20190422
+./20190423-chimera.bash MS-20190422 hg38.chr6 
+
+
+for d in /raid/data/working/MS-20190422/20190423-chimera/20190423-chimera-*-hg38.chr6 ; do
+echo $d
+cd $d
+../mini_chimera.bash --human hg38.chr6 blah &
+done
+
+
+
+
 
 
 
