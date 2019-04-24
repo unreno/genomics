@@ -11,8 +11,25 @@ for r1 in /raid/data/raw/MS-20190422/*R1.fastq.gz ; do
 	r2=${r1/_R1/_R2}
 	base=$(basename $r1 _R1.fastq.gz) 
 
-#echo "sickle pe -g -t sanger -f ${r1} -r ${r2} -o ${base}_R1.fastq.gz -p ${base}_R2.fastq.gz -s /dev/null > ${base}.sickle.log 2> ${base}.sickle.err"
+	f=${base}.hg38.chr6_alts.bam
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bowtie2 --threads 40 --very-sensitive -x hg38.chr6_alts -1 ${r1} -2 ${r2} \
+			2> ${base}.bowtie2.err \
+			| samtools view -o ${base}.hg38.chr6_alts.bam - > ${base}.samtools.log 2> ${base}.samtools.err
+		chmod a-w $f
+	fi
 
-	bowtie2 --threads 40 --very-sensitive -x hg38.chr6_alts -1 ${r1} -2 ${r2} 2> ${base}.bowtie2.err | samtools view -o ${base}.hg38.chr6_alts.bam - > ${base}.samtools.log 2> ${base}.samtools.err
+	f=${base}.hg38.chr6_alts.counts
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		samtools view ${base}.hg38.chr6_alts.bam | awk '{print $3}' | sort | uniq -c > $f
+		chmod a-w $f
+	fi
+
 done 
 
