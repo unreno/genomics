@@ -31,5 +31,14 @@ for r1 in /raid/data/raw/MS-20190422/*R1.fastq.gz ; do
 		chmod a-w $f
 	fi
 
+	f=${base}.hg38.chr6_alts.proper_pair.counts
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		samtools view -f 2 ${base}.hg38.chr6_alts.bam | awk '{print $3}' | sort | uniq -c > $f
+		chmod a-w $f
+	fi
+
 done 
 
