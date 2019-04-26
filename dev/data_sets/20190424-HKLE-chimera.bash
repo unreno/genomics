@@ -2,6 +2,9 @@
 
 
 echo $0
+script_base=$( basename $0 .bash )
+echo "script_base: ${script_base}"
+
 
 if [ $# -ne 2 ] ; then
 	echo "Expecting project and human reference"
@@ -16,9 +19,6 @@ echo "Project: ${project}"
 human=$2		#	hg38.chr6	#	hg38_no_alts
 echo "Human: ${human}"
 
-script_base=$( basename $0 .bash )
-echo "script_base: ${script_base}"
-
 
 for virus in HERV_K113 SVA_A SVA_B SVA_C SVA_D SVA_E SVA_F ; do
 echo $virus
@@ -32,4 +32,4 @@ cd ..
 
 done
 
-} > $0.log 2> $0.err
+} > ${script_base}.log 2> ${script_base}.err
