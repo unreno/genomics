@@ -280,9 +280,7 @@ for AF in $( seq 0.40 0.01 0.50 ) ; do
 			--output-type z \
 			--prefix ${f} \
 			${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
-			GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
-
-
+			GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz
 		chmod -R a-w $f
 	fi
 	
