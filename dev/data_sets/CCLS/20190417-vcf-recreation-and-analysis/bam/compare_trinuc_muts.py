@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import glob
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
@@ -12,14 +13,18 @@ pdf = matplotlib.backends.backend_pdf.PdfPages("plots.pdf")
 complements={'A':'T','C':'G','G':'C','T':'A'}
 nucleotides=sorted(complements.keys())
 
-for file in '983899.somatic/983899.count_trinuc_muts.counts.txt', '983899.somatic/983899_strelka.count_trinuc_muts.counts.txt':
+for filepath in sorted(glob.glob('*.somatic/*.0.??.count_trinuc_muts.counts.txt')):
+	print(filepath)
+	filename=filepath.split('/')[1]
+	print(filename)
 
-	tumor=pd.read_csv(file,
+
+	sample=pd.read_csv(filepath,
 		header=None,
 		sep='\s+',
 		names=['count','trinuc'])
-	tumor['rc_trinuc']=''
-	tumor['rc_count']=0
+	sample['rc_trinuc']=''
+	sample['rc_count']=0
 	
 	for nt1 in nucleotides:	#[0:2]:
 		for nt2 in ['C','T']:	#nucleotides:
@@ -30,8 +35,8 @@ for file in '983899.somatic/983899.count_trinuc_muts.counts.txt', '983899.somati
 					mut=nt1+'['+nt2+'>'+nt3+']'+nt4
 					rcmut=complements[nt4]+'['+complements[nt2]+'>'+complements[nt3]+']'+complements[nt1]
 	
-					mut_row=tumor[tumor['trinuc'] == mut]
-					rcmut_row=tumor[tumor['trinuc'] == rcmut]
+					mut_row=sample[sample['trinuc'] == mut]
+					rcmut_row=sample[sample['trinuc'] == rcmut]
 	
 					mut_row_count=len(mut_row)
 					rcmut_row_count=len(rcmut_row)
@@ -43,20 +48,20 @@ for file in '983899.somatic/983899.count_trinuc_muts.counts.txt', '983899.somati
 	
 					if mut_row_count == 0:
 						mut_count=0 
-						tumor=tumor.append({ 'trinuc': mut, 'count': 0,
+						sample=sample.append({ 'trinuc': mut, 'count': 0,
 							'rc_trinuc': rcmut, 'rc_count': rcmut_count }, ignore_index=True)
 					else:
 						mut_count=mut_row.iloc[0]['count']
-						tumor.at[mut_row.index,'rc_trinuc'] = rcmut
-						tumor.at[mut_row.index,'rc_count'] = rcmut_count
+						sample.at[mut_row.index,'rc_trinuc'] = rcmut
+						sample.at[mut_row.index,'rc_count'] = rcmut_count
 				
-	tumor.drop(tumor[tumor['rc_trinuc']==''].index, inplace=True)
-	tumor.sort_values(by=['trinuc'], inplace=True)
-	tumor.reset_index(drop=True, inplace=True)
+	sample.drop(sample[sample['rc_trinuc']==''].index, inplace=True)
+	sample.sort_values(by=['trinuc'], inplace=True)
+	sample.reset_index(drop=True, inplace=True)
 	
-	tumor['total']=tumor['count']+tumor['rc_count']
+	sample['total']=sample['count']+sample['rc_count']
 	
-	tumor.plot(x='trinuc', y='total', kind='bar',title=file)
+	sample.plot(x='trinuc', y='total', kind='bar',title=filename)
 	pdf.savefig( )
 	plt.close()
 
