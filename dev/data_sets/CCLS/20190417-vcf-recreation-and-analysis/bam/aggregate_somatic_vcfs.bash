@@ -31,7 +31,7 @@ cd ${base_sample}.somatic
 
 for sample in ${base_sample} GM_${base_sample} ; do
 
-	for AF in $( seq 0.40 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 		f=${sample}.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz
 		if [ -f ${f} ] && [ ! -w ${f} ] ; then

@@ -226,7 +226,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		chmod a-w $f
 	fi
 	
-	for AF in $( seq 0.40 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 	
 		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz 
 		if [ -f $f ] && [ ! -w $f ] ; then
@@ -266,7 +266,7 @@ done	#	sample
 
 
 
-for AF in $( seq 0.40 0.01 0.50 ) ; do
+for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
 	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
@@ -306,71 +306,4 @@ for AF in $( seq 0.40 0.01 0.50 ) ; do
 
 done	#	AF
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exit
-
-
-
-
-
-#	After all run
-
-echo mpileup.MQ60.call.vcf.count
-cat *mpileup.MQ60.call.vcf.count | awk '{s+=$1}END{print s}'
-echo mpileup.MQ60.call.SNP.DP.vcf.count
-cat *mpileup.MQ60.call.SNP.DP.vcf.count | awk '{s+=$1}END{print s}'
-echo mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.count
-cat *mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.count | awk '{s+=$1}END{print s}'
-echo mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.count
-cat *mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.count | awk '{s+=$1}END{print s}'
-echo mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.count
-cat *mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.count | awk '{s+=$1}END{print s}'
-
-
-bcftools concat -Oz -o 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz 983899.recaled.[1-9].mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz 983899.recaled.1?.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz 983899.recaled.2?.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz 983899.recaled.X.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz
-
-bcftools index 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz
-
-/bin/rm -rf 983899.recaled.mpileup.filtered-strelka
-mkdir 983899.recaled.mpileup.filtered-strelka
-
-bcftools isec -p 983899.recaled.mpileup.filtered-strelka /raid/data/raw/CCLS/vcf/983899.hg38_num_noalts.loc.strelka.filtered/TUMOR.vcf.gz 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz
-
-ll 983899.recaled.mpileup.filtered-strelka
-
-
-
-
-bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t983899\n" 983899.recaled.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz > 983899.count_trinuc_muts.input.txt
-
-/home/jake/.github/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa 983899.count_trinuc_muts.input.txt
-mv 983899.count_trinuc_muts.input.txt.*.count.txt 983899.count_trinuc_muts.txt
-
-tail -n +2 983899.count_trinuc_muts.txt | awk -F"\t" '{print $7}' | sort | uniq -c > 983899.count_trinuc_muts.counts.txt
-
-
-
-
-
-bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t983899\n" /raid/data/raw/CCLS/vcf/983899.hg38_num_noalts.loc.strelka.filtered/TUMOR.vcf.gz > 983899_strelka.count_trinuc_muts.input.txt
-
-/home/jake/.github/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa 983899_strelka.count_trinuc_muts.input.txt
-mv 983899_strelka.count_trinuc_muts.input.txt.*.count.txt 983899_strelka.count_trinuc_muts.txt
-
-tail -n +2 983899_strelka.count_trinuc_muts.txt | awk -F"\t" '{print $7}' | sort | uniq -c > 983899_strelka.count_trinuc_muts.counts.txt
 
