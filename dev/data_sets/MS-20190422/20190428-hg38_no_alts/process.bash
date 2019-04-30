@@ -11,7 +11,7 @@ for r1 in /raid/data/raw/MS-20190422/*R1.fastq.gz ; do
 	r2=${r1/_R1/_R2}
 	base=$(basename $r1 _R1.fastq.gz) 
 
-	ref=hg38
+	ref=hg38_no_alts
 
 	f=${base}.${ref}.bam
 	if [ -f $f ] && [ ! -w $f ] ; then
