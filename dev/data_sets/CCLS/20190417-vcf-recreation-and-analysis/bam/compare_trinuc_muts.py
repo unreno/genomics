@@ -13,7 +13,7 @@ pdf = matplotlib.backends.backend_pdf.PdfPages("plots.pdf")
 complements={'A':'T','C':'G','G':'C','T':'A'}
 nucleotides=sorted(complements.keys())
 
-for filepath in sorted(glob.glob('*.somatic/*.0.??.count_trinuc_muts.counts.txt')):
+for filepath in sorted(glob.glob('*.somatic/*.0.[25]0.count_trinuc_muts.counts.txt')):
 	print(filepath)
 	filename=filepath.split('/')[1]
 	print(filename)
@@ -25,9 +25,11 @@ for filepath in sorted(glob.glob('*.somatic/*.0.??.count_trinuc_muts.counts.txt'
 		names=['count','trinuc'])
 	sample['rc_trinuc']=''
 	sample['rc_count']=0
+
 	
-	for nt1 in nucleotides:	#[0:2]:
-		for nt2 in ['C','T']:	#nucleotides:
+	
+	for nt1 in nucleotides:
+		for nt2 in ['C','T']:
 			for nt3 in nucleotides:
 				if( nt2 == nt3 ):
 					continue
@@ -56,12 +58,20 @@ for filepath in sorted(glob.glob('*.somatic/*.0.??.count_trinuc_muts.counts.txt'
 						sample.at[mut_row.index,'rc_count'] = rcmut_count
 				
 	sample.drop(sample[sample['rc_trinuc']==''].index, inplace=True)
-	sample.sort_values(by=['trinuc'], inplace=True)
+	sample['nt1'] = sample['trinuc'].str[0]
+	sample['nt2'] = sample['trinuc'].str[2]
+	sample['nt3'] = sample['trinuc'].str[4]
+	sample['nt4'] = sample['trinuc'].str[6]
+
+#	sample.sort_values(by=['trinuc'], inplace=True)
+	sample.sort_values(by=['nt2','nt3','nt1','nt4'], inplace=True)
+
 	sample.reset_index(drop=True, inplace=True)
 	
 	sample['total']=sample['count']+sample['rc_count']
 	
-	sample.plot(x='trinuc', y='total', kind='bar',title=filename)
+	#sample.plot(x='trinuc', y='total', kind='bar', title=filename, logy=True)
+	sample.plot(x='trinuc', y='total', kind='bar', title=filename )
 	pdf.savefig( )
 	plt.close()
 

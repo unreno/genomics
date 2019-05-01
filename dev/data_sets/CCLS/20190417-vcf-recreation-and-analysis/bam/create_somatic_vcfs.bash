@@ -6,6 +6,7 @@ set -e	#	exit if any command fails
 set -u	#	Error on usage of unset variables
 set -o pipefail
 wd=$PWD
+bam_dir=/raid/data/raw/CCLS/bam
 
 if [ $# -ne 2 ] ; then
 	echo "Requires two arguments: the sample id and the chromosome"
@@ -36,13 +37,18 @@ cd ${base_sample}.somatic
 
 for sample in ${base_sample} GM_${base_sample} ; do
 
+	if [ ! -f ${bam_dir}/${sample}.recaled.bam ] ;  then
+		echo "${bam_dir}/${sample}.recaled.bam not found. Skipping."
+		continue
+	fi
+
 	f=${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
 		bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' \
-			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa $wd/${sample}.recaled.bam \
+			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa ${bam_dir}/${sample}.recaled.bam \
 			| bcftools call --keep-alts --multiallelic-caller -Oz -o $f
 		chmod a-w $f
 	fi
@@ -269,6 +275,13 @@ done	#	sample
 for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
+
+	if [ ! -f ${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz ] || [ ! -f GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz ] ; then
+		echo "One of the source VCF files does not exist so skipping."
+		continue
+	fi
+
+
 	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
 	if [ -d $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."

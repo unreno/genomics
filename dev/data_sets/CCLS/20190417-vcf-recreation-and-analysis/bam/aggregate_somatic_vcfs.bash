@@ -6,6 +6,7 @@ set -e	#	exit if any command fails
 set -u	#	Error on usage of unset variables
 set -o pipefail
 wd=$PWD
+bam_dir=/raid/data/raw/CCLS/bam
 
 if [ $# -ne 1 ] ; then
 	echo "Requires one argument: the sample id"
@@ -30,6 +31,11 @@ cd ${base_sample}.somatic
 #	with the added sample and allele depth tags (AD and DP)
 
 for sample in ${base_sample} GM_${base_sample} ; do
+	
+	if [ ! -f ${bam_dir}/${sample}.recaled.bam ] ;  then
+		echo "${bam_dir}/${sample}.recaled.bam not found. Skipping."
+		continue
+	fi
 
 	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
