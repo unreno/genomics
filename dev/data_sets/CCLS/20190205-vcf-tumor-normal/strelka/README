@@ -289,3 +289,15 @@ bcftools isec 983899.hg38_num_noalts.e2e_PP_e2e_loc_PP_loc/0003.vcf.gz /raid/dat
 
 
 
+
+
+
+for vcf in /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/*hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ; do 
+echo $vcf
+#	vcf to trinuc input
+#	count trinucs
+done
+
+#	plot trinuc counts
+
+

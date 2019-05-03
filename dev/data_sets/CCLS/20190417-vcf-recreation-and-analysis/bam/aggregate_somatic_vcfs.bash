@@ -94,14 +94,6 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
-
-#	fold in reverse complements
-#	plot trinuc counts / ratios
-	
-
-
-
-
 	done	#	AF
 
 done	#	sample
