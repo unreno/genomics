@@ -49,7 +49,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		echo "Creating $f"
 		bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' \
 			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa ${bam_dir}/${sample}.recaled.bam \
-			| bcftools call --keep-alts --multiallelic-caller -Oz -o $f
+			| bcftools call --keep-alts --multiallelic-caller --output-type z --output-file $f
 		chmod a-w $f
 	fi
 	
@@ -67,119 +67,95 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz \
-			| wc -l > $f
+		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz | wc -l > $f
 		chmod a-w $f
 	fi
 	
-	#	983899 - 2787476084 ( nearly 3 billion as expected )
 	
+	#	Tumor 65x, Normal 40x
+	#	Select only SNPs with DP between 10 and 200 (~3x coverage)
 	
-	#	Select only SNPs with DP between 10 and 100
-	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view -i "TYPE='SNP' && DP>10 && DP<100" -Oz \
-			-o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz
+		bcftools view --include "TYPE='SNP' && DP>10 && DP<200" --output-type z \
+			--output-file $f ${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz
 		chmod a-w $f
 	fi
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.count
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz.csi
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz \
-			| wc -l > $f
+		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz
 		chmod a-w $f
 	fi
 	
-	#	983899 - 246632193 ( Down to about 10% )
-	
-	
-	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz.csi
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.count
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz
+		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz | wc -l > $f
 		chmod a-w $f
 	fi
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz 
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.vcf.gz 
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools annotate -a /raid/refs/vcf/gnomad.genomes.r2.0.2.sites.liftover.b38/gnomad.genomes.r2.0.2.sites.chr${chr}.liftover.b38.vcf.gz --columns ID,GNOMAD_AC:=AC,GNOMAD_AN:=AN,GNOMAD_AF:=AF -Oz \
-			-o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.vcf.gz
+		bcftools annotate -a /raid/refs/vcf/gnomad.genomes.r2.0.2.sites.liftover.b38/gnomad.genomes.r2.0.2.sites.chr${chr}.liftover.b38.vcf.gz --columns ID,GNOMAD_AC:=AC,GNOMAD_AN:=AN,GNOMAD_AF:=AF --output-type z \
+			--output-file $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz
 		chmod a-w $f
 	fi
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz.csi
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.vcf.gz.csi
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz
+		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.vcf.gz
 		chmod a-w $f
 	fi
 	
 	
 	#	Select only unknown and rare gnomad SNPs.
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz 
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.gz 
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view -i "GNOMAD_AF == '' || GNOMAD_AF < 0.001" -Oz \
-			-o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.vcf.gz
+		bcftools view --include "GNOMAD_AF == '' || GNOMAD_AF < 0.001" --output-type z \
+			--output-file $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.vcf.gz
 		chmod a-w $f
 	fi
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.count
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.gz.csi
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz \
+		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.gz
+		chmod a-w $f
+	fi
+	
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.count
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.gz \
 			| wc -l > $f
 		chmod a-w $f
 	fi
 	
-	#	983899 - 242297670 ( sadly, minimal impact )
-	
 	
 	#	#	3/63 = 0.047...
-	#	
-	#	#	Select alternate alleles with a depth of at least 3 and a portion between 0.04 and 0.25
-	#	
-	#	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.gz 
-	#	if [ -f $f ] && [ ! -w $f ] ; then
-	#		echo "Write-protected $f exists. Skipping."
-	#	else
-	#		echo "Creating $f"
-	#		bcftools view -i '(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= 0.25 ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.04 && (FMT/AD[0:2]/FMT/DP) <= 0.25 ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.04 && (FMT/AD[0:3]/FMT/DP) <= 0.25 )' \
-	#			-Oz -o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz
-	#		chmod a-w $f
-	#	fi
-	#	
-	#	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.count
-	#	if [ -f $f ] && [ ! -w $f ] ; then
-	#		echo "Write-protected $f exists. Skipping."
-	#	else
-	#		echo "Creating $f"
-	#		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.gz \
-	#			| wc -l > $f
-	#		chmod a-w $f
-	#	fi
-	#	
-	#	#	983899 - 2124370 ( Under 1% )
 	#	
 	#	#	Select only half on the "better" side of these biases
 	#	##INFO=<ID=VDB,Number=1,Type=Float,Description="Variant Distance Bias for filtering splice-site artefacts in RNA-seq data (bigger is better)",Version="3">
@@ -188,135 +164,121 @@ for sample in ${base_sample} GM_${base_sample} ; do
 	#	##INFO=<ID=BQB,Number=1,Type=Float,Description="Mann-Whitney U test of Base Quality Bias (bigger is better)">
 	#	##INFO=<ID=MQSB,Number=1,Type=Float,Description="Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)">
 	#	##INFO=<ID=MQ0F,Number=1,Type=Float,Description="Fraction of MQ0 reads (smaller is better)">
-	#	
-	#	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz 
-	#	if [ -f $f ] && [ ! -w $f ] ; then
-	#		echo "Write-protected $f exists. Skipping."
-	#	else
-	#		echo "Creating $f"
-	#		bcftools view -i 'VDB>0.5 && RPB>0.5 && MQB>0.5 && BQB>0.5 && MQSB>0.5 && MQ0F<0.5' \
-	#			-Oz -o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.vcf.gz
-	#		chmod a-w $f
-	#	fi
-	#	
-	#	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.count
-	#	if [ -f $f ] && [ ! -w $f ] ; then
-	#		echo "Write-protected $f exists. Skipping."
-	#	else
-	#		echo "Creating $f"
-	#		bcftools query -f "\n" ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.AD.Bias.vcf.gz \
-	#			| wc -l > $f
-	#		chmod a-w $f
-	#	fi
-	#	
-	#	#	983899 - 108766 ( Under 0.1% )
+
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz 
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz 
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view -i 'VDB>0.5 && RPB>0.5 && MQB>0.5 && BQB>0.5 && MQSB>0.5 && MQ0F<0.5' \
-			-Oz -o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.vcf.gz
+		bcftools view --include 'VDB>0.5 && RPB>0.5 && MQB>0.5 && BQB>0.5 && MQSB>0.5 && MQ0F<0.5' \
+			--output-type z --output-file $f \
+			${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.vcf.gz
 		chmod a-w $f
 	fi
 	
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.count
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz.csi
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz
+		chmod a-w $f
+	fi
+	
+	f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.count
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
 		bcftools query -f "\n" \
-			${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz \
+			${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz \
 			| wc -l > $f
 		chmod a-w $f
 	fi
 	
-	for AF in $( seq 0.20 0.01 0.50 ) ; do
+	for AF in $( seq 0.30 0.01 0.50 ) ; do
 	
-		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz 
+		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz 
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools view -i "(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= ${AF} ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.04 && (FMT/AD[0:2]/FMT/DP) <= ${AF} ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.04 && (FMT/AD[0:3]/FMT/DP) <= ${AF} )" \
-				-Oz -o $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.vcf.gz
+			bcftools view --include "(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= ${AF} ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.04 && (FMT/AD[0:2]/FMT/DP) <= ${AF} ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.04 && (FMT/AD[0:3]/FMT/DP) <= ${AF} )" \
+				--output-type z --output-file $f \
+				${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz
 			chmod a-w $f
 		fi
 		
-		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz.csi
+		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz.csi
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz
+			bcftools index ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz
 			chmod a-w $f
 		fi
 		
-		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.count
+		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.count
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
 			bcftools query -f "\n" \
-				${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
+				${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
 				| wc -l > $f
 			chmod a-w $f
 		fi
 	
-	
 	done	#	AF
-
 
 done	#	sample
 
 
-
-for AF in $( seq 0.20 0.01 0.50 ) ; do
-
-	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}
-
-	if [ ! -f ${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz ] || [ ! -f GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz ] ; then
-		echo "One of the source VCF files does not exist so skipping."
-		continue
-	fi
-
-
-	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
-	if [ -d $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-
-		mkdir -p $f
-		bcftools isec --regions ${chr} \
-			--output-type z \
-			--prefix ${f} \
-			${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz \
-			GM_${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz
-		chmod -R a-w $f
-	fi
-	
-	for i in 0000 0001 0002 0003 ; do
-
-		#0000.vcf.gz	for records private to	FIRST sample
-		#0001.vcf.gz	for records private to	SECOND sample
-		#0002.vcf.gz	for records from FIRST sample shared by both
-		#0003.vcf.gz	for records from SECOND sample shared by both
-
-		f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}.${i}.count
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			bcftools query -f "\n" \
-				${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP.annotate.GNOMAD_AF.Bias.AD.${AF}/${i}.vcf.gz \
-				| wc -l > $f
-			chmod a-w $f
-		fi
-
-	done
-
-done	#	AF
+#for AF in $( seq 0.30 0.01 0.50 ) ; do
+#
+#	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
+#
+#	if [ ! -f ${f}.vcf.gz ] || [ ! -f GM_${f}.vcf.gz ] ; then
+#		echo "One of the source VCF files does not exist so skipping."
+#		continue
+#	fi
+#
+#	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
+#	if [ -d $f ] && [ ! -w $f ] ; then
+#		echo "Write-protected $f exists. Skipping."
+#	else
+#		echo "Creating $f"
+#
+#		mkdir -p $f
+#		bcftools isec --regions ${chr} \
+#			--output-type z \
+#			--prefix ${f} \
+#			${f}.vcf.gz \
+#			GM_${f}.vcf.gz
+#		chmod -R a-w $f
+#	fi
+#	
+#	for i in 0000 0001 0002 0003 ; do
+#
+#		#0000.vcf.gz	for records private to	FIRST sample
+#		#0001.vcf.gz	for records private to	SECOND sample
+#		#0002.vcf.gz	for records from FIRST sample shared by both
+#		#0003.vcf.gz	for records from SECOND sample shared by both
+#
+#		f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.${i}.count
+#		if [ -f $f ] && [ ! -w $f ] ; then
+#			echo "Write-protected $f exists. Skipping."
+#		else
+#			echo "Creating $f"
+#			bcftools query -f "\n" \
+#				${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}/${i}.vcf.gz \
+#				| wc -l > $f
+#			chmod a-w $f
+#		fi
+#
+#	done
+#
+#done	#	AF
 
 
