@@ -49,7 +49,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		echo "Creating $f"
 		bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' \
 			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa ${bam_dir}/${sample}.recaled.bam \
-			| bcftools call --keep-alts --multiallelic-caller --output-type z --output-file $f
+			| bcftools call --keep-alts --multiallelic-caller --output-type z --output $f
 		chmod a-w $f
 	fi
 	
@@ -109,7 +109,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 	else
 		echo "Creating $f"
 		bcftools annotate -a /raid/refs/vcf/gnomad.genomes.r2.0.2.sites.liftover.b38/gnomad.genomes.r2.0.2.sites.chr${chr}.liftover.b38.vcf.gz --columns ID,GNOMAD_AC:=AC,GNOMAD_AN:=AN,GNOMAD_AF:=AF --output-type z \
-			--output-file $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz
+			--output $f ${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.vcf.gz
 		chmod a-w $f
 	fi
 	

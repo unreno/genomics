@@ -85,7 +85,7 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
+		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
 			${base_sample}.strelka.filtered.vcf.gz \
 			> ${f}
 		chmod a-w ${f}
@@ -128,7 +128,8 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 
 	base=${sample}.recaled
-	for new_suffix in mpileup.MQ60.call.SNP .DP200 .annotate.GNOMAD_AF .Bias ; do 
+	suffix=""
+	for new_suffix in mpileup.MQ60.call.SNP.DP200 .annotate.GNOMAD_AF .Bias ; do 
 		suffix=${suffix}${new_suffix}
 
 		f=${base}.${suffix}.vcf.gz
@@ -136,7 +137,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected ${f} exists. Skipping."
 		else
 			echo "Creating ${f}"
-			bcftools concat --output-type z --output-file ${f} \
+			bcftools concat --output-type z --output ${f} \
 				${base}.[1-9].${suffix}.vcf.gz \
 				${base}.1?.${suffix}.vcf.gz \
 				${base}.2?.${suffix}.vcf.gz \
@@ -210,7 +211,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected ${f} exists. Skipping."
 		else
 			echo "Creating ${f}"
-			bcftools concat --output-type z --output-file ${f} \
+			bcftools concat --output-type z --output ${f} \
 				${base}.[1-9].${suffix}.vcf.gz \
 				${base}.1?.${suffix}.vcf.gz \
 				${base}.2?.${suffix}.vcf.gz \
@@ -278,6 +279,8 @@ done	#	sample
 
 
 
+if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
+
 for AF in $( seq 0.30 0.01 0.50 ) ; do
 
 	base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
@@ -325,3 +328,4 @@ for AF in $( seq 0.30 0.01 0.50 ) ; do
 
 done
 
+fi
