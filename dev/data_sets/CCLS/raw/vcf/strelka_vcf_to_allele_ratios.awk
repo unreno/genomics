@@ -1,7 +1,8 @@
 #
 #	DESIGNED FOR SNPs ONLY
+#	DESIGNED FOR STRELKA VCFs ONLY
 #
-#	bcftools view -i "TYPE='SNP'" GM_983899.output-HC.vcf.gz | awk -f ./vcf_to_allele_ratios.awk 
+#	bcftools view -i "TYPE='SNP'" STRELKA.vcf.gz | awk -f ./strelka_vcf_to_allele_ratios.awk 
 #
 #	bcftools +split PATH/somatic.snvs.vcf.gz -Oz -o STRELKA_OUT_DIR
 #
@@ -16,7 +17,7 @@ BEGIN{ FS=OFS="\t"
 ( /^#/ ){ next; }
 {
 
-	ref_ad=alt_ad1=alt_ad2=alt_ad3=0
+	#ref_ad=alt_ad1=alt_ad2=alt_ad3=0
 	split($8,format_i ,";")
 	split($9,info_i ,":")
 	split($10,values,":")
@@ -52,15 +53,17 @@ BEGIN{ FS=OFS="\t"
 			ad["G"]=g[format["TQSS"]]
 			ad["T"]=t[format["TQSS"]]
 	
-			#ref_ad=alt_ad1=alt_ad2=alt_ad3=0
+			ref_ad=alt_ad1=alt_ad2=alt_ad3=0
 
 			ref_ad=ad[$4]
 			delete ad[$4]
 			alt_ad1=ad[$5]
 			delete ad[$5]
 			
-#			alt_ad2=	#	not using at the moment so irrelevant
-#			alt_ad3=	#	not using at the moment so irrelevant
+			asort(ad)
+
+			alt_ad2=ad[2]
+			alt_ad3=ad[1]
 
 			#			print ref_ad/info["DP"], alt_ad1/info["DP"], alt_ad2/info["DP"], alt_ad3/info["DP"]
 			print ref_ad/total, alt_ad1/total, alt_ad2/total, alt_ad3/total
