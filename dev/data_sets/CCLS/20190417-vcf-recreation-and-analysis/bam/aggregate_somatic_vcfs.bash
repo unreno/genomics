@@ -92,14 +92,20 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 	fi
 
 	f=${base_sample}.strelka.filtered.count_trinuc_muts.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
+	fgz=${f}.gz
+	if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+		echo "Write-protected ${fgz} exists. Skipping."
 	else
-		echo "Creating ${f}"
-		/home/jake/.github/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-			${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
-		mv ${base_sample}.strelka.filtered.count_trinuc_muts.input.txt.*.count.txt ${f}
-		chmod a-w ${f}
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
+		else
+			echo "Creating ${f}"
+			/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+				${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
+			mv ${base_sample}.strelka.filtered.count_trinuc_muts.input.txt.*.count.txt ${f}
+			chmod a-w ${f}
+		fi
+		gzip --best ${f}
 	fi
 
 	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
@@ -107,8 +113,9 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
-			| awk -F"\t" '{print $7}' | sort | uniq -c \
+		#tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
+		zcat ${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz \
+			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 			> ${f}
 		chmod a-w ${f}
 	fi
@@ -177,14 +184,20 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		fi
 	
 		f=${base}.${suffix}.count_trinuc_muts.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
+		fgz=${f}.gz
+		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+			echo "Write-protected ${fgz} exists. Skipping."
 		else
-			echo "Creating ${f}"
-			/home/jake/.github/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-				${base}.${suffix}.count_trinuc_muts.input.txt
-			mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-			chmod a-w ${f}
+			if [ -f ${f} ] && [ ! -w ${f} ] ; then
+				echo "Write-protected ${f} exists. Skipping."
+			else
+				echo "Creating ${f}"
+				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+					${base}.${suffix}.count_trinuc_muts.input.txt
+				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
+				chmod a-w ${f}
+			fi
+			gzip --best ${f}
 		fi
 	
 		f=${base}.${suffix}.count_trinuc_muts.counts.txt
@@ -192,8 +205,9 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected ${f} exists. Skipping."
 		else
 			echo "Creating ${f}"
-			tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-				| awk -F"\t" '{print $7}' | sort | uniq -c \
+			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
+			zcat ${base}.${suffix}.count_trinuc_muts.txt.gz \
+				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 				> ${f}
 			chmod a-w ${f}
 		fi
@@ -251,14 +265,20 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		fi
 
 		f=${base}.${suffix}.count_trinuc_muts.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
+		fgz=${f}.gz
+		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+			echo "Write-protected ${fgz} exists. Skipping."
 		else
-			echo "Creating ${f}"
-			/home/jake/.github/mcjarvis/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-				${base}.${suffix}.count_trinuc_muts.input.txt
-			mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-			chmod a-w ${f}
+			if [ -f ${f} ] && [ ! -w ${f} ] ; then
+				echo "Write-protected ${f} exists. Skipping."
+			else
+				echo "Creating ${f}"
+				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+					${base}.${suffix}.count_trinuc_muts.input.txt
+				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
+				chmod a-w ${f}
+			fi
+			gzip --best ${f}
 		fi
 
 		f=${base}.${suffix}.count_trinuc_muts.counts.txt
@@ -266,8 +286,9 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected ${f} exists. Skipping."
 		else
 			echo "Creating ${f}"
-			tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-				| awk -F"\t" '{print $7}' | sort | uniq -c \
+			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
+			zcat ${base}.${suffix}.count_trinuc_muts.txt \
+				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 				> ${f}
 			chmod a-w ${f}
 		fi
