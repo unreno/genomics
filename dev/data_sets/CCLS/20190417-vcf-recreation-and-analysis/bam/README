@@ -1,8 +1,5 @@
 
 
-
-
-
 What to do with multiple ALT calls? Split call? Threshold? Drop?
 
 Filter on Biases?
@@ -26,10 +23,6 @@ done ; done | parallel -j 40 --no-notice --joblog parallel.log &
 
 
 
-
-
-make strelka allele calls output all 4 columns
-
 move allele callers into repo base
 
 
@@ -41,6 +34,12 @@ nohup ./aggregate_somatic_vcfs.bash $sample >> ${sample}.aggregate_somatic_vcfs.
 done
 
 
+for f in *.somatic/*allele_ratios.csv ; do
+echo $f
+./allele_ratio_histogram.py $f
+done
+
 
 ./compare_trinuc_muts.py 
+
 
