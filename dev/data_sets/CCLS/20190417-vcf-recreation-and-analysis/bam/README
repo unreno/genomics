@@ -32,10 +32,20 @@ for f in *.somatic/*.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.alle
 for f in *.somatic/*.strelka.filtered.allele_ratios.csv.gz ; do
 
 
+
+
 for f in *.somatic/*allele_ratios.csv.gz ; do
 echo $f
-if [ ! -f ${f}.histogram.png ] ; then
+if [ ! -w ${f} ] ; then
+if [ -f ${f}.histogram.png ] && [ ! -w ${f}.histogram.png ]  ; then
+echo "Skipping"
+else
 allele_ratio_histogram.py $f
+chmod a-w ${f}.histogram.png
+echo "Done"
+fi
+else
+echo "Input not complete yet"
 fi
 done
 
