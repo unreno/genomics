@@ -26,11 +26,11 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		mkdir -p 983899.strelka
-		bcftools +split /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz --output-type z --output 983899.strelka
-		bcftools view --include "TYPE='SNP'" --output-type z --output-file ${f} 983899.strelka/TUMOR.vcf.gz
+		mkdir -p strelka_tmp
+		bcftools +split /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz --output-type z --output strelka_tmp
+		bcftools view --types snps --output-type z --output-file ${f} strelka_tmp/TUMOR.vcf.gz
 		chmod a-w $f
-		/bin/rm -rf 983899.strelka
+		/bin/rm -rf strelka_tmp
 	fi
 
 	f=${base_sample}.strelka.vcf.gz.csi
@@ -69,56 +69,57 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.strelka.filtered.allele_ratios.csv
+	f=${base_sample}.strelka.filtered.allele_ratios.csv.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view ${base_sample}.strelka.filtered.vcf.gz | \
-			awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/strelka_vcf_to_allele_ratios.awk \
-			> ${f}
+#		bcftools view ${base_sample}.strelka.filtered.vcf.gz | \
+#			awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/strelka_vcf_to_allele_ratios.awk \
+#			| gzip --best > ${f}
+		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
-			${base_sample}.strelka.filtered.vcf.gz \
-			> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.txt
-	fgz=${f}.gz
-	if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-		echo "Write-protected ${fgz} exists. Skipping."
-	else
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-				${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
-			mv ${base_sample}.strelka.filtered.count_trinuc_muts.input.txt.*.count.txt ${f}
-			chmod a-w ${f}
-		fi
-		gzip --best ${f}
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		#tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
-		zcat ${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz \
-			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-			> ${f}
-		chmod a-w ${f}
-	fi
+#	f=${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
+#	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#		echo "Write-protected ${f} exists. Skipping."
+#	else
+#		echo "Creating ${f}"
+#		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
+#			${base_sample}.strelka.filtered.vcf.gz \
+#			> ${f}
+#		chmod a-w ${f}
+#	fi
+#
+#	f=${base_sample}.strelka.filtered.count_trinuc_muts.txt
+#	fgz=${f}.gz
+#	if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+#		echo "Write-protected ${fgz} exists. Skipping."
+#	else
+#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#			echo "Write-protected ${f} exists. Skipping."
+#		else
+#			echo "Creating ${f}"
+#			/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+#				${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
+#			mv ${base_sample}.strelka.filtered.count_trinuc_muts.input.txt.*.count.txt ${f}
+#			chmod a-w ${f}
+#		fi
+#		gzip --best ${f}
+#	fi
+#
+#	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
+#	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#		echo "Write-protected ${f} exists. Skipping."
+#	else
+#		echo "Creating ${f}"
+#		#tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
+#		zcat ${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz \
+#			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+#			> ${f}
+#		chmod a-w ${f}
+#	fi
 
 fi
 
@@ -161,56 +162,57 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 	
-		f=${base}.${suffix}.allele_ratios.csv
+		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools view ${base}.${suffix}.vcf.gz | \
-				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
-				> ${f}
+#			bcftools view ${base}.${suffix}.vcf.gz | \
+#				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
+#				| gzip --best > ${f}
+			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
 			chmod a-w $f
 		fi
 
-		f=${base}.${suffix}.count_trinuc_muts.input.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-				${base}.${suffix}.vcf.gz \
-				> ${f}
-			chmod a-w ${f}
-		fi
-	
-		f=${base}.${suffix}.count_trinuc_muts.txt
-		fgz=${f}.gz
-		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-			echo "Write-protected ${fgz} exists. Skipping."
-		else
-			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-				echo "Write-protected ${f} exists. Skipping."
-			else
-				echo "Creating ${f}"
-				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-					${base}.${suffix}.count_trinuc_muts.input.txt
-				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-				chmod a-w ${f}
-			fi
-			gzip --best ${f}
-		fi
-	
-		f=${base}.${suffix}.count_trinuc_muts.counts.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-			zcat ${base}.${suffix}.count_trinuc_muts.txt.gz \
-				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-				> ${f}
-			chmod a-w ${f}
-		fi
+#		f=${base}.${suffix}.count_trinuc_muts.input.txt
+#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#			echo "Write-protected ${f} exists. Skipping."
+#		else
+#			echo "Creating ${f}"
+#			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
+#				${base}.${suffix}.vcf.gz \
+#				> ${f}
+#			chmod a-w ${f}
+#		fi
+#	
+#		f=${base}.${suffix}.count_trinuc_muts.txt
+#		fgz=${f}.gz
+#		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+#			echo "Write-protected ${fgz} exists. Skipping."
+#		else
+#			if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#				echo "Write-protected ${f} exists. Skipping."
+#			else
+#				echo "Creating ${f}"
+#				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+#					${base}.${suffix}.count_trinuc_muts.input.txt
+#				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
+#				chmod a-w ${f}
+#			fi
+#			gzip --best ${f}
+#		fi
+#	
+#		f=${base}.${suffix}.count_trinuc_muts.counts.txt
+#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#			echo "Write-protected ${f} exists. Skipping."
+#		else
+#			echo "Creating ${f}"
+#			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
+#			zcat ${base}.${suffix}.count_trinuc_muts.txt.gz \
+#				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+#				> ${f}
+#			chmod a-w ${f}
+#		fi
 
 	done
 
@@ -242,56 +244,57 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
-		f=${base}.${suffix}.allele_ratios.csv
+		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools view ${base}.${suffix}.vcf.gz | \
-				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
-				> ${f}
+#			bcftools view ${base}.${suffix}.vcf.gz | \
+#				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
+#				| gzip --best > ${f}
+			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
 			chmod a-w $f
 		fi
 
-		f=${base}.${suffix}.count_trinuc_muts.input.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-				${base}.${suffix}.vcf.gz \
-				> ${f}
-			chmod a-w ${f}
-		fi
-
-		f=${base}.${suffix}.count_trinuc_muts.txt
-		fgz=${f}.gz
-		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-			echo "Write-protected ${fgz} exists. Skipping."
-		else
-			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-				echo "Write-protected ${f} exists. Skipping."
-			else
-				echo "Creating ${f}"
-				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
-					${base}.${suffix}.count_trinuc_muts.input.txt
-				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-				chmod a-w ${f}
-			fi
-			gzip --best ${f}
-		fi
-
-		f=${base}.${suffix}.count_trinuc_muts.counts.txt
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-			zcat ${base}.${suffix}.count_trinuc_muts.txt \
-				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-				> ${f}
-			chmod a-w ${f}
-		fi
+#		f=${base}.${suffix}.count_trinuc_muts.input.txt
+#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#			echo "Write-protected ${f} exists. Skipping."
+#		else
+#			echo "Creating ${f}"
+#			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
+#				${base}.${suffix}.vcf.gz \
+#				> ${f}
+#			chmod a-w ${f}
+#		fi
+#
+#		f=${base}.${suffix}.count_trinuc_muts.txt
+#		fgz=${f}.gz
+#		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+#			echo "Write-protected ${fgz} exists. Skipping."
+#		else
+#			if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#				echo "Write-protected ${f} exists. Skipping."
+#			else
+#				echo "Creating ${f}"
+#				/home/jake/.github/jakewendt/Mutation-Signatures-Including-APOBEC-in-Cancer-Cell-Lines-JNCI-CS-Supplementary-Scripts/count_trinuc_muts_v8.pl pvcf /raid/refs/fasta/hg38_num_noalts.fa \
+#					${base}.${suffix}.count_trinuc_muts.input.txt
+#				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
+#				chmod a-w ${f}
+#			fi
+#			gzip --best ${f}
+#		fi
+#
+#		f=${base}.${suffix}.count_trinuc_muts.counts.txt
+#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+#			echo "Write-protected ${f} exists. Skipping."
+#		else
+#			echo "Creating ${f}"
+#			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
+#			zcat ${base}.${suffix}.count_trinuc_muts.txt \
+#				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+#				> ${f}
+#			chmod a-w ${f}
+#		fi
 
 	done	#	AF
 

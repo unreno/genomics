@@ -18,18 +18,21 @@ done ; done | parallel -j 40 --no-notice --joblog parallel.log &
 
 
 Even after a number of mods, this still takes memory into swap
+something in the perl script is eating lots of memory for no reason. probably the db fasta
 
 for sample in 983899 268325 439338 63185 634370 120207 122997 186069 201771 209605 266836 321666 341203 36077 492023 495910 506458 530196 607654 673944 73753 780690 811386 813891 833536 853767 866648 868614 871719 900420 919207 972727 99776 ; do
 echo ./aggregate_somatic_vcfs.bash $sample \>\> ${sample}.aggregate_somatic_vcfs.log 2\>\&1
-done | parallel -j 4 --no-notice --joblog parallel.aggregate.log &
+done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
+
+nohup ./aggregate_somatic_vcfs.bash $sample >> ${sample}.aggregate_somatic_vcfs.log 2>&1 &
+done
+
+for f in *.somatic/*.recaled.mpileup.MQ60.call.SNP.DP200.allele_ratios.csv.gz ; do
+for f in *.somatic/*.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.allele_ratios.csv.gz ; do
+for f in *.somatic/*.strelka.filtered.allele_ratios.csv.gz ; do
 
 
-for f in *.somatic/*.recaled.mpileup.MQ60.call.SNP.DP200.allele_ratios.csv ; do
-for f in *.somatic/*.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.allele_ratios.csv ; do
-for f in *.somatic/*.strelka.filtered.allele_ratios.csv ; do
-
-
-for f in *.somatic/*allele_ratios.csv ; do
+for f in *.somatic/*allele_ratios.csv.gz ; do
 echo $f
 if [ ! -f ${f}.histogram.png ] ; then
 allele_ratio_histogram.py $f
