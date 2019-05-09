@@ -44,6 +44,15 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
+	f=${base_sample}.strelka.vcf.count
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools query -f "\n" ${base_sample}.strelka.vcf.gz | wc -l > $f
+		chmod a-w $f
+	fi
+
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
@@ -76,10 +85,16 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-#		bcftools view ${base_sample}.strelka.filtered.vcf.gz | \
-#			awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/strelka_vcf_to_allele_ratios.awk \
-#			| gzip --best > ${f}
 		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.strelka.filtered.allele_ratios.csv.gz.histogram.png
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		allele_ratio_histogram.py ${base_sample}.strelka.filtered.allele_ratios.csv.gz
 		chmod a-w $f
 	fi
 
@@ -158,15 +173,30 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
+		f=${base}.${suffix}.vcf.count
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			bcftools query -f "\n" ${base}.${suffix}.vcf.gz | wc -l > $f
+			chmod a-w $f
+		fi
+
 		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-#			bcftools view ${base}.${suffix}.vcf.gz | \
-#				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
-#				| gzip --best > ${f}
 			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
+			chmod a-w $f
+		fi
+
+		f=${base}.${suffix}.allele_ratios.csv.gz.histogram.png
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			allele_ratio_histogram.py ${base}.${suffix}.allele_ratios.csv.gz
 			chmod a-w $f
 		fi
 
@@ -214,7 +244,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 	done
 
 
-	for AF in $( seq 0.30 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 		base=${sample}.recaled
 		suffix=mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
@@ -241,15 +271,30 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
+		f=${base}.${suffix}.vcf.count
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			bcftools query -f "\n" ${base}.${suffix}.vcf.gz | wc -l > $f
+			chmod a-w $f
+		fi
+
 		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-#			bcftools view ${base}.${suffix}.vcf.gz | \
-#				awk -f /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/raw/vcf/vcf_to_allele_ratios.awk \
-#				| gzip --best > ${f}
 			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
+			chmod a-w $f
+		fi
+
+		f=${base}.${suffix}.allele_ratios.csv.gz.histogram.png
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			allele_ratio_histogram.py ${base}.${suffix}.allele_ratios.csv.gz
 			chmod a-w $f
 		fi
 
@@ -303,7 +348,7 @@ done	#	sample
 
 if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
 
-for AF in $( seq 0.30 0.01 0.50 ) ; do
+for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 	base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
 	tumor=${base}.vcf.gz

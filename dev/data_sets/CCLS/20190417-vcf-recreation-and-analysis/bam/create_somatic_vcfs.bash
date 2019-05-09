@@ -232,7 +232,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		chmod a-w $f
 	fi
 
-	for AF in $( seq 0.30 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}.vcf.gz 
 		if [ -f $f ] && [ ! -w $f ] ; then
@@ -270,7 +270,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 done	#	sample
 
 
-#for AF in $( seq 0.30 0.01 0.50 ) ; do
+#for AF in $( seq 0.20 0.01 0.50 ) ; do
 #
 #	f=${base_sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
 #
