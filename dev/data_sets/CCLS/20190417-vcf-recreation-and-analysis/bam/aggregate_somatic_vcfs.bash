@@ -325,7 +325,7 @@ for AF in $( seq 0.30 0.01 0.50 ) ; do
 		echo "Creating $isec_dir"
 
 		mkdir -p $isec_dir
-		bcftools isec --regions ${chr} \
+		bcftools isec \
 			--output-type z \
 			--prefix ${isec_dir} \
 			${tumor} \
