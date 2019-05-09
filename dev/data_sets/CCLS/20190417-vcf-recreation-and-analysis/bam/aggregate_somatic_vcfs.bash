@@ -41,7 +41,7 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		bcftools index ${base_sample}.strelka.vcf.gz
 		chmod a-w $f
 	fi
-	
+
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
@@ -50,7 +50,7 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		bcftools view --include "FILTER='PASS'" --output-type z --output-file $f ${base_sample}.strelka.vcf.gz
 		chmod a-w $f
 	fi
-	
+
 	f=${base_sample}.strelka.filtered.vcf.gz.csi
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
@@ -59,7 +59,7 @@ if [ -f /raid/data/working/CCLS/20190205-vcf-tumor-normal/strelka/${base_sample}
 		bcftools index ${base_sample}.strelka.filtered.vcf.gz
 		chmod a-w $f
 	fi
-	
+
 	f=${base_sample}.strelka.filtered.vcf.count
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
@@ -128,7 +128,7 @@ fi
 
 
 for sample in ${base_sample} GM_${base_sample} ; do
-	
+
 	if [ ! -f ${bam_dir}/${sample}.recaled.bam ] ;  then
 		echo "${bam_dir}/${sample}.recaled.bam not found. Skipping."
 		continue
@@ -137,7 +137,8 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 	base=${sample}.recaled
 	suffix=""
-	for new_suffix in mpileup.MQ60.call.SNP.DP200 .annotate.GNOMAD_AF .Bias ; do 
+	#for new_suffix in mpileup.MQ60.call.SNP.DP200 .annotate.GNOMAD_AF .Bias ; do 
+	for new_suffix in mpileup.MQ60.call.SNP .DP200 .annotate.GNOMAD_AF .Bias ; do 
 		suffix=${suffix}${new_suffix}
 
 		f=${base}.${suffix}.vcf.gz
@@ -152,7 +153,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 				${base}.X.${suffix}.vcf.gz
 			chmod a-w ${f}
 		fi
-	
+
 		f=${base}.${suffix}.vcf.gz.csi
 		if [ -f ${f} ] && [ ! -w ${f} ] ; then
 			echo "Write-protected ${f} exists. Skipping."
@@ -161,7 +162,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			bcftools index ${base}.${suffix}.vcf.gz
 			chmod a-w ${f}
 		fi
-	
+
 		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
@@ -184,7 +185,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 #				> ${f}
 #			chmod a-w ${f}
 #		fi
-#	
+#
 #		f=${base}.${suffix}.count_trinuc_muts.txt
 #		fgz=${f}.gz
 #		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
@@ -201,7 +202,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 #			fi
 #			gzip --best ${f}
 #		fi
-#	
+#
 #		f=${base}.${suffix}.count_trinuc_muts.counts.txt
 #		if [ -f ${f} ] && [ ! -w ${f} ] ; then
 #			echo "Write-protected ${f} exists. Skipping."
@@ -331,7 +332,7 @@ for AF in $( seq 0.30 0.01 0.50 ) ; do
 			${strelka}
 		chmod -R a-w $isec_dir
 	fi
-	
+
 	for i in 0000 0001 0002 0003 ; do
 
 		#0000.vcf.gz	for records private to	FIRST sample
