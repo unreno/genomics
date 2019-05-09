@@ -12,7 +12,7 @@ How to keep strand in VCF?
 
 for sample in 983899 268325 439338 63185 634370 120207 122997 186069 201771 209605 266836 321666 341203 36077 492023 495910 506458 530196 607654 673944 73753 780690 811386 813891 833536 853767 866648 868614 871719 900420 919207 972727 99776 ; do
 for chr in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X ; do
-echo ./create_somatic_vcfs.bash $sample $chr \> ${sample}.${chr}.create_somatic_vcfs.log 2\>\&1
+echo ./create_somatic_vcfs.bash $sample $chr \>\> ${sample}.${chr}.create_somatic_vcfs.log 2\>\&1
 done ; done | parallel -j 40 --no-notice --joblog parallel.log &
 
 
