@@ -44,6 +44,25 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
+	f=${base_sample}.strelka.allele_ratios.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.strelka.nonzero_af_counts
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		zcat ${base_sample}.strelka.allele_ratios.csv.gz | tail -n +2 | \
+			awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+		chmod a-w $f
+	fi
+
 	f=${base_sample}.strelka.vcf.count
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
@@ -86,6 +105,16 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 	else
 		echo "Creating $f"
 		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.strelka.filtered.nonzero_af_counts
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		zcat ${base_sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | \
+			awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 		chmod a-w $f
 	fi
 
@@ -191,6 +220,16 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
+		f=${base}.${suffix}.nonzero_af_counts
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
+				awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+			chmod a-w $f
+		fi
+
 		f=${base}.${suffix}.allele_ratios.csv.gz.histogram.png
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
@@ -286,6 +325,16 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		else
 			echo "Creating $f"
 			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
+			chmod a-w $f
+		fi
+
+		f=${base}.${suffix}.nonzero_af_counts
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
+				awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 			chmod a-w $f
 		fi
 
