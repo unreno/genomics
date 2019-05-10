@@ -20,7 +20,7 @@ base_sample=$1
 
 cd ${base_sample}.somatic
 
-if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
+if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
 
 	f=${base_sample}.strelka.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
