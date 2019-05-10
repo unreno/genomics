@@ -30,16 +30,6 @@ done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
 
 
 
-./compare_trinuc_muts.py 
-
-
-
-
-fix and use MY version of count_trinuc_muts script
-
 count_trinucs_muts is really overkill for this task. it flanks 10 and 20 and it actually filters. 
-
-move allele callers into repo base and use
-
 
 
