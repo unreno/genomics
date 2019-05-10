@@ -106,6 +106,15 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w ${f}
 	fi
 
+	f=${base_sample}.strelka.count_trinuc_muts.counts.txt.plot.png
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		trinuc_muts_counts_plot.py ${base_sample}.strelka.count_trinuc_muts.counts.txt
+		chmod a-w $f
+	fi
+
 
 
 	f=${base_sample}.strelka.filtered.vcf.gz
@@ -195,6 +204,15 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 			> ${f}
 		chmod a-w ${f}
+	fi
+
+	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt.plot.png
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		trinuc_muts_counts_plot.py ${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
+		chmod a-w $f
 	fi
 
 fi
