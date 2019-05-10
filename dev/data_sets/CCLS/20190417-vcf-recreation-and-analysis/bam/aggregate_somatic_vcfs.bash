@@ -72,6 +72,42 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
+	f=${base_sample}.strelka.count_trinuc_muts.input.txt
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
+			${base_sample}.strelka.vcf.gz \
+			> ${f}
+		chmod a-w ${f}
+	fi
+
+	f=${base_sample}.strelka.count_trinuc_muts.txt.gz
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
+			/raid/refs/fasta/hg38_num_noalts.fa \
+			${base_sample}.strelka.count_trinuc_muts.input.txt | gzip --best >> ${f}
+		chmod a-w ${f}
+	fi
+
+	f=${base_sample}.strelka.count_trinuc_muts.counts.txt
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		#tail -n +2 ${base_sample}.strelka.count_trinuc_muts.txt \
+		zcat ${base_sample}.strelka.count_trinuc_muts.txt.gz \
+			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+			> ${f}
+		chmod a-w ${f}
+	fi
+
+
+
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
