@@ -16,7 +16,7 @@
 
 
 bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t" 
-	print "REF_RATIO","ALT1_RATIO","ALT2_RATIO","ALT3_RATIO"
+	print "CHROM","POS","REF_RATIO","ALT1_RATIO","ALT2_RATIO","ALT3_RATIO"
 	#print "A_RATIO","C_RATIO","G_RATIO","T_RATIO"
 }
 ( /^#/ ){ next; }
@@ -71,7 +71,7 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 			alt_ad3=ad[1]
 
 			#			print ref_ad/info["DP"], alt_ad1/info["DP"], alt_ad2/info["DP"], alt_ad3/info["DP"]
-			print ref_ad/total, alt_ad1/total, alt_ad2/total, alt_ad3/total
+			print $1,$2,ref_ad/total, alt_ad1/total, alt_ad2/total, alt_ad3/total
 		}
 
 
