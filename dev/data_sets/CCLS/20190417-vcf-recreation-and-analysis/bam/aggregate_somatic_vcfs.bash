@@ -59,7 +59,7 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 	else
 		echo "Creating $f"
 		zcat ${base_sample}.strelka.allele_ratios.csv.gz | tail -n +2 | \
-			awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+			awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 		chmod a-w $f
 	fi
 
@@ -114,7 +114,7 @@ if [ -f ${strelka-dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 	else
 		echo "Creating $f"
 		zcat ${base_sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | \
-			awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+			awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 		chmod a-w $f
 	fi
 
@@ -226,7 +226,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		else
 			echo "Creating $f"
 			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
-				awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+				awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 			chmod a-w $f
 		fi
 
@@ -334,7 +334,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		else
 			echo "Creating $f"
 			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
-				awk -F"\t" '{c=0;for(i=1;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+				awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
 			chmod a-w $f
 		fi
 
