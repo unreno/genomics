@@ -32,6 +32,8 @@ done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
 
 count_trinucs_muts is really overkill for this task. it flanks 10 and 20 and it actually filters. 
 
+but I am gonna give the Mutation Signature R script another go so ???
+ (CCLS/20190225-count_trinuc_muts)
 
 
 
@@ -40,22 +42,38 @@ zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n
 done
 
 
-for sample in 983899 268325 439338 63185 634370 ; do zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | awk -F"\t" '{ if( $3 == 0 )print 0; else print 1}' | sort | uniq -c; done
-for sample in 983899 268325 439338 63185 634370 ; do zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | awk -F"\t" '{ if( $5 == 0 && $6 == 0 )print 0; else print 1}' | sort | uniq -c; done
-for sample in 983899 268325 439338 63185 634370 ; do zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | awk -F"\t" '{ if( $3 < 0.5 )print 0; else print 1}' | sort | uniq -c; done
-
-
-
 for sample in 983899 268325 439338 63185 634370 ; do
-nohup gatk Mutect2 \
--R /raid/refs/fasta/hg38_num_noalts.fa \
--I /raid/data/raw/CCLS/bam/${sample}.recaled.bam \
--tumor ${sample} \
--I /raid/data/raw/CCLS/bam/GM_${sample}.recaled.bam \
--normal GM_${sample} \
---germline-resource /raid/refs/vcf/af-only-gnomad.hg38_num.vcf.gz \
--O ${sample}.mutect.vcf.gz > ${sample}.mutect.log 2> ${sample}.mutect.err &
+zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | awk -F"\t" '{ if( $5 == 0 && $6 == 0 )print 0; else print 1}' | sort | uniq -c
+done
+for sample in 983899 268325 439338 63185 634370 ; do
+zcat ${sample}.somatic/${sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | awk -F"\t" '{ if( $3 < 0.5 )print 0; else print 1}' | sort | uniq -c
 done
 
+
+
+
+
+
+
+
+
+From 20190225-count_trinuc_muts
+
+
+f=mut_all_sort.txt
+if [ -f ${f} ] && [ ! -w ${f} ]  ; then
+        echo "Write-protected ${f} exists. Skipping step."
+else
+        echo "Head *count_trinuc_muts.txt"
+        head -n 1 -q *count_trinuc_muts.txt | head -1 > ${f}
+        echo "Combining and sorting *count_trinuc_muts.txt"
+        tail -n +2 -q *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
+        chmod a-w ${f}
+fi
+
+
+
+zcat $( ls -1 *somatic/*.strelka.filtered.count_trinuc_muts.txt.gz | head -1 ) | head -1 > ${f}
+        tail -n +2 -q *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
 
 

@@ -145,5 +145,7 @@ gsutil -m rsync -x gnomad.genomes.r2.1.1.sites.vcf.bg* -x gnomad.genomes.r2.1.1.
 
 bcftools annotate --rename-chrs chr_to_num.txt --output-type z --output af-only-gnomad.hg38_num.vcf.gz af-only-gnomad.hg38.vcf.gz &
 
+gatk IndexFeatureFile --feature-file af-only-gnomad.hg38_num.vcf.gz
+
 
 

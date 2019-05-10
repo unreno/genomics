@@ -20,6 +20,39 @@ base_sample=$1
 
 cd ${base_sample}.somatic
 
+
+if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sample}.recaled.bam ] ; then
+
+	f=${base_sample}.mutect.vcf.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		gatk Mutect2 \
+			-R /raid/refs/fasta/hg38_num_noalts.fa \
+			-I ${bam_dir}/${base_sample}.recaled.bam \
+			-tumor ${base_sample} \
+			-I ${bam_dir}/GM_${base_sample}.recaled.bam \
+			-normal GM_${base_sample} \
+			--germline-resource /raid/refs/vcf/af-only-gnomad.hg38_num.vcf.gz \
+			-O ${f} > ${f}.log 2> ${f}.err
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.mutect.filtered.vcf.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		gatk FilterMutectCalls \
+			--variant ${base_sample}.mutect.vcf.gz \
+			--output ${base_sample}.mutect.filtered.vcf.gz > ${f}.log 2> ${f}.err
+		chmod a-w $f
+	fi
+
+fi
+
+
 if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
 
 	f=${base_sample}.strelka.vcf.gz
