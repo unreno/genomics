@@ -9,7 +9,7 @@
 
 
 bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t" 
-	print "REF_RATIO","ALT1_RATIO","ALT2_RATIO","ALT3_RATIO"
+	print "CHROM","POS","REF_RATIO","ALT1_RATIO","ALT2_RATIO","ALT3_RATIO"
 }
 ( /^#/ ){ next; }
 {
@@ -23,19 +23,25 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 	for(i=1;i<=length(info_i);i++)
 		info[info_i[i]]=values[i]
 
-	split( info["GT"],INFO_GT,"/" )
+#	split( info["GT"],INFO_GT,"/" )
 	split( info["AD"],INFO_AD,"," )
 
 #	could be
 #	1	2760182	.	G	A,T	475.77	.	AC=1,1;AF=0.5,0.5;AN=2;DP=13;ExcessHet=3.0103;FS=0;MLEAC=1,1;MLEAF=0.5,0.5;MQ=30.13;QD=30;SOR=3.611	GT:AD:DP:GQ:PL	1/2:0,4,8:12:99:504,336,324,168,0,144
 #
 
-	for( i=1;i<=length(INFO_GT);i++){
-		if( INFO_GT[i] == 0 ) ref_ad  = INFO_AD[1]
-		if( INFO_GT[i] == 1 ) alt_ad1 = INFO_AD[2]
-		if( INFO_GT[i] == 2 ) alt_ad2 = INFO_AD[3]
-		if( INFO_GT[i] == 3 ) alt_ad3 = INFO_AD[4]
-	}
+#	Not true. AD is REF, ALT1, ALT2, ALT3. PERIOD. Not related to genotype.
+#	for( i=1;i<=length(INFO_GT);i++){
+#		if( INFO_GT[i] == 0 ) ref_ad  = INFO_AD[1]
+#		if( INFO_GT[i] == 1 ) alt_ad1 = INFO_AD[2]
+#		if( INFO_GT[i] == 2 ) alt_ad2 = INFO_AD[3]
+#		if( INFO_GT[i] == 3 ) alt_ad3 = INFO_AD[4]
+#	}
+
+	ref_ad  = INFO_AD[1]
+	alt_ad1 = INFO_AD[2]
+	alt_ad2 = INFO_AD[3]
+	alt_ad3 = INFO_AD[4]
 
 #if( info["DP"] == 0 )print
 #	DP can be 0 ????
@@ -47,7 +53,7 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 #	print ref_ad, alt_ad1, alt_ad2, alt_ad3, info["DP"]
 
 	if( info["DP"] > 0 ){
-		print ref_ad/info["DP"], alt_ad1/info["DP"], alt_ad2/info["DP"], alt_ad3/info["DP"]
+		print $1,$2,ref_ad/info["DP"], alt_ad1/info["DP"], alt_ad2/info["DP"], alt_ad3/info["DP"]
 	}
 
 }' 
