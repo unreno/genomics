@@ -60,20 +60,20 @@ done
 From 20190225-count_trinuc_muts
 
 
-f=mut_all_sort.txt
-if [ -f ${f} ] && [ ! -w ${f} ]  ; then
-        echo "Write-protected ${f} exists. Skipping step."
-else
-        echo "Head *count_trinuc_muts.txt"
-        head -n 1 -q *count_trinuc_muts.txt | head -1 > ${f}
-        echo "Combining and sorting *count_trinuc_muts.txt"
-        tail -n +2 -q *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
-        chmod a-w ${f}
-fi
+zcat 983899.somatic/983899.strelka.filtered.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
+for sample in 983899 268325 439338 63185 634370 ; do
+zcat ${sample}.somatic/${sample}.strelka.filtered.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
+done
+sort -k1,1 -k2,2n mut_all_sort.tmp >> mut_all_sort.txt
+\rm mut_all_sort.tmp
+
+
+Mutation-Signatures.r 
+
+Sample ids NEED to be text or R treat them as indexes?
 
 
 
-zcat $( ls -1 *somatic/*.strelka.filtered.count_trinuc_muts.txt.gz | head -1 ) | head -1 > ${f}
-        tail -n +2 -q *count_trinuc_muts.txt | sort -k1,1 -k2,2n >> ${f}
+
 
 

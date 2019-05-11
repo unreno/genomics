@@ -72,6 +72,24 @@ head(deconstructSigs_input)
 deconstructSigs_input <- subset(deconstructSigs_input, select = c("chr", "pos", "ref", "alt", "sample"))
 head(deconstructSigs_input)
 
+
+
+
+
+deconstructSigs_input$sample <- as.character(deconstructSigs_input$sample)
+head(deconstructSigs_input)
+
+#	sample needs to be text when passed to mut.to.sigs.input or ...
+#
+#	Error in `[<-`(`*tmp*`, i, trimer, value = beep[trimer]) : 
+#	  subscript out of bounds
+#	Calls: mut.to.sigs.input
+#	Execution halted
+#	
+
+
+
+
 Sys.time()
 message("Running mut.to.sigs.input. Takes about 25 minutes.")
 message("Memory usage up to 50GB")
@@ -500,9 +518,31 @@ head(sigs_types)
 #			}
 #	}
 
-for( this_type in types ){
+
+
+
+
+
+message("About to melt stuff")
+print(types)
+
+#	About to melt stuff
+#	[1] "normal" "tumor" 
+#	Error in data.frame(ids, x, data[, x]) : 
+#		arguments imply differing number of rows: 0, 1
+#	Calls: melt ... melt.data.frame -> do.call -> lapply -> FUN -> data.frame
+#	Execution halted
+
+#	Only tumor data. Matter?
+
+#	types includes 'normal' but no data here so the melt command fails
+
+#for( this_type in types ){
+for( this_type in c('tumor') ){
 	sigs_individual <- subset(sigs_types, type == this_type)
+	head(sigs_individual)
 	sigs_individual <- sigs_individual[,!colnames(sigs_individual) %in% c('type','mut_tot')]
+	head(sigs_individual)
 	sigs_melt <- melt(sigs_individual, id = "sample")
 	colnames(sigs_melt) <- c("sample", "sig", "value")
 	sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
@@ -747,22 +787,32 @@ colnames(number) <- c("type", "freq")
 #	ggplot(number, aes(tissue, freq)) +
 ggplot(number, aes(type, freq)) +
 	geom_point(size = 4) +
-	ylim(0,200) +
+	#ylim(0,200) +
 	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
 	scale_x_discrete(limits = types )
 #	  scale_x_discrete(limits = tissues )
 
+print("f")
+
 # use same sort as median number of mutations plot
 #	number <- as.data.frame(table(cosmic_tissue_type$tissue))
 number <- as.data.frame(table(sample_types$type))
+
+print("g")
+
 #	colnames(number) <- c("tissue", "freq")
 colnames(number) <- c("type", "freq")
+
+print("h")
+
 #	ggplot(number, aes(tissue, freq)) +
 ggplot(number, aes(type, freq)) +
 	geom_point(size = 4) +
-	ylim(0,200) +
+	#ylim(0,200) +
 	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
 	scale_x_discrete(limits = plot_order)
+
+print("i")
 
 #	sigs_tissues_individual <- subset(sigs_tissues, tissue == "L. Intestine")
 #	head(sigs_tissues_individual)
@@ -794,8 +844,16 @@ ggplot(number, aes(type, freq)) +
 #			panel.grid.minor = element_blank(),
 #			axis.line = element_line(colour = "black"))
 
+
+print("Another types loop")
+
+#	Error in `.rowNamesDF<-`(x, value = value) : invalid 'row.names' length
+#	Calls: rownames<- ... row.names<- -> row.names<-.data.frame -> .rowNamesDF<-
+#	Execution halted
+
 #for( this_tissue in tissues ){
-for( this_type in types ){
+#for( this_type in types ){
+for( this_type in c('tumor') ){
 	#sigs_tissues_individual <- subset(sigs_tissues, tissue == this_tissue)
 	sigs_types_individual <- subset(sigs_types, type == this_type)
 	#sigs_tissues_individual_1 <- sigs_tissues_individual[order(sigs_tissues_individual$zAPOBEC.Sig),]
@@ -813,7 +871,7 @@ for( this_type in types ){
 		ggtitle(this_type) +
 		xlab("Sample") +
 		ylab("Mut Burden") +
-		ylim(0,1600) +
+		#ylim(0,1600) +
 		theme_bw() +
 		theme(axis.text.x=element_text(angle = 45, hjust = 1),
 			panel.border = element_blank(),
@@ -821,6 +879,9 @@ for( this_type in types ){
 			panel.grid.minor = element_blank(),
 			axis.line = element_line(colour = "black")))
 }
+
+
+print("j")
 
 #sigs_enrich <- merge(sigs_tissues, enrich_final, by = "sample")
 sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
@@ -832,8 +893,12 @@ sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
 head(sigs_enrich_tcw)
 Sys.time()
 
+print("k")
+
 # Adjust plot size
 options(repr.plot.width=10, repr.plot.height=10)
+
+print("l")
 
 #ggplot(sigs_enrich_tcw, aes(enrich_score, tca_tct)) +
 #	geom_point() +
@@ -841,19 +906,19 @@ options(repr.plot.width=10, repr.plot.height=10)
 #	ylim(0,0.5)
 
 ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
-	geom_point() +
-	ylim(0,5) +
-	xlim(0,0.5)
+	geom_point() #	+ ylim(0,5) + xlim(0,0.5)
+
+print("m")
 
 ggplot(sigs_enrich_tcw, aes(zAPOBEC.Sig, tca_tct)) +
-	geom_point() +
-	xlim(0,0.8) +
-	ylim(0,0.5)
+	geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
+
+print("n")
 
 ggplot(sigs_enrich_tcw, aes(zAPOBEC.Sig, enrich_score)) +
-	geom_point() +
-	xlim(0,0.8) +
-	ylim(0,5)
+	geom_point() #	+ xlim(0,0.8) + ylim(0,5)
+
+print("o")
 
 # Try to plot "Mutation Fraction"/"Trinucleotide Context" from "context"
 
@@ -865,6 +930,8 @@ head(context)
 #	context <- merge(context, cosmic_tissue_type, by = "sample", all.x = T)
 #	head(context)
 
+print("p")
+
 #context_melt <- melt(context,id=c("sample","tissue"))
 context_melt <- melt(context,id="sample")
 head(context_melt)
@@ -872,10 +939,14 @@ head(context_melt)
 context_melt$alt <- substr(context_melt$variable, 5, 5)
 head(context_melt)
 
+print("q")
+
 context_melt$trinuc <- paste0(substr(context_melt$variable, 1, 1),
 		substr(context_melt$variable, 3, 3),
 		substr(context_melt$variable, 7, 7))
 head(context_melt)
+
+print("r")
 
 # Adjust plot size
 options(repr.plot.width=16, repr.plot.height=6)
@@ -883,9 +954,13 @@ options(repr.plot.width=16, repr.plot.height=6)
 samples <- unique(as.vector(context_melt[,"sample"]))
 head(samples)
 
+print("s")
+
 length(samples)
 
 message("Plotting")
+
+print("t")
 
 #for( this_tissue in tissues ){
 for( this_sample in samples ){
@@ -893,7 +968,7 @@ for( this_sample in samples ){
 	if( nrow(cell_line) > 0 ){
 		print(ggplot(cell_line, aes(trinuc, value, fill = alt)) +
 			geom_col() +
-			ylim(0,0.30) +  # fixed y limit for easier viewing and comparison
+			ylim(0,0.40) +  # fixed y limit for easier viewing and comparison
 			ggtitle( this_sample ) +
 			#ggtitle( paste0( this_sample, " - ", cell_line$tissue[1] ) ) +
 			#ggtitle( paste0( this_tissue, " - ", this_sample ) ) +
