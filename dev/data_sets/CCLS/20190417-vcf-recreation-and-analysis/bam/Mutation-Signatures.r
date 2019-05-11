@@ -537,9 +537,15 @@ print(types)
 
 #	types includes 'normal' but no data here so the melt command fails
 
-#for( this_type in types ){
-for( this_type in c('tumor') ){
+for( this_type in types ){
+#for( this_type in c('tumor') ){
 	sigs_individual <- subset(sigs_types, type == this_type)
+	print( this_type )
+	print( nrow(sigs_individual) )
+	if( nrow(sigs_individual) == 0 ){
+		print( paste0("No data with this type: ",this_type) )
+		next
+	}
 	head(sigs_individual)
 	sigs_individual <- sigs_individual[,!colnames(sigs_individual) %in% c('type','mut_tot')]
 	head(sigs_individual)
@@ -852,10 +858,17 @@ print("Another types loop")
 #	Execution halted
 
 #for( this_tissue in tissues ){
-#for( this_type in types ){
-for( this_type in c('tumor') ){
+for( this_type in types ){
+#for( this_type in c('tumor') ){
 	#sigs_tissues_individual <- subset(sigs_tissues, tissue == this_tissue)
 	sigs_types_individual <- subset(sigs_types, type == this_type)
+	print( this_type )
+	print( nrow(sigs_types_individual) )
+	if( nrow(sigs_types_individual) == 0 ){
+		print( paste0("No data with this type: ",this_type) )
+		next
+	}
+	head(sigs_individual)
 	#sigs_tissues_individual_1 <- sigs_tissues_individual[order(sigs_tissues_individual$zAPOBEC.Sig),]
 	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$zAPOBEC.Sig),]
 	#rownames(sigs_tissues_individual_1) <- c(1:nrow(sigs_tissues_individual_1))
