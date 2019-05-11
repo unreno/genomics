@@ -434,46 +434,46 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
-#		f=${base}.${suffix}.count_trinuc_muts.input.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-#				${base}.${suffix}.vcf.gz \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.txt
-#		fgz=${f}.gz
-#		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-#			echo "Write-protected ${fgz} exists. Skipping."
-#		else
-#			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#				echo "Write-protected ${f} exists. Skipping."
-#			else
-#				echo "Creating ${f}"
-#				/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-#					/raid/refs/fasta/hg38_num_noalts.fa \
-#					${base}.${suffix}.count_trinuc_muts.input.txt
-#				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-#				chmod a-w ${f}
-#			fi
-#			gzip --best ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.counts.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-#			zcat ${base}.${suffix}.count_trinuc_muts.txt \
-#				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
+		f=${base}.${suffix}.count_trinuc_muts.input.txt
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
+		else
+			echo "Creating ${f}"
+			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
+				${base}.${suffix}.vcf.gz \
+				> ${f}
+			chmod a-w ${f}
+		fi
+
+		f=${base}.${suffix}.count_trinuc_muts.txt
+		fgz=${f}.gz
+		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
+			echo "Write-protected ${fgz} exists. Skipping."
+		else
+			if [ -f ${f} ] && [ ! -w ${f} ] ; then
+				echo "Write-protected ${f} exists. Skipping."
+			else
+				echo "Creating ${f}"
+				/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
+					/raid/refs/fasta/hg38_num_noalts.fa \
+					${base}.${suffix}.count_trinuc_muts.input.txt
+				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
+				chmod a-w ${f}
+			fi
+			gzip --best ${f}
+		fi
+
+		f=${base}.${suffix}.count_trinuc_muts.counts.txt
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
+		else
+			echo "Creating ${f}"
+			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
+			zcat ${base}.${suffix}.count_trinuc_muts.txt \
+				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+				> ${f}
+			chmod a-w ${f}
+		fi
 
 	done	#	AF
 
@@ -484,51 +484,51 @@ done	#	sample
 
 if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
 
-for AF in $( seq 0.20 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
-	base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
-	tumor=${base}.vcf.gz
-	isec_dir=${base}-strelka
-	strelka=${base_sample}.strelka.filtered.vcf.gz
+		base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
+		tumor=${base}.vcf.gz
+		isec_dir=${base}-strelka
+		strelka=${base_sample}.strelka.filtered.vcf.gz
 
-	if [ ! -f ${tumor} ] || [ ! -f ${strelka} ] ; then
-		echo "One of the source VCF files does not exist so skipping."
-		continue
-	fi
-
-	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
-	if [ -d $isec_dir ] && [ ! -w $isec_dir ] ; then
-		echo "Write-protected $isec_dir exists. Skipping."
-	else
-		echo "Creating $isec_dir"
-
-		mkdir -p $isec_dir
-		bcftools isec \
-			--output-type z \
-			--prefix ${isec_dir} \
-			${tumor} \
-			${strelka}
-		chmod -R a-w $isec_dir
-	fi
-
-	for i in 0000 0001 0002 0003 ; do
-
-		#0000.vcf.gz	for records private to	FIRST sample
-		#0001.vcf.gz	for records private to	SECOND sample
-		#0002.vcf.gz	for records from FIRST sample shared by both
-		#0003.vcf.gz	for records from SECOND sample shared by both
-
-		f=${isec_dir}.${i}.count
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			bcftools query -f "\n" ${isec_dir}/${i}.vcf.gz | wc -l > $f
-			chmod a-w $f
+		if [ ! -f ${tumor} ] || [ ! -f ${strelka} ] ; then
+			echo "One of the source VCF files does not exist so skipping."
+			continue
 		fi
 
-	done
+		#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
+		if [ -d $isec_dir ] && [ ! -w $isec_dir ] ; then
+			echo "Write-protected $isec_dir exists. Skipping."
+		else
+			echo "Creating $isec_dir"
 
-done
+			mkdir -p $isec_dir
+			bcftools isec \
+				--output-type z \
+				--prefix ${isec_dir} \
+				${tumor} \
+				${strelka}
+			chmod -R a-w $isec_dir
+		fi
+
+		for i in 0000 0001 0002 0003 ; do
+
+			#0000.vcf.gz	for records private to	FIRST sample
+			#0001.vcf.gz	for records private to	SECOND sample
+			#0002.vcf.gz	for records from FIRST sample shared by both
+			#0003.vcf.gz	for records from SECOND sample shared by both
+
+			f=${isec_dir}.${i}.count
+			if [ -f $f ] && [ ! -w $f ] ; then
+				echo "Write-protected $f exists. Skipping."
+			else
+				echo "Creating $f"
+				bcftools query -f "\n" ${isec_dir}/${i}.vcf.gz | wc -l > $f
+				chmod a-w $f
+			fi
+
+		done
+
+	done
 
 fi
