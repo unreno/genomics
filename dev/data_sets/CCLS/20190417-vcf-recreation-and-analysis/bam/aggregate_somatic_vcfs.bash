@@ -132,7 +132,6 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		#tail -n +2 ${base_sample}.strelka.count_trinuc_muts.txt \
 		zcat ${base_sample}.strelka.count_trinuc_muts.txt.gz \
 			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 			> ${f}
@@ -232,7 +231,6 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		#tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
 		zcat ${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz \
 			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 			> ${f}
@@ -445,22 +443,15 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
-		f=${base}.${suffix}.count_trinuc_muts.txt
-		fgz=${f}.gz
-		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-			echo "Write-protected ${fgz} exists. Skipping."
+		f=${base}.${suffix}.count_trinuc_muts.txt.gz
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
 		else
-			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-				echo "Write-protected ${f} exists. Skipping."
-			else
-				echo "Creating ${f}"
-				/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-					/raid/refs/fasta/hg38_num_noalts.fa \
-					${base}.${suffix}.count_trinuc_muts.input.txt
-				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-				chmod a-w ${f}
-			fi
-			gzip --best ${f}
+			echo "Creating ${f}"
+			/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
+				/raid/refs/fasta/hg38_num_noalts.fa \
+				${base}.${suffix}.count_trinuc_muts.input.txt | gzip --best >> ${f}
+			chmod a-w ${f}
 		fi
 
 		f=${base}.${suffix}.count_trinuc_muts.counts.txt
@@ -468,8 +459,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected ${f} exists. Skipping."
 		else
 			echo "Creating ${f}"
-			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-			zcat ${base}.${suffix}.count_trinuc_muts.txt \
+			zcat ${base}.${suffix}.count_trinuc_muts.txt.gz \
 				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
 				> ${f}
 			chmod a-w ${f}
