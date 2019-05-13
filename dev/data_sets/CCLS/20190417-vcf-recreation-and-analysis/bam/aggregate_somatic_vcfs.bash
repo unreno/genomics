@@ -21,6 +21,99 @@ base_sample=$1
 cd ${base_sample}.somatic
 
 
+common_function(){
+	base_file=$1
+
+	f=${base_file}.vcf.gz.csi
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools index ${base_file}.vcf.gz
+		chmod a-w $f
+	fi
+
+	f=${base_file}.vcf.count
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools query -f "\n" ${base_file}.vcf.gz | wc -l > $f
+		chmod a-w $f
+	fi
+
+	f=${base_file}.nonzero_af_counts
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		zcat ${base_file}.allele_ratios.csv.gz | tail -n +2 | \
+			awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
+		chmod a-w $f
+	fi
+
+	f=${base_file}.allele_ratios.csv.gz.histogram.png
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		allele_ratio_histogram.py ${base_file}.allele_ratios.csv.gz
+		chmod a-w $f
+	fi
+
+}
+
+count_trinuc_muts(){
+	base_file=$1
+
+	f=${base_file}.count_trinuc_muts.input.txt
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
+			${base_file}.vcf.gz \
+			> ${f}
+		chmod a-w ${f}
+	fi
+
+	f=${base_file}.count_trinuc_muts.txt.gz
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
+			/raid/refs/fasta/hg38_num_noalts.fa \
+			${base_file}.count_trinuc_muts.input.txt | gzip --best >> ${f}
+		chmod a-w ${f}
+	fi
+
+	f=${base_file}.count_trinuc_muts.counts.txt
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		zcat ${base_file}.count_trinuc_muts.txt.gz \
+			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
+			> ${f}
+		chmod a-w ${f}
+	fi
+
+	f=${base_file}.count_trinuc_muts.counts.txt.plot.png
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		trinuc_muts_counts_plot.py ${base_file}.count_trinuc_muts.counts.txt
+		chmod a-w $f
+	fi
+
+}
+
+
+
+
+
 if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sample}.recaled.bam ] ; then
 
 	f=${base_sample}.mutect.vcf.gz
@@ -50,6 +143,27 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 		chmod a-w $f
 	fi
 
+	f=${base_sample}.mutect.filtered.snps.vcf.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools view --types snps --output-type z --output-file ${f} ${base_sample}.mutect.filtered.vcf.gz
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.mutect.filtered.snps.allele_ratios.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	common_function "${base_sample}.mutect.filtered.snps"
+	count_trinuc_muts "${base_sample}.mutect.filtered.snps"
+
 fi
 
 
@@ -68,87 +182,17 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		/bin/rm -rf strelka_tmp
 	fi
 
-	f=${base_sample}.strelka.vcf.gz.csi
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		bcftools index ${base_sample}.strelka.vcf.gz
-		chmod a-w $f
-	fi
-
 	f=${base_sample}.strelka.allele_ratios.csv.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.vcf.gz | gzip --best > ${f}
+		strelka_vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.strelka.nonzero_af_counts
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		zcat ${base_sample}.strelka.allele_ratios.csv.gz | tail -n +2 | \
-			awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
-		chmod a-w $f
-	fi
-
-	f=${base_sample}.strelka.vcf.count
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		bcftools query -f "\n" ${base_sample}.strelka.vcf.gz | wc -l > $f
-		chmod a-w $f
-	fi
-
-	f=${base_sample}.strelka.count_trinuc_muts.input.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
-			${base_sample}.strelka.vcf.gz \
-			> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.count_trinuc_muts.txt.gz
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-			/raid/refs/fasta/hg38_num_noalts.fa \
-			${base_sample}.strelka.count_trinuc_muts.input.txt | gzip --best >> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.count_trinuc_muts.counts.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		#tail -n +2 ${base_sample}.strelka.count_trinuc_muts.txt \
-		zcat ${base_sample}.strelka.count_trinuc_muts.txt.gz \
-			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-			> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.count_trinuc_muts.counts.txt.plot.png
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		trinuc_muts_counts_plot.py ${base_sample}.strelka.count_trinuc_muts.counts.txt
-		chmod a-w $f
-	fi
-
-
+	common_function "${base_sample}.strelka"
+	count_trinuc_muts "${base_sample}.strelka"
 
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
@@ -159,94 +203,17 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.strelka.filtered.vcf.gz.csi
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		bcftools index ${base_sample}.strelka.filtered.vcf.gz
-		chmod a-w $f
-	fi
-
-	f=${base_sample}.strelka.filtered.vcf.count
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		bcftools query -f "\n" ${base_sample}.strelka.filtered.vcf.gz | wc -l > $f
-		chmod a-w $f
-	fi
-
 	f=${base_sample}.strelka.filtered.allele_ratios.csv.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
+		strelka_vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.strelka.filtered.nonzero_af_counts
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		zcat ${base_sample}.strelka.filtered.allele_ratios.csv.gz | tail -n +2 | \
-			awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
-		chmod a-w $f
-	fi
-
-	f=${base_sample}.strelka.filtered.allele_ratios.csv.gz.histogram.png
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		allele_ratio_histogram.py ${base_sample}.strelka.filtered.allele_ratios.csv.gz
-		chmod a-w $f
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.input.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
-			${base_sample}.strelka.filtered.vcf.gz \
-			> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-			/raid/refs/fasta/hg38_num_noalts.fa \
-			${base_sample}.strelka.filtered.count_trinuc_muts.input.txt | gzip --best >> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-		#tail -n +2 ${base_sample}.strelka.filtered.count_trinuc_muts.txt \
-		zcat ${base_sample}.strelka.filtered.count_trinuc_muts.txt.gz \
-			| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-			> ${f}
-		chmod a-w ${f}
-	fi
-
-	f=${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt.plot.png
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		trinuc_muts_counts_plot.py ${base_sample}.strelka.filtered.count_trinuc_muts.counts.txt
-		chmod a-w $f
-	fi
+	common_function "${base_sample}.strelka.filtered"
+	count_trinuc_muts "${base_sample}.strelka.filtered"
 
 fi
 
@@ -280,24 +247,6 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
-		f=${base}.${suffix}.vcf.gz.csi
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			bcftools index ${base}.${suffix}.vcf.gz
-			chmod a-w ${f}
-		fi
-
-		f=${base}.${suffix}.vcf.count
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			bcftools query -f "\n" ${base}.${suffix}.vcf.gz | wc -l > $f
-			chmod a-w $f
-		fi
-
 		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
@@ -307,65 +256,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
-		f=${base}.${suffix}.nonzero_af_counts
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
-				awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
-			chmod a-w $f
-		fi
-
-		f=${base}.${suffix}.allele_ratios.csv.gz.histogram.png
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			allele_ratio_histogram.py ${base}.${suffix}.allele_ratios.csv.gz
-			chmod a-w $f
-		fi
-
-#		f=${base}.${suffix}.count_trinuc_muts.input.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-#				${base}.${suffix}.vcf.gz \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.txt
-#		fgz=${f}.gz
-#		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-#			echo "Write-protected ${fgz} exists. Skipping."
-#		else
-#			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#				echo "Write-protected ${f} exists. Skipping."
-#			else
-#				echo "Creating ${f}"
-#				/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-#					/raid/refs/fasta/hg38_num_noalts.fa \
-#					${base}.${suffix}.count_trinuc_muts.input.txt
-#				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-#				chmod a-w ${f}
-#			fi
-#			gzip --best ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.counts.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-#			zcat ${base}.${suffix}.count_trinuc_muts.txt.gz \
-#				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
+		common_function "${base}.${suffix}"
 
 	done
 
@@ -388,24 +279,6 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w ${f}
 		fi
 
-		f=${base}.${suffix}.vcf.gz.csi
-		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-			echo "Write-protected ${f} exists. Skipping."
-		else
-			echo "Creating ${f}"
-			bcftools index ${base}.${suffix}.vcf.gz
-			chmod a-w ${f}
-		fi
-
-		f=${base}.${suffix}.vcf.count
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			bcftools query -f "\n" ${base}.${suffix}.vcf.gz | wc -l > $f
-			chmod a-w $f
-		fi
-
 		f=${base}.${suffix}.allele_ratios.csv.gz
 		if [ -f $f ] && [ ! -w $f ] ; then
 			echo "Write-protected $f exists. Skipping."
@@ -415,65 +288,8 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
-		f=${base}.${suffix}.nonzero_af_counts
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			zcat ${base}.${suffix}.allele_ratios.csv.gz | tail -n +2 | \
-				awk -F"\t" '{c=0;for(i=3;i<=NF;i++) if($i>0)c++;print c}' | sort | uniq -c > ${f}
-			chmod a-w $f
-		fi
-
-		f=${base}.${suffix}.allele_ratios.csv.gz.histogram.png
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			allele_ratio_histogram.py ${base}.${suffix}.allele_ratios.csv.gz
-			chmod a-w $f
-		fi
-
-#		f=${base}.${suffix}.count_trinuc_muts.input.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-#				${base}.${suffix}.vcf.gz \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.txt
-#		fgz=${f}.gz
-#		if [ -f ${fgz} ] && [ ! -w ${fgz} ] ; then
-#			echo "Write-protected ${fgz} exists. Skipping."
-#		else
-#			if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#				echo "Write-protected ${f} exists. Skipping."
-#			else
-#				echo "Creating ${f}"
-#				/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
-#					/raid/refs/fasta/hg38_num_noalts.fa \
-#					${base}.${suffix}.count_trinuc_muts.input.txt
-#				mv ${base}.${suffix}.count_trinuc_muts.input.txt.*.count.txt ${f}
-#				chmod a-w ${f}
-#			fi
-#			gzip --best ${f}
-#		fi
-#
-#		f=${base}.${suffix}.count_trinuc_muts.counts.txt
-#		if [ -f ${f} ] && [ ! -w ${f} ] ; then
-#			echo "Write-protected ${f} exists. Skipping."
-#		else
-#			echo "Creating ${f}"
-#			#tail -n +2 ${base}.${suffix}.count_trinuc_muts.txt \
-#			zcat ${base}.${suffix}.count_trinuc_muts.txt \
-#				| tail -n +2 | awk -F"\t" '{print $7}' | sort | uniq -c \
-#				> ${f}
-#			chmod a-w ${f}
-#		fi
+		common_function "${base}.${suffix}"
+		count_trinuc_muts "${base}.${suffix}"
 
 	done	#	AF
 
@@ -484,51 +300,51 @@ done	#	sample
 
 if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somatic.snvs.vcf.gz ] ; then
 
-for AF in $( seq 0.20 0.01 0.50 ) ; do
+	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
-	base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
-	tumor=${base}.vcf.gz
-	isec_dir=${base}-strelka
-	strelka=${base_sample}.strelka.filtered.vcf.gz
+		base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
+		tumor=${base}.vcf.gz
+		isec_dir=${base}-strelka
+		strelka=${base_sample}.strelka.filtered.vcf.gz
 
-	if [ ! -f ${tumor} ] || [ ! -f ${strelka} ] ; then
-		echo "One of the source VCF files does not exist so skipping."
-		continue
-	fi
-
-	#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
-	if [ -d $isec_dir ] && [ ! -w $isec_dir ] ; then
-		echo "Write-protected $isec_dir exists. Skipping."
-	else
-		echo "Creating $isec_dir"
-
-		mkdir -p $isec_dir
-		bcftools isec \
-			--output-type z \
-			--prefix ${isec_dir} \
-			${tumor} \
-			${strelka}
-		chmod -R a-w $isec_dir
-	fi
-
-	for i in 0000 0001 0002 0003 ; do
-
-		#0000.vcf.gz	for records private to	FIRST sample
-		#0001.vcf.gz	for records private to	SECOND sample
-		#0002.vcf.gz	for records from FIRST sample shared by both
-		#0003.vcf.gz	for records from SECOND sample shared by both
-
-		f=${isec_dir}.${i}.count
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			bcftools query -f "\n" ${isec_dir}/${i}.vcf.gz | wc -l > $f
-			chmod a-w $f
+		if [ ! -f ${tumor} ] || [ ! -f ${strelka} ] ; then
+			echo "One of the source VCF files does not exist so skipping."
+			continue
 		fi
 
-	done
+		#	NOTE THAT THIS IS A DIRECTORY AND NOT A FILE SO -d AND NOT -f
+		if [ -d $isec_dir ] && [ ! -w $isec_dir ] ; then
+			echo "Write-protected $isec_dir exists. Skipping."
+		else
+			echo "Creating $isec_dir"
 
-done
+			mkdir -p $isec_dir
+			bcftools isec \
+				--output-type z \
+				--prefix ${isec_dir} \
+				${tumor} \
+				${strelka}
+			chmod -R a-w $isec_dir
+		fi
+
+		for i in 0000 0001 0002 0003 ; do
+
+			#0000.vcf.gz	for records private to	FIRST sample
+			#0001.vcf.gz	for records private to	SECOND sample
+			#0002.vcf.gz	for records from FIRST sample shared by both
+			#0003.vcf.gz	for records from SECOND sample shared by both
+
+			f=${isec_dir}.${i}.count
+			if [ -f $f ] && [ ! -w $f ] ; then
+				echo "Write-protected $f exists. Skipping."
+			else
+				echo "Creating $f"
+				bcftools query -f "\n" ${isec_dir}/${i}.vcf.gz | wc -l > $f
+				chmod a-w $f
+			fi
+
+		done
+
+	done
 
 fi
