@@ -65,13 +65,15 @@ common_function(){
 
 count_trinuc_muts(){
 	base_file=$1
+	sample=$2
 
 	f=${base_file}.count_trinuc_muts.input.txt
 	if [ -f ${f} ] && [ ! -w ${f} ] ; then
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
+#		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
+		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
 			${base_file}.vcf.gz \
 			> ${f}
 		chmod a-w ${f}
@@ -164,7 +166,7 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 	fi
 
 	common_function "${base_sample}.mutect.filtered.snps"
-	count_trinuc_muts "${base_sample}.mutect.filtered.snps"
+	count_trinuc_muts "${base_sample}.mutect.filtered.snps" "${base_sample}"
 
 fi
 
@@ -194,7 +196,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 	fi
 
 	common_function "${base_sample}.strelka"
-	count_trinuc_muts "${base_sample}.strelka"
+	count_trinuc_muts "${base_sample}.strelka" "${base_sample}"
 
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
@@ -215,7 +217,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 	fi
 
 	common_function "${base_sample}.strelka.filtered"
-	count_trinuc_muts "${base_sample}.strelka.filtered"
+	count_trinuc_muts "${base_sample}.strelka.filtered" "${base_sample}"
 
 fi
 
@@ -291,7 +293,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		fi
 
 		common_function "${base}.${suffix}"
-		count_trinuc_muts "${base}.${suffix}"
+		count_trinuc_muts "${base}.${suffix}" "${sample}"
 
 	done	#	AF
 
