@@ -130,6 +130,7 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 			--germline-resource /raid/refs/vcf/af-only-gnomad.hg38_num.vcf.gz \
 			-O ${f} > ${f}.log 2> ${f}.err
 		chmod a-w $f
+		chmod a-w $f.tbi
 	fi
 
 	f=${base_sample}.mutect.filtered.vcf.gz
@@ -141,6 +142,7 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 			--variant ${base_sample}.mutect.vcf.gz \
 			--output ${base_sample}.mutect.filtered.vcf.gz > ${f}.log 2> ${f}.err
 		chmod a-w $f
+		chmod a-w $f.tbi
 	fi
 
 	f=${base_sample}.mutect.filtered.snps.vcf.gz
@@ -157,7 +159,7 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
+		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.snps.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
@@ -187,7 +189,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		strelka_vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
+		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
@@ -208,7 +210,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		strelka_vcf_to_allele_ratios.bash ${base_file}.vcf.gz | gzip --best > ${f}
+		strelka_vcf_to_allele_ratios.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
