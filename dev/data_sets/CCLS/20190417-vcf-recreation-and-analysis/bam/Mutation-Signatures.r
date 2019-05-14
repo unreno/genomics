@@ -587,6 +587,7 @@ length(samples)
 message("Plotting")
 
 for( this_sample in samples ){
+	message(this_sample)
 	cell_line = subset(context_melt, sample == this_sample ) #& tissue == this_tissue )
 	if( nrow(cell_line) > 0 ){
 
