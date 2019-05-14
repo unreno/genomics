@@ -264,6 +264,10 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 	done
 
+	#	A LOT of data
+	#count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF" "${sample}"
+
+	count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias" "${sample}"
 
 	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
