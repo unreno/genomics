@@ -152,8 +152,9 @@ ls()
 
 
 #	combine to separate signatures. Not sure exactly what 2 and 13 are just yet
-message("output.sigs.final$zAPOBEC.Sig")
-output.sigs.final$zAPOBEC.Sig <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
+#	rename zAPOBEC.Sig zAPOBEC
+message("output.sigs.final$zAPOBEC")
+output.sigs.final$zAPOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
 
 message("head(output.sigs.final[,c(1:30,319,320)])")
 head(output.sigs.final[,c(1:30,319,320)])
@@ -235,11 +236,10 @@ colnames(sigs_types)
 colnames(sigs_types)[!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13','mut_tot')]
 head(sigs_types)
 
-
+#	Drop 2 and 13 as they were merged into zAPOBEC?
+#	if not removed, the stacked bar will add to over 100%.
 sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13')]
 head(sigs_types)
-
-
 
 
 message("About to melt stuff")
@@ -267,42 +267,53 @@ for( this_type in types ){
 	head(sigs_individual)
 	sigs_melt <- melt(sigs_individual, id = "sample")
 	colnames(sigs_melt) <- c("sample", "sig", "value")
-	sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.10", "I", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.11", "J", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.12", "K", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.14", "L", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.15", "M", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.16", "N", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.17", "O", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.18", "P", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.19", "Q", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.20", "R", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.21", "S", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.22", "T", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.23", "U", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.24", "V", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.25", "W", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.26", "X", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.27", "Y", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.28", "Z", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.29", "ZZ", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.30", "ZZZ", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("unknown", "ZZZZ", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("zAPOBEC.Sig", "ZZZZZ", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.1", "A", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.3", "B", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.4", "C", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.5", "D", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.6", "E", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.7", "F", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.8", "G", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("Signature.9", "H", sigs_melt[,"sig"])
-	list <- sigs_individual[order(sigs_individual$zAPOBEC.Sig),]
+	sigs_melt[,"sig"] <- gsub("weights.Signature.", "", sigs_melt[,"sig"])
+	sigs_melt[,"sig"] <- gsub("^(\\d)$", "0\\1", sigs_melt[,"sig"])
+	#	Added leading 0 to 1 digit signature to hold numerical order.
+#	Why the renames? Likely to keep in order, which I can't seem to figure out.
+#	sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.10", "I", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.11", "J", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.12", "K", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.14", "L", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.15", "M", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.16", "N", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.17", "O", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.18", "P", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.19", "Q", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.20", "R", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.21", "S", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.22", "T", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.23", "U", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.24", "V", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.25", "W", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.26", "X", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.27", "Y", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.28", "Z", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.29", "ZZ", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.30", "ZZZ", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("unknown", "ZZZZ", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("zAPOBEC.Sig", "ZZZZZ", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.1", "A", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.3", "B", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.4", "C", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.5", "D", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.6", "E", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.7", "F", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.8", "G", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("Signature.9", "H", sigs_melt[,"sig"])
+	list <- sigs_individual[order(sigs_individual$zAPOBEC),]
 	list1 <- as.vector(list[,"sample"])
 
+
+	#print(sigs_melt[order(as.numeric(sigs_melt$sig)),])
+
 	#	Apparently in a loop, plot must be printed?
-	print(ggplot(sigs_melt, aes(sample, value, fill = sig)) +
+	#print(ggplot(sigs_melt, aes(sample, value, fill = sig)) +
+	#
+	#print(ggplot(sigs_melt[order(as.numeric(as.character(sigs_melt$sig))),], aes(sample, value, fill = sig)) +
+	#print(ggplot(sigs_melt[order(as.numeric(sigs_melt$sig)),], aes(sample, value, fill = sig)) +
+	print(ggplot(sigs_melt, aes(sample, value, fill = sig, order = as.numeric(sig) )) +
 		geom_col() +
 		ggtitle( paste0("Signatures for ",this_type," (n=", length(list1), ")")) +
 		#scale_fill_brewer() +
@@ -318,12 +329,12 @@ for( this_type in types ){
 			axis.line = element_line(colour = "black")))
 	#ggsave(paste0("signatures_for_",this_type,".png"),width=6, height=4, dpi=1000)
 
-	sigs_individual <- subset(sigs_individual, zAPOBEC.Sig > 0)
+	sigs_individual <- subset(sigs_individual, zAPOBEC > 0)
 	if( nrow(sigs_individual) > 0){
 		sigs_melt <- melt(sigs_individual, id = "sample")
 		colnames(sigs_melt) <- c("sample", "sig", "value")
-		sigs_melt <- subset(sigs_melt, sig == "zAPOBEC.Sig")
-		list <- sigs_individual[order(sigs_individual$zAPOBEC.Sig),]
+		sigs_melt <- subset(sigs_melt, sig == "zAPOBEC")
+		list <- sigs_individual[order(sigs_individual$zAPOBEC),]
 		list1 <- as.vector(list[,"sample"])
 
 		#	Apparently in a loop, plot must be printed?
@@ -514,7 +525,7 @@ for( this_type in types ){
 		next
 	}
 	head(sigs_individual)
-	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$zAPOBEC.Sig),]
+	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$zAPOBEC),]
 	rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
 	sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
 
@@ -553,10 +564,10 @@ options(repr.plot.width=10, repr.plot.height=10)
 ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
 	geom_point() #	+ ylim(0,5) + xlim(0,0.5)
 
-ggplot(sigs_enrich_tcw, aes(zAPOBEC.Sig, tca_tct)) +
+ggplot(sigs_enrich_tcw, aes(zAPOBEC, tca_tct)) +
 	geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
 
-ggplot(sigs_enrich_tcw, aes(zAPOBEC.Sig, enrich_score)) +
+ggplot(sigs_enrich_tcw, aes(zAPOBEC, enrich_score)) +
 	geom_point() #	+ xlim(0,0.8) + ylim(0,5)
 
 # Try to plot "Mutation Fraction"/"Trinucleotide Context" from "context"
