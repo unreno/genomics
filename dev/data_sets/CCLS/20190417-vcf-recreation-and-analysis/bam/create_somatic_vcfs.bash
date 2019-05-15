@@ -239,7 +239,9 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			bcftools view --include "(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= ${AF} ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.04 && (FMT/AD[0:2]/FMT/DP) <= ${AF} ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.04 && (FMT/AD[0:3]/FMT/DP) <= ${AF} )" \
+			#bcftools view --include "(FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= ${AF} ) || (FMT/AD[0:2] >= 3 && (FMT/AD[0:2]/FMT/DP) >= 0.04 && (FMT/AD[0:2]/FMT/DP) <= ${AF} ) || (FMT/AD[0:3] >= 3 && (FMT/AD[0:3]/FMT/DP) >= 0.04 && (FMT/AD[0:3]/FMT/DP) <= ${AF} )" \
+			#	For the moment, ONLY getting REF>ALT1 mutations. NO ALT2. NO ALT3.
+			bcftools view --include "FMT/AD[0:1] >= 3 && (FMT/AD[0:1]/FMT/DP) >= 0.04 && (FMT/AD[0:1]/FMT/DP) <= ${AF} && (FMT/AD[0:2]/FMT/DP) == '' && (FMT/AD[0:3]/FMT/DP) == ''" \
 				--output-type z --output-file $f \
 				${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.vcf.gz
 			chmod a-w $f
