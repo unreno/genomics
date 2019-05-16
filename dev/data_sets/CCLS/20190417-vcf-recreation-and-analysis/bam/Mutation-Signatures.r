@@ -13,6 +13,7 @@ require(plyr)
 require(gridExtra)
 require(pryr)  # for object_size, mem_used
 require(gdata) # for humanReadable
+require(gtools)
 
 
 require(BSgenome.Hsapiens.UCSC.hg38)
@@ -243,7 +244,7 @@ head(sigs_types)
 
 
 
-csv = sigs_types
+csv = sigs_types[mixedorder(sigs_types$sample),]
 colnames(csv) = gsub("weights.Signature.", "", colnames(csv))
 head(csv)
 write.csv(csv, file = "mutations.csv", row.names=FALSE)
@@ -607,7 +608,8 @@ length(samples)
 
 message("Plotting")
 
-for( this_sample in samples ){
+#for( this_sample in sort(as.numeric(gsub("[^[:digit:]]", "",samples)))){
+for( this_sample in mixedsort(samples)){
 	message(this_sample)
 	cell_line = subset(context_melt, sample == this_sample ) #& tissue == this_tissue )
 	if( nrow(cell_line) > 0 ){
@@ -629,3 +631,4 @@ for( this_sample in samples ){
 		#ggsave(paste0("mutation_fraction_for_",this_sample,".png"),width=6, height=4, dpi=1000)
 	}
 }
+

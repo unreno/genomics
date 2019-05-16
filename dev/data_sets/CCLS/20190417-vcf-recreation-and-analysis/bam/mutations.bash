@@ -36,6 +36,7 @@ for pdf in *pdf ; do
 png=$( basename $pdf .pdf )
 gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
 done
+#\rm pg_*pdf
 cd ..
 
 
@@ -61,6 +62,7 @@ for pdf in *pdf ; do
 png=$( basename $pdf .pdf )
 gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
 done
+\rm pg_*pdf
 cd ..
 
 
@@ -84,11 +86,12 @@ cd ..
 #	png=$( basename $pdf .pdf )
 #	gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
 #	done
+#	\rm pg_*pdf
 #	cd ..
 
 
 
-for AF in 0.20 0.25 0.30 ; do
+for AF in 0.20 0.25 0.30 0.35 0.40 ; do
 
 	\rm -f mut_all_sort.tmp
 	zcat ../983899.somatic/983899.recaled.mpileup*.${AF}.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
@@ -110,6 +113,7 @@ for AF in 0.20 0.25 0.30 ; do
 	png=$( basename $pdf .pdf )
 	gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
 	done
+	\rm pg_*pdf
 	cd ..
 
 done
