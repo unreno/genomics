@@ -242,6 +242,16 @@ sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','we
 head(sigs_types)
 
 
+
+csv = sigs_types
+colnames(csv) = gsub("weights.Signature.", "", colnames(csv))
+head(csv)
+write.csv(csv, file = "mutations.csv", row.names=FALSE)
+#quit()
+
+
+
+
 message("About to melt stuff")
 print(types)
 

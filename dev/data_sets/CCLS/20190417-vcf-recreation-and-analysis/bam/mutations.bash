@@ -27,6 +27,7 @@ cp mut_all_sort.txt mut_all_sort-strelka.txt
 
 ../Mutation-Signatures.r
 mv mutations.pdf mutations-strelka.pdf
+mv mutations.csv mutations-strelka.csv
 
 mkdir mutations-strelka
 cd mutations-strelka
@@ -51,6 +52,7 @@ cp mut_all_sort.txt mut_all_sort-mutect.txt
 
 ../Mutation-Signatures.r
 mv mutations.pdf mutations-mutect.pdf
+mv mutations.csv mutations-mutect.csv
 
 mkdir mutations-mutect
 cd mutations-mutect
@@ -73,6 +75,7 @@ cd ..
 #	
 #	../Mutation-Signatures.r
 #	mv mutations.pdf mutations-Bias.pdf
+#	mv mutations.csv mutations-Bias.csv
 #	
 #	mkdir mutations-Bias
 #	cd mutations-Bias
@@ -98,6 +101,7 @@ for AF in 0.20 0.25 0.30 ; do
 
 	../Mutation-Signatures.r
 	mv mutations.pdf mutations-manual-${AF}.pdf
+	mv mutations.csv mutations-manual-${AF}.csv
 
 	mkdir mutations-manual-${AF}
 	cd mutations-manual-${AF}
