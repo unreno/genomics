@@ -10,17 +10,15 @@ set -x
 
 mkdir -p mutations
 cd mutations
+
+
 ln -s ../sample_types.csv
 
 \rm -f mut_all_sort.tmp
 zcat ../983899.somatic/983899.strelka.filtered.count_trinuc_muts.txt.gz | head -n 1 > mut_all_sort.txt
-
-echo "asdf"
-
 for sample in 983899 268325 439338 63185 634370 ; do
 	zcat ../${sample}.somatic/${sample}.strelka.filtered.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
 done
-
 sort -k1,1 -k2,2n mut_all_sort.tmp >> mut_all_sort.txt
 \rm mut_all_sort.tmp
 cp mut_all_sort.txt mut_all_sort-strelka.txt
@@ -36,7 +34,7 @@ for pdf in *pdf ; do
 png=$( basename $pdf .pdf )
 gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
 done
-#\rm pg_*pdf
+\rm pg_*pdf
 cd ..
 
 
@@ -91,7 +89,7 @@ cd ..
 
 
 
-for AF in 0.20 0.25 0.30 0.35 0.40 ; do
+for AF in 0.20 0.25 0.30 0.35 0.40 0.45 ; do
 
 	\rm -f mut_all_sort.tmp
 	zcat ../983899.somatic/983899.recaled.mpileup*.${AF}.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt

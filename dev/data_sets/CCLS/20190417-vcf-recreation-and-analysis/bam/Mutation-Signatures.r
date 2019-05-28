@@ -1,6 +1,21 @@
 #!/usr/bin/env Rscript
 
 
+#	20190528 - try to use bioconductor to install, update and manage these packages
+#
+#	update.packages(checkBuilt = TRUE, ask = FALSE) 
+#	list.of.packages <- c("deconstructSigs","ggplot2","BSgenome.Hsapiens.UCSC.hg38","reshape","stringr","plyr","gridExtra")
+#	new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#
+#	if (!requireNamespace("BiocManager", quietly = TRUE))
+#		install.packages("BiocManager")
+#	BiocManager::install()
+#	if(length(new.packages))
+#		BiocManager::install( new.packages )
+
+
+
+
 #	Sys.setenv("DISPLAY"=":0")
 #options(bitmapType='cairo')
 #	Need to ssh -Y to server to save these png plots.
@@ -150,6 +165,18 @@ print("object_size(output.sigs.final)")
 print(object_size(output.sigs.final))
 message("ls()")
 ls()
+
+
+
+#
+#message("colnames(output.sigs.final)")
+#colnames(output.sigs.final)
+#
+#quit()
+#
+
+
+
 
 
 #	combine to separate signatures. Not sure exactly what 2 and 13 are just yet
