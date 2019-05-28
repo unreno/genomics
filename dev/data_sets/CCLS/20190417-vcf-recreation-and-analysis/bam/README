@@ -45,3 +45,55 @@ done
 
 
 
+
+
+20190528
+
+Sanger has released version 3 of its signatures.
+deconstructSigs does not include this reference matrix yet so let's see if we can make it.
+https://www.synapse.org/#!Synapse:syn12025148
+Maybe even try to reconstruct version 2 for that warm fuzzy feeling. (can't find the raw v2)
+
+cd ~/github/raerose01/deconstructSigs/data/
+R
+load("signatures.cosmic.rda")
+write.csv(signatures.cosmic,file="signatures.cosmic.csv")
+quit()
+
+
+wc -l signatures.cosmic.csv
+31 signatures.cosmic.csv
+
+
+awk 'BEGIN{FS=OFS=","}{ print NF }' signatures.cosmic.csv | uniq -c
+     31 97
+
+
+awk 'BEGIN{FS=OFS=","}( NR < 5 ){ print $1,$2,$3,$4,$5 }' signatures.cosmic.csv 
+"","A[C>A]A","A[C>A]C","A[C>A]G","A[C>A]T"
+"Signature.1",0.011098326166,0.009149340734,0.001490070468,0.006233885236
+"Signature.2",0.000682708227,0.000619107232,9.9278956e-05,0.000323891363
+"Signature.3",0.022172306775,0.017871675353,0.002138339617,0.01626514559
+
+
+The new file is rotated and has a type and subtype, so I got work to do.
+
+Merge Type and Subtype FIRST!
+
+
+awk 'BEGIN{FS=OFS=","}(NR==1){printf("\"sig\"")}(NR>1){split($2,a,"");printf("\"%s[%s]%s\"",a[1],$1,a[3])}{for(i=3;i<=NF;i++)printf(",%s",$i);printf("\n")}' sigProfiler_SBS_signatures_2019_05_22.csv > sigProfiler_SBS_signatures_2019_05_22.merged.csv
+
+Then transpose.
+
+datamash transpose -t , < sigProfiler_SBS_signatures_2019_05_22.merged.csv > sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv
+cp sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv ~/github/raerose01/deconstructSigs/data/
+
+
+R
+signatures.v3 <- read.csv(file="sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv") , header=TRUE, sep=",")
+
+
+
+
+
+
