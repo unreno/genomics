@@ -98,6 +98,7 @@ signatures.v3 <- read.csv(file="sigProfiler_SBS_signatures_2019_05_22.merged.tp.
 save(signatures.v3,file="signatures.v3.rda")
 
 
+cp signatures.v3.rda ~/github/unreno/genomics/dev/data_sets/CCLS/20190417-vcf-recreation-and-analysis/bam/
 
 
 
