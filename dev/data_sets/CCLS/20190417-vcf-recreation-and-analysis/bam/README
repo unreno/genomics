@@ -86,11 +86,16 @@ awk 'BEGIN{FS=OFS=","}(NR==1){printf("\"sig\"")}(NR>1){split($2,a,"");printf("\"
 Then transpose.
 
 datamash transpose -t , < sigProfiler_SBS_signatures_2019_05_22.merged.csv > sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv
+
+For some reason, this added control-M's after field. Can't figure out why.
+sed -i -e 's/\r//g' sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv
+
 cp sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv ~/github/raerose01/deconstructSigs/data/
 
 
 R
-signatures.v3 <- read.csv(file="sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv") , header=TRUE, sep=",")
+signatures.v3 <- read.csv(file="sigProfiler_SBS_signatures_2019_05_22.merged.tp.csv",check.names=FALSE,row.names='sig')
+save(signatures.v3,file="signatures.v3.rda")
 
 
 
