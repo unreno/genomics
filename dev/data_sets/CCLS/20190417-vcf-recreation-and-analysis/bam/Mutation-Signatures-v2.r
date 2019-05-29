@@ -181,11 +181,12 @@ ls()
 
 #	combine to separate signatures. Not sure exactly what 2 and 13 are just yet
 #	rename zAPOBEC.Sig zAPOBEC
-message("output.sigs.final$zAPOBEC")
-output.sigs.final$zAPOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
+#	rename zAPOBEC APOBEC
+message("output.sigs.final$APOBEC")
+output.sigs.final$APOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
 
 #	319 is "unknown"
-#	320 is this newly created zAPOBED
+#	320 is this newly created APOBEC
 
 message("head(output.sigs.final[,c(1:30,319,320)])")
 head(output.sigs.final[,c(1:30,319,320)])
@@ -267,10 +268,48 @@ colnames(sigs_types)
 colnames(sigs_types)[!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13','mut_tot')]
 head(sigs_types)
 
-#	Drop 2 and 13 as they were merged into zAPOBEC?
+#	Drop 2 and 13 as they were merged into APOBEC?
 #	if not removed, the stacked bar will add to over 100%.
-sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13')]
-head(sigs_types)
+#sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13')]
+#head(sigs_types)
+
+
+
+
+
+# Drop all signatures which are not present in any sample
+# This will clean up the stacked bar chart big time
+
+new_sigs_types = sigs_types[c('sample','type','mut_tot','APOBEC','unknown')]
+head(new_sigs_types)
+for( c in colnames(sigs_types)[!colnames(sigs_types) %in% c('sample','type','mut_tot','APOBEC','unknown','weights.Signature.2','weights.Signature.13')] ){
+  print(c)
+  print(sigs_types[c])
+  if( sum(sigs_types[c] > 0 ) ){
+    new_sigs_types[c] = sigs_types[c]
+  }
+}
+head(new_sigs_types)
+#warnings()
+#quit()
+
+sigs_types = new_sigs_types
+rm(new_sigs_types)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -334,7 +373,7 @@ for( this_type in types ){
 #	sigs_melt[,"sig"] <- gsub("Signature.29", "ZZ", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.30", "ZZZ", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("unknown", "ZZZZ", sigs_melt[,"sig"])
-#	sigs_melt[,"sig"] <- gsub("zAPOBEC.Sig", "ZZZZZ", sigs_melt[,"sig"])
+#	sigs_melt[,"sig"] <- gsub("APOBEC.Sig", "ZZZZZ", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.1", "A", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.3", "B", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.4", "C", sigs_melt[,"sig"])
@@ -343,7 +382,7 @@ for( this_type in types ){
 #	sigs_melt[,"sig"] <- gsub("Signature.7", "F", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.8", "G", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.9", "H", sigs_melt[,"sig"])
-	list <- sigs_individual[order(sigs_individual$zAPOBEC),]
+	list <- sigs_individual[order(sigs_individual$APOBEC),]
 	list1 <- as.vector(list[,"sample"])
 
 
@@ -370,12 +409,12 @@ for( this_type in types ){
 			axis.line = element_line(colour = "black")))
 	#ggsave(paste0("signatures_for_",this_type,".png"),width=6, height=4, dpi=1000)
 
-	sigs_individual <- subset(sigs_individual, zAPOBEC > 0)
+	sigs_individual <- subset(sigs_individual, APOBEC > 0)
 	if( nrow(sigs_individual) > 0){
 		sigs_melt <- melt(sigs_individual, id = "sample")
 		colnames(sigs_melt) <- c("sample", "sig", "value")
-		sigs_melt <- subset(sigs_melt, sig == "zAPOBEC")
-		list <- sigs_individual[order(sigs_individual$zAPOBEC),]
+		sigs_melt <- subset(sigs_melt, sig == "APOBEC")
+		list <- sigs_individual[order(sigs_individual$APOBEC),]
 		list1 <- as.vector(list[,"sample"])
 
 		#	Apparently in a loop, plot must be printed?
@@ -566,7 +605,7 @@ for( this_type in types ){
 		next
 	}
 	head(sigs_individual)
-	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$zAPOBEC),]
+	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$APOBEC),]
 	rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
 	sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
 
@@ -605,10 +644,10 @@ options(repr.plot.width=10, repr.plot.height=10)
 ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
 	geom_point() #	+ ylim(0,5) + xlim(0,0.5)
 
-ggplot(sigs_enrich_tcw, aes(zAPOBEC, tca_tct)) +
+ggplot(sigs_enrich_tcw, aes(APOBEC, tca_tct)) +
 	geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
 
-ggplot(sigs_enrich_tcw, aes(zAPOBEC, enrich_score)) +
+ggplot(sigs_enrich_tcw, aes(APOBEC, enrich_score)) +
 	geom_point() #	+ xlim(0,0.8) + ylim(0,5)
 
 # Try to plot "Mutation Fraction"/"Trinucleotide Context" from "context"
