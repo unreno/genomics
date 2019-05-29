@@ -475,90 +475,90 @@ for( this_type in types ){
 	}
 }
 
-message("nrow(mut_all_sort)")		#	90475122
-nrow(mut_all_sort)
-
-Sys.time()
-
-
-mut_all_sort$Mut_TCW <- "0"
-mut_all_sort$Mut_C <- "0"
-mut_all_sort$Con_TCW <- "0"
-mut_all_sort$Con_C <- "0"
-mut <- data.frame(do.call('rbind', strsplit(as.character(mut_all_sort$mut),'>',fixed=T)))
-mut_all_sort$mut_ref <- mut[,1]
-enrich_C <- subset(mut_all_sort, mut_ref == "C")
-
-message("enrich_CtoK <- subset(enrich_C")
-Sys.time()
-enrich_CtoK <- subset(enrich_C, mut != "C>A") # Remove C>A mutations!
-Sys.time()
-
-enrich_CtoK[which(enrich_CtoK$mut_ref == "C"),"Mut_C"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]A"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]T"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]A"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]T"),"Mut_TCW"] <- "1"
-
-enrich_CtoK$Con_C <- str_count(enrich_CtoK$context, "C") + str_count(enrich_CtoK$context, "G")
-
-enrich_CtoK$Con_TCW <- str_count(enrich_CtoK$context, "TCA") +
-		str_count(enrich_CtoK$context, "TCT") +
-		str_count(enrich_CtoK$context, "TGA") +
-		str_count(enrich_CtoK$context, "TGT")
-
-enrich_final <- enrich_CtoK[,16:20]
-enrich_final$Mut_TCW <- as.integer(enrich_final$Mut_TCW)
-enrich_final$Mut_C <- as.integer(enrich_final$Mut_C)
-
-message("ddply(enrich_final")
-Sys.time()
-enrich_final <- ddply(enrich_final, "sample", numcolwise(sum))
-Sys.time()
-
-rownames(enrich_final) <- enrich_final$sample
-enrich_final$sample <- NULL
-enrich_final$enrich_score <- (enrich_final$Mut_TCW / enrich_final$Con_TCW) / (enrich_final$Mut_C / enrich_final$Con_C)
-
-enrich_matrix <- as.data.frame(enrich_final$Mut_TCW)
-enrich_matrix$Mut_Denom <- enrich_final$Mut_C - enrich_final$Mut_TCW
-enrich_matrix$Con_TCW <- enrich_final$Con_TCW
-enrich_matrix$Con_Denom <- enrich_final$Con_C - enrich_final$Con_TCW
-rownames(enrich_matrix) <- rownames(enrich_final)
-colnames(enrich_matrix) <- c("Mut_TCW", "Mut_Denom", "Con_TCW", "Con_Denom")
-
-message("as.matrix(enrich_matrix)")
-Sys.time()
-enrich_matrix <- as.matrix(enrich_matrix)
-Sys.time()
-
-
-exe_fisher <- function(x) {
-	m <- matrix(unlist(x), ncol = 2, nrow = 2, byrow = T)
-	f <- fisher.test(m)
-	return(as.data.frame(f$p.value))
-}
-
-message("t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))")
-Sys.time()
-fishers <- t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))
-Sys.time()
-fishers <- as.data.frame(fishers)
-
-enrich_final$fisher_pval <- fishers$V1
-enrich_final$bh_adj_qval <- p.adjust(enrich_final$fisher_pval, method = "BH")
-
-enrich_final$Mut_Ratio <- enrich_final$Mut_TCW/(enrich_final$Mut_C - enrich_final$Mut_TCW)
-enrich_final$Con_Ratio <- enrich_final$Con_TCW/(enrich_final$Con_C - enrich_final$Con_TCW)
-enrich_final[which(enrich_final$Mut_Ratio < enrich_final$Con_Ratio), "bh_adj_qval"] <- 1
-enrich_final$Mut_Ratio <- NULL
-enrich_final$Con_Ratio <- NULL
-enrich_final$sample <- rownames(enrich_final)
-rownames(enrich_final) <- NULL
-
-Sys.time()
-
-
+#	message("nrow(mut_all_sort)")		#	90475122
+#	nrow(mut_all_sort)
+#	
+#	Sys.time()
+#	
+#	
+#	mut_all_sort$Mut_TCW <- "0"
+#	mut_all_sort$Mut_C <- "0"
+#	mut_all_sort$Con_TCW <- "0"
+#	mut_all_sort$Con_C <- "0"
+#	mut <- data.frame(do.call('rbind', strsplit(as.character(mut_all_sort$mut),'>',fixed=T)))
+#	mut_all_sort$mut_ref <- mut[,1]
+#	enrich_C <- subset(mut_all_sort, mut_ref == "C")
+#	
+#	message("enrich_CtoK <- subset(enrich_C")
+#	Sys.time()
+#	enrich_CtoK <- subset(enrich_C, mut != "C>A") # Remove C>A mutations!
+#	Sys.time()
+#	
+#	enrich_CtoK[which(enrich_CtoK$mut_ref == "C"),"Mut_C"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]A"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]T"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]A"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]T"),"Mut_TCW"] <- "1"
+#	
+#	enrich_CtoK$Con_C <- str_count(enrich_CtoK$context, "C") + str_count(enrich_CtoK$context, "G")
+#	
+#	enrich_CtoK$Con_TCW <- str_count(enrich_CtoK$context, "TCA") +
+#			str_count(enrich_CtoK$context, "TCT") +
+#			str_count(enrich_CtoK$context, "TGA") +
+#			str_count(enrich_CtoK$context, "TGT")
+#	
+#	enrich_final <- enrich_CtoK[,16:20]
+#	enrich_final$Mut_TCW <- as.integer(enrich_final$Mut_TCW)
+#	enrich_final$Mut_C <- as.integer(enrich_final$Mut_C)
+#	
+#	message("ddply(enrich_final")
+#	Sys.time()
+#	enrich_final <- ddply(enrich_final, "sample", numcolwise(sum))
+#	Sys.time()
+#	
+#	rownames(enrich_final) <- enrich_final$sample
+#	enrich_final$sample <- NULL
+#	enrich_final$enrich_score <- (enrich_final$Mut_TCW / enrich_final$Con_TCW) / (enrich_final$Mut_C / enrich_final$Con_C)
+#	
+#	enrich_matrix <- as.data.frame(enrich_final$Mut_TCW)
+#	enrich_matrix$Mut_Denom <- enrich_final$Mut_C - enrich_final$Mut_TCW
+#	enrich_matrix$Con_TCW <- enrich_final$Con_TCW
+#	enrich_matrix$Con_Denom <- enrich_final$Con_C - enrich_final$Con_TCW
+#	rownames(enrich_matrix) <- rownames(enrich_final)
+#	colnames(enrich_matrix) <- c("Mut_TCW", "Mut_Denom", "Con_TCW", "Con_Denom")
+#	
+#	message("as.matrix(enrich_matrix)")
+#	Sys.time()
+#	enrich_matrix <- as.matrix(enrich_matrix)
+#	Sys.time()
+#	
+#	
+#	exe_fisher <- function(x) {
+#		m <- matrix(unlist(x), ncol = 2, nrow = 2, byrow = T)
+#		f <- fisher.test(m)
+#		return(as.data.frame(f$p.value))
+#	}
+#	
+#	message("t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))")
+#	Sys.time()
+#	fishers <- t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))
+#	Sys.time()
+#	fishers <- as.data.frame(fishers)
+#	
+#	enrich_final$fisher_pval <- fishers$V1
+#	enrich_final$bh_adj_qval <- p.adjust(enrich_final$fisher_pval, method = "BH")
+#	
+#	enrich_final$Mut_Ratio <- enrich_final$Mut_TCW/(enrich_final$Mut_C - enrich_final$Mut_TCW)
+#	enrich_final$Con_Ratio <- enrich_final$Con_TCW/(enrich_final$Con_C - enrich_final$Con_TCW)
+#	enrich_final[which(enrich_final$Mut_Ratio < enrich_final$Con_Ratio), "bh_adj_qval"] <- 1
+#	enrich_final$Mut_Ratio <- NULL
+#	enrich_final$Con_Ratio <- NULL
+#	enrich_final$sample <- rownames(enrich_final)
+#	rownames(enrich_final) <- NULL
+#	
+#	Sys.time()
+#	
+#	
 #	if( exists("mut_med_quantiles") ){
 #		rm(mut_med_quantiles)
 #	}
@@ -664,22 +664,22 @@ Sys.time()
 #				panel.grid.minor = element_blank(),
 #				axis.line = element_line(colour = "black")))
 #	}
-
-
-sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
-head(sigs_enrich)
-
-message("Merging sigs_enrich and tca_tct")
-Sys.time()
-sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
-head(sigs_enrich_tcw)
-Sys.time()
-
-
-# Adjust plot size
-options(repr.plot.width=10, repr.plot.height=10)
-
-
+#	
+#	
+#	sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
+#	head(sigs_enrich)
+#	
+#	message("Merging sigs_enrich and tca_tct")
+#	Sys.time()
+#	sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
+#	head(sigs_enrich_tcw)
+#	Sys.time()
+#	
+#	
+#	# Adjust plot size
+#	options(repr.plot.width=10, repr.plot.height=10)
+#	
+#	
 #	ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
 #		geom_point() #	+ ylim(0,5) + xlim(0,0.5)
 #	

@@ -436,219 +436,219 @@ for( this_type in types ){
 	}
 }
 
-message("nrow(mut_all_sort)")		#	90475122
-nrow(mut_all_sort)
-
-Sys.time()
-
-
-mut_all_sort$Mut_TCW <- "0"
-mut_all_sort$Mut_C <- "0"
-mut_all_sort$Con_TCW <- "0"
-mut_all_sort$Con_C <- "0"
-mut <- data.frame(do.call('rbind', strsplit(as.character(mut_all_sort$mut),'>',fixed=T)))
-mut_all_sort$mut_ref <- mut[,1]
-enrich_C <- subset(mut_all_sort, mut_ref == "C")
-
-message("enrich_CtoK <- subset(enrich_C")
-Sys.time()
-enrich_CtoK <- subset(enrich_C, mut != "C>A") # Remove C>A mutations!
-Sys.time()
-
-enrich_CtoK[which(enrich_CtoK$mut_ref == "C"),"Mut_C"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]A"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]T"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]A"),"Mut_TCW"] <- "1"
-enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]T"),"Mut_TCW"] <- "1"
-
-enrich_CtoK$Con_C <- str_count(enrich_CtoK$context, "C") + str_count(enrich_CtoK$context, "G")
-
-enrich_CtoK$Con_TCW <- str_count(enrich_CtoK$context, "TCA") +
-		str_count(enrich_CtoK$context, "TCT") +
-		str_count(enrich_CtoK$context, "TGA") +
-		str_count(enrich_CtoK$context, "TGT")
-
-enrich_final <- enrich_CtoK[,16:20]
-enrich_final$Mut_TCW <- as.integer(enrich_final$Mut_TCW)
-enrich_final$Mut_C <- as.integer(enrich_final$Mut_C)
-
-message("ddply(enrich_final")
-Sys.time()
-enrich_final <- ddply(enrich_final, "sample", numcolwise(sum))
-Sys.time()
-
-rownames(enrich_final) <- enrich_final$sample
-enrich_final$sample <- NULL
-enrich_final$enrich_score <- (enrich_final$Mut_TCW / enrich_final$Con_TCW) / (enrich_final$Mut_C / enrich_final$Con_C)
-
-enrich_matrix <- as.data.frame(enrich_final$Mut_TCW)
-enrich_matrix$Mut_Denom <- enrich_final$Mut_C - enrich_final$Mut_TCW
-enrich_matrix$Con_TCW <- enrich_final$Con_TCW
-enrich_matrix$Con_Denom <- enrich_final$Con_C - enrich_final$Con_TCW
-rownames(enrich_matrix) <- rownames(enrich_final)
-colnames(enrich_matrix) <- c("Mut_TCW", "Mut_Denom", "Con_TCW", "Con_Denom")
-
-message("as.matrix(enrich_matrix)")
-Sys.time()
-enrich_matrix <- as.matrix(enrich_matrix)
-Sys.time()
-
-
-exe_fisher <- function(x) {
-	m <- matrix(unlist(x), ncol = 2, nrow = 2, byrow = T)
-	f <- fisher.test(m)
-	return(as.data.frame(f$p.value))
-}
-
-message("t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))")
-Sys.time()
-fishers <- t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))
-Sys.time()
-fishers <- as.data.frame(fishers)
-
-enrich_final$fisher_pval <- fishers$V1
-enrich_final$bh_adj_qval <- p.adjust(enrich_final$fisher_pval, method = "BH")
-
-enrich_final$Mut_Ratio <- enrich_final$Mut_TCW/(enrich_final$Mut_C - enrich_final$Mut_TCW)
-enrich_final$Con_Ratio <- enrich_final$Con_TCW/(enrich_final$Con_C - enrich_final$Con_TCW)
-enrich_final[which(enrich_final$Mut_Ratio < enrich_final$Con_Ratio), "bh_adj_qval"] <- 1
-enrich_final$Mut_Ratio <- NULL
-enrich_final$Con_Ratio <- NULL
-enrich_final$sample <- rownames(enrich_final)
-rownames(enrich_final) <- NULL
-
-Sys.time()
-
-
-if( exists("mut_med_quantiles") ){
-	rm(mut_med_quantiles)
-}
-
-message("med quantiles loop")
-Sys.time()
-for( this_type in types ) {
-	mut_sub <- subset(cell_line_mutload, type == this_type)
-	if( exists("mut_med_quantiles") ){
-		x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
-		mut_med_quantiles <- rbind(mut_med_quantiles, x)
-	} else {
-		mut_med_quantiles <- as.data.frame(t(quantile(mut_sub$mut_tot)))
-	}
-}
-Sys.time()
-
-rownames(mut_med_quantiles) = types
-mut_med_quantiles$type <- rownames(mut_med_quantiles)
-colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "type")
-
-mut_med_quantiles
-
-mut_med_quantiles <- mut_med_quantiles[order(mut_med_quantiles$med),]
-head(mut_med_quantiles)
-
-plot_order <- as.vector(mut_med_quantiles[,"type"])
-head(plot_order)
-
-# Adjust plot size
-options(repr.plot.width=16, repr.plot.height=6)
-
-ggplot(mut_med_quantiles, aes(type, med)) +
-	geom_col() +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1), legend.position = "none") +
-	geom_errorbar(aes(ymin=first, ymax=third), width=.3) +
-	scale_y_continuous(limits = c(0,3501),
-		breaks = c(0,1200,2400,3600)) +
-	xlab("Type") +
-	ylab("Median Number of Mutations") +
-	theme_bw() +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1),
-		panel.border = element_blank(),
-		panel.grid.major = element_blank(),
-		panel.grid.minor = element_blank(),
-		axis.line = element_line(colour = "black")) +
-	scale_fill_gradient(low = "blue", high = "red") +
-	scale_x_discrete(limits = plot_order ) +
-	ggtitle("Median Mutations by Type")
-
-number <- as.data.frame(table(sample_types$type))
-colnames(number) <- c("type", "freq")
-ggplot(number, aes(type, freq)) +
-	geom_point(size = 4) +
-	#ylim(0,200) +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-	scale_x_discrete(limits = types )
-
-# use same sort as median number of mutations plot
-number <- as.data.frame(table(sample_types$type))
-
-colnames(number) <- c("type", "freq")
-
-ggplot(number, aes(type, freq)) +
-	geom_point(size = 4) +
-	#ylim(0,200) +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-	scale_x_discrete(limits = plot_order)
-
-
-print("Another types loop")
-
-#	Error in `.rowNamesDF<-`(x, value = value) : invalid 'row.names' length
-#	Calls: rownames<- ... row.names<- -> row.names<-.data.frame -> .rowNamesDF<-
-#	Execution halted
-
-for( this_type in types ){
-	sigs_types_individual <- subset(sigs_types, type == this_type)
-	print( this_type )
-	print( nrow(sigs_types_individual) )
-	if( nrow(sigs_types_individual) == 0 ){
-		print( paste0("No data with this type: ",this_type) )
-		next
-	}
-	head(sigs_individual)
-	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$APOBEC),]
-	rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
-	sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
-
-	#	Apparently in a loop, plot must be printed?
-	print(ggplot(sigs_types_individual_1, aes(as.numeric(order), mut_tot)) +
-		geom_point(shape = 18, size = 4) +
-		geom_smooth(span = 0.75) +
-		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-		ggtitle(this_type) +
-		xlab("Sample") +
-		ylab("Mut Burden") +
-		#ylim(0,1600) +
-		theme_bw() +
-		theme(axis.text.x=element_text(angle = 45, hjust = 1),
-			panel.border = element_blank(),
-			panel.grid.major = element_blank(),
-			panel.grid.minor = element_blank(),
-			axis.line = element_line(colour = "black")))
-}
-
-
-sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
-head(sigs_enrich)
-
-message("Merging sigs_enrich and tca_tct")
-Sys.time()
-sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
-head(sigs_enrich_tcw)
-Sys.time()
-
-
-# Adjust plot size
-options(repr.plot.width=10, repr.plot.height=10)
-
-
-ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
-	geom_point() #	+ ylim(0,5) + xlim(0,0.5)
-
-ggplot(sigs_enrich_tcw, aes(APOBEC, tca_tct)) +
-	geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
-
-ggplot(sigs_enrich_tcw, aes(APOBEC, enrich_score)) +
-	geom_point() #	+ xlim(0,0.8) + ylim(0,5)
+#	message("nrow(mut_all_sort)")		#	90475122
+#	nrow(mut_all_sort)
+#	
+#	Sys.time()
+#	
+#	
+#	mut_all_sort$Mut_TCW <- "0"
+#	mut_all_sort$Mut_C <- "0"
+#	mut_all_sort$Con_TCW <- "0"
+#	mut_all_sort$Con_C <- "0"
+#	mut <- data.frame(do.call('rbind', strsplit(as.character(mut_all_sort$mut),'>',fixed=T)))
+#	mut_all_sort$mut_ref <- mut[,1]
+#	enrich_C <- subset(mut_all_sort, mut_ref == "C")
+#	
+#	message("enrich_CtoK <- subset(enrich_C")
+#	Sys.time()
+#	enrich_CtoK <- subset(enrich_C, mut != "C>A") # Remove C>A mutations!
+#	Sys.time()
+#	
+#	enrich_CtoK[which(enrich_CtoK$mut_ref == "C"),"Mut_C"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]A"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>G]T"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]A"),"Mut_TCW"] <- "1"
+#	enrich_CtoK[which(enrich_CtoK$trinuc_mut == "T[C>T]T"),"Mut_TCW"] <- "1"
+#	
+#	enrich_CtoK$Con_C <- str_count(enrich_CtoK$context, "C") + str_count(enrich_CtoK$context, "G")
+#	
+#	enrich_CtoK$Con_TCW <- str_count(enrich_CtoK$context, "TCA") +
+#			str_count(enrich_CtoK$context, "TCT") +
+#			str_count(enrich_CtoK$context, "TGA") +
+#			str_count(enrich_CtoK$context, "TGT")
+#	
+#	enrich_final <- enrich_CtoK[,16:20]
+#	enrich_final$Mut_TCW <- as.integer(enrich_final$Mut_TCW)
+#	enrich_final$Mut_C <- as.integer(enrich_final$Mut_C)
+#	
+#	message("ddply(enrich_final")
+#	Sys.time()
+#	enrich_final <- ddply(enrich_final, "sample", numcolwise(sum))
+#	Sys.time()
+#	
+#	rownames(enrich_final) <- enrich_final$sample
+#	enrich_final$sample <- NULL
+#	enrich_final$enrich_score <- (enrich_final$Mut_TCW / enrich_final$Con_TCW) / (enrich_final$Mut_C / enrich_final$Con_C)
+#	
+#	enrich_matrix <- as.data.frame(enrich_final$Mut_TCW)
+#	enrich_matrix$Mut_Denom <- enrich_final$Mut_C - enrich_final$Mut_TCW
+#	enrich_matrix$Con_TCW <- enrich_final$Con_TCW
+#	enrich_matrix$Con_Denom <- enrich_final$Con_C - enrich_final$Con_TCW
+#	rownames(enrich_matrix) <- rownames(enrich_final)
+#	colnames(enrich_matrix) <- c("Mut_TCW", "Mut_Denom", "Con_TCW", "Con_Denom")
+#	
+#	message("as.matrix(enrich_matrix)")
+#	Sys.time()
+#	enrich_matrix <- as.matrix(enrich_matrix)
+#	Sys.time()
+#	
+#	
+#	exe_fisher <- function(x) {
+#		m <- matrix(unlist(x), ncol = 2, nrow = 2, byrow = T)
+#		f <- fisher.test(m)
+#		return(as.data.frame(f$p.value))
+#	}
+#	
+#	message("t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))")
+#	Sys.time()
+#	fishers <- t(as.data.frame(apply(enrich_matrix, 1, exe_fisher)))
+#	Sys.time()
+#	fishers <- as.data.frame(fishers)
+#	
+#	enrich_final$fisher_pval <- fishers$V1
+#	enrich_final$bh_adj_qval <- p.adjust(enrich_final$fisher_pval, method = "BH")
+#	
+#	enrich_final$Mut_Ratio <- enrich_final$Mut_TCW/(enrich_final$Mut_C - enrich_final$Mut_TCW)
+#	enrich_final$Con_Ratio <- enrich_final$Con_TCW/(enrich_final$Con_C - enrich_final$Con_TCW)
+#	enrich_final[which(enrich_final$Mut_Ratio < enrich_final$Con_Ratio), "bh_adj_qval"] <- 1
+#	enrich_final$Mut_Ratio <- NULL
+#	enrich_final$Con_Ratio <- NULL
+#	enrich_final$sample <- rownames(enrich_final)
+#	rownames(enrich_final) <- NULL
+#	
+#	Sys.time()
+#	
+#	
+#	if( exists("mut_med_quantiles") ){
+#		rm(mut_med_quantiles)
+#	}
+#	
+#	message("med quantiles loop")
+#	Sys.time()
+#	for( this_type in types ) {
+#		mut_sub <- subset(cell_line_mutload, type == this_type)
+#		if( exists("mut_med_quantiles") ){
+#			x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
+#			mut_med_quantiles <- rbind(mut_med_quantiles, x)
+#		} else {
+#			mut_med_quantiles <- as.data.frame(t(quantile(mut_sub$mut_tot)))
+#		}
+#	}
+#	Sys.time()
+#	
+#	rownames(mut_med_quantiles) = types
+#	mut_med_quantiles$type <- rownames(mut_med_quantiles)
+#	colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "type")
+#	
+#	mut_med_quantiles
+#	
+#	mut_med_quantiles <- mut_med_quantiles[order(mut_med_quantiles$med),]
+#	head(mut_med_quantiles)
+#	
+#	plot_order <- as.vector(mut_med_quantiles[,"type"])
+#	head(plot_order)
+#	
+#	# Adjust plot size
+#	options(repr.plot.width=16, repr.plot.height=6)
+#	
+#	ggplot(mut_med_quantiles, aes(type, med)) +
+#		geom_col() +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1), legend.position = "none") +
+#		geom_errorbar(aes(ymin=first, ymax=third), width=.3) +
+#		scale_y_continuous(limits = c(0,3501),
+#			breaks = c(0,1200,2400,3600)) +
+#		xlab("Type") +
+#		ylab("Median Number of Mutations") +
+#		theme_bw() +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1),
+#			panel.border = element_blank(),
+#			panel.grid.major = element_blank(),
+#			panel.grid.minor = element_blank(),
+#			axis.line = element_line(colour = "black")) +
+#		scale_fill_gradient(low = "blue", high = "red") +
+#		scale_x_discrete(limits = plot_order ) +
+#		ggtitle("Median Mutations by Type")
+#	
+#	number <- as.data.frame(table(sample_types$type))
+#	colnames(number) <- c("type", "freq")
+#	ggplot(number, aes(type, freq)) +
+#		geom_point(size = 4) +
+#		#ylim(0,200) +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#		scale_x_discrete(limits = types )
+#	
+#	# use same sort as median number of mutations plot
+#	number <- as.data.frame(table(sample_types$type))
+#	
+#	colnames(number) <- c("type", "freq")
+#	
+#	ggplot(number, aes(type, freq)) +
+#		geom_point(size = 4) +
+#		#ylim(0,200) +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#		scale_x_discrete(limits = plot_order)
+#	
+#	
+#	print("Another types loop")
+#	
+#	#	Error in `.rowNamesDF<-`(x, value = value) : invalid 'row.names' length
+#	#	Calls: rownames<- ... row.names<- -> row.names<-.data.frame -> .rowNamesDF<-
+#	#	Execution halted
+#	
+#	for( this_type in types ){
+#		sigs_types_individual <- subset(sigs_types, type == this_type)
+#		print( this_type )
+#		print( nrow(sigs_types_individual) )
+#		if( nrow(sigs_types_individual) == 0 ){
+#			print( paste0("No data with this type: ",this_type) )
+#			next
+#		}
+#		head(sigs_individual)
+#		sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$APOBEC),]
+#		rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
+#		sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
+#	
+#		#	Apparently in a loop, plot must be printed?
+#		print(ggplot(sigs_types_individual_1, aes(as.numeric(order), mut_tot)) +
+#			geom_point(shape = 18, size = 4) +
+#			geom_smooth(span = 0.75) +
+#			theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#			ggtitle(this_type) +
+#			xlab("Sample") +
+#			ylab("Mut Burden") +
+#			#ylim(0,1600) +
+#			theme_bw() +
+#			theme(axis.text.x=element_text(angle = 45, hjust = 1),
+#				panel.border = element_blank(),
+#				panel.grid.major = element_blank(),
+#				panel.grid.minor = element_blank(),
+#				axis.line = element_line(colour = "black")))
+#	}
+#	
+#	
+#	sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
+#	head(sigs_enrich)
+#	
+#	message("Merging sigs_enrich and tca_tct")
+#	Sys.time()
+#	sigs_enrich_tcw <- merge(sigs_enrich, tca_tct, by = "sample")
+#	head(sigs_enrich_tcw)
+#	Sys.time()
+#	
+#	
+#	# Adjust plot size
+#	options(repr.plot.width=10, repr.plot.height=10)
+#	
+#	
+#	ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
+#		geom_point() #	+ ylim(0,5) + xlim(0,0.5)
+#	
+#	ggplot(sigs_enrich_tcw, aes(APOBEC, tca_tct)) +
+#		geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
+#	
+#	ggplot(sigs_enrich_tcw, aes(APOBEC, enrich_score)) +
+#		geom_point() #	+ xlim(0,0.8) + ylim(0,5)
 
 # Try to plot "Mutation Fraction"/"Trinucleotide Context" from "context"
 head(context)
