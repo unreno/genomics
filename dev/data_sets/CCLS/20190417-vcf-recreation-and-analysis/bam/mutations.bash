@@ -8,10 +8,11 @@ set -u  #       Error on usage of unset variables
 
 set -x
 
-mkdir -p mutations
-cd mutations
+mkdir -p mutations_v3
+cd mutations_v3
 
 
+ln -s ../signatures.v3.rda
 ln -s ../sample_types.csv
 
 \rm -f mut_all_sort.tmp

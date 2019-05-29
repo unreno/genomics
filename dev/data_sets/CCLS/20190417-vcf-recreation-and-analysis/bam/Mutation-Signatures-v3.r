@@ -13,7 +13,24 @@
 #	if(length(new.packages))
 #		BiocManager::install( new.packages )
 
-
+#	> head(signatures.v3[['A[C>A]A']])
+#	[1] 8.86e-04 5.80e-07 2.08e-02 4.22e-02 1.20e-02 4.25e-04
+#	> head(signatures.v3[,'A[C>A]A'])
+#	[1] 8.86e-04 5.80e-07 2.08e-02 4.22e-02 1.20e-02 4.25e-04
+#	> head(signatures.v3['A[C>A]A'])
+#		A[C>A]A
+#	SBS1 8.86e-04
+#	SBS2 5.80e-07
+#	SBS3 2.08e-02
+#	SBS4 4.22e-02
+#	SBS5 1.20e-02
+#	SBS6 4.25e-04
+#	
+#	[var] returns dataframe
+#	[[var]] or [,var] returns array
+#	in some uses, it doesn't matter which is used
+#
+#	[var,] selects a row, which I won't use here
 
 
 #	Sys.setenv("DISPLAY"=":0")
@@ -137,13 +154,18 @@ Sys.time()
 message("looping whichSignatures")
 nrow(context)
 
+
+#	My version of version 3 signatures
+load("signatures.v3.rda")
+
+
 # signatures.cosmic is part of the deconstructSigs package so guessing that is why it works without me loading it.
 # Wonder what happens if I use signatures.nature2013
 for(i in (1:nrow(context))) {
 	#message(i," - ",nrow(context))
 	output.sigs <- as.data.frame(whichSignatures(context,
 			sample.id = rownames(context[i,]),
-			signatures.cosmic,
+			signatures.v3,
 			contexts.needed = F))
 	if( exists("output.sigs.final")){
 		output.sigs.final <- rbind(output.sigs.final, output.sigs)
@@ -168,31 +190,53 @@ ls()
 
 
 
-#
+
 #message("colnames(output.sigs.final)")
 #colnames(output.sigs.final)
-#
 #quit()
-#
 
 
 
 
 
-#	combine to separate signatures. Not sure exactly what 2 and 13 are just yet
-#	rename zAPOBEC.Sig zAPOBEC
-message("output.sigs.final$zAPOBEC")
-output.sigs.final$zAPOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
 
-message("head(output.sigs.final[,c(1:30,319,320)])")
-head(output.sigs.final[,c(1:30,319,320)])
+#	#	combine to separate signatures. Not sure exactly what 2 and 13 are just yet
+#	#	rename zAPOBEC.Sig zAPOBEC
+#	message("output.sigs.final$zAPOBEC")
+#	output.sigs.final$zAPOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
+#	
+#	#	319 is "unknown"
+#	#	320 is this newly created zAPOBEC
+#	
+#	message("head(output.sigs.final[,c(1:30,319,320)])")
+#	head(output.sigs.final[,c(1:30,319,320)])
+#	
+#	message("colnames(output.sigs.final)[c(1:30,319,320)]")
+#	colnames(output.sigs.final)[c(1:30,319,320)]
+#	
+#	# Only want 32 of these columns? ( just the weights, plus unknown and zAPOBEC )
+#	output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
+#	head(output.sigs.final)
 
-message("colnames(output.sigs.final)[c(1:30,319,320)]")
-colnames(output.sigs.final)[c(1:30,319,320)]
 
-# Only want 32 of these columns?
-output.sigs.final <- output.sigs.final[,c(1:30,319,320)]
+
+#	Renaming zAPOBEC to just APOBEC
+
+
+#	Merge 2 and 13 into APOBEC
+#	Monkey see, monkey do
+#	SBS13 is closely associated with SBS2
+message("output.sigs.final$APOBEC")
+output.sigs.final$APOBEC <- output.sigs.final$weights.SBS2 + output.sigs.final$weights.SBS13
+
+#	select just the weights and unknown and newly created APOBEC
+#	I DO NOT LIKE THESE HARD CODED NUMBERS
+output.sigs.final <- output.sigs.final[,c(1:67,356,357)]
 head(output.sigs.final)
+
+
+
+
 
 output.sigs.final$sample <- rownames(output.sigs.final)
 head(output.sigs.final$sample)
@@ -259,20 +303,48 @@ message("ls()")
 ls()
 
 
-colnames(sigs_types)[c(3,14,34)]
-colnames(sigs_types)
-colnames(sigs_types)[!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13','mut_tot')]
-head(sigs_types)
 
-#	Drop 2 and 13 as they were merged into zAPOBEC?
-#	if not removed, the stacked bar will add to over 100%.
-sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13')]
-head(sigs_types)
+
+#	colnames(sigs_types)[c(3,14,34)]
+#	colnames(sigs_types)
+#	colnames(sigs_types)[!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13','mut_tot')]
+#	head(sigs_types)
+#	
+#	#	Drop 2 and 13 as they were merged into APOBEC?
+#	#	if not removed, the stacked bar will add to over 100%.
+#	sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.Signature.2','weights.Signature.13')]
+#	head(sigs_types)
+
+#	sigs_types <- sigs_types[,!colnames(sigs_types) %in% c('weights.SBS2','weights.SBS13')]
+#	head(sigs_types)
+
+
+
+#	Drop all signatures which are not present in any sample
+#	This will clean up the stacked bar chart big time
+
+new_sigs_types = sigs_types[c('sample','type','mut_tot','APOBEC','unknown')]
+head(new_sigs_types)
+for( c in colnames(sigs_types)[!colnames(sigs_types) %in% c('sample','type','mut_tot','APOBEC','unknown','weights.SBS2','weights.SBS13')] ){
+	print(c)
+	print(sigs_types[c])
+	if( sum(sigs_types[c] > 0 ) ){
+		new_sigs_types[c] = sigs_types[c]
+	}
+}
+head(new_sigs_types)
+#warnings()
+#quit()
+
+sigs_types = new_sigs_types
+rm(new_sigs_types)
+
 
 
 
 csv = sigs_types[mixedorder(sigs_types$sample),]
-colnames(csv) = gsub("weights.Signature.", "", colnames(csv))
+#	colnames(csv) = gsub("weights.Signature.", "", colnames(csv))
+colnames(csv) = gsub("weights.SBS", "", colnames(csv))
 head(csv)
 write.csv(csv, file = "mutations.csv", row.names=FALSE)
 #quit()
@@ -300,13 +372,17 @@ for( this_type in types ){
 		print( paste0("No data with this type: ",this_type) )
 		next
 	}
-	head(sigs_individual)
+	print(head(sigs_individual))
 	sigs_individual <- sigs_individual[,!colnames(sigs_individual) %in% c('type','mut_tot')]
-	head(sigs_individual)
+	print(head(sigs_individual))
 	sigs_melt <- melt(sigs_individual, id = "sample")
 	colnames(sigs_melt) <- c("sample", "sig", "value")
-	sigs_melt[,"sig"] <- gsub("weights.Signature.", "", sigs_melt[,"sig"])
-	sigs_melt[,"sig"] <- gsub("^(\\d)$", "0\\1", sigs_melt[,"sig"])
+	#	sigs_melt[,"sig"] <- gsub("weights.Signature.", "", sigs_melt[,"sig"])
+	sigs_melt[,"sig"] <- gsub("weights.SBS", "", sigs_melt[,"sig"])
+
+	#sigs_melt[,"sig"] <- gsub("^(\\d)[^\\d]+$", "0\\1", sigs_melt[,"sig"])
+	sigs_melt[,"sig"] <- gsub("^(\\d{1}\\D?)$", "0\\1", sigs_melt[,"sig"])
+
 	#	Added leading 0 to 1 digit signature to hold numerical order.
 #	Why the renames? Likely to keep in order, which I can't seem to figure out.
 #	sigs_melt[,"sig"] <- gsub("weights.", "", sigs_melt[,"sig"])
@@ -340,7 +416,12 @@ for( this_type in types ){
 #	sigs_melt[,"sig"] <- gsub("Signature.7", "F", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.8", "G", sigs_melt[,"sig"])
 #	sigs_melt[,"sig"] <- gsub("Signature.9", "H", sigs_melt[,"sig"])
-	list <- sigs_individual[order(sigs_individual$zAPOBEC),]
+
+	# YOU MUST print() WHEN INSIDE A FOR LOOP
+	message('head(sigs_melt)')
+	print(head(sigs_melt))
+
+	list <- sigs_individual[order(sigs_individual$APOBEC),]
 	list1 <- as.vector(list[,"sample"])
 
 
@@ -367,12 +448,12 @@ for( this_type in types ){
 			axis.line = element_line(colour = "black")))
 	#ggsave(paste0("signatures_for_",this_type,".png"),width=6, height=4, dpi=1000)
 
-	sigs_individual <- subset(sigs_individual, zAPOBEC > 0)
+	sigs_individual <- subset(sigs_individual, APOBEC > 0)
 	if( nrow(sigs_individual) > 0){
 		sigs_melt <- melt(sigs_individual, id = "sample")
 		colnames(sigs_melt) <- c("sample", "sig", "value")
-		sigs_melt <- subset(sigs_melt, sig == "zAPOBEC")
-		list <- sigs_individual[order(sigs_individual$zAPOBEC),]
+		sigs_melt <- subset(sigs_melt, sig == "APOBEC")
+		list <- sigs_individual[order(sigs_individual$APOBEC),]
 		list1 <- as.vector(list[,"sample"])
 
 		#	Apparently in a loop, plot must be printed?
@@ -478,111 +559,111 @@ rownames(enrich_final) <- NULL
 Sys.time()
 
 
-if( exists("mut_med_quantiles") ){
-	rm(mut_med_quantiles)
-}
-
-message("med quantiles loop")
-Sys.time()
-for( this_type in types ) {
-	mut_sub <- subset(cell_line_mutload, type == this_type)
-	if( exists("mut_med_quantiles") ){
-		x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
-		mut_med_quantiles <- rbind(mut_med_quantiles, x)
-	} else {
-		mut_med_quantiles <- as.data.frame(t(quantile(mut_sub$mut_tot)))
-	}
-}
-Sys.time()
-
-rownames(mut_med_quantiles) = types
-mut_med_quantiles$type <- rownames(mut_med_quantiles)
-colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "type")
-
-mut_med_quantiles
-
-mut_med_quantiles <- mut_med_quantiles[order(mut_med_quantiles$med),]
-head(mut_med_quantiles)
-
-plot_order <- as.vector(mut_med_quantiles[,"type"])
-head(plot_order)
-
-# Adjust plot size
-options(repr.plot.width=16, repr.plot.height=6)
-
-ggplot(mut_med_quantiles, aes(type, med)) +
-	geom_col() +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1), legend.position = "none") +
-	geom_errorbar(aes(ymin=first, ymax=third), width=.3) +
-	scale_y_continuous(limits = c(0,3501),
-		breaks = c(0,1200,2400,3600)) +
-	xlab("Type") +
-	ylab("Median Number of Mutations") +
-	theme_bw() +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1),
-		panel.border = element_blank(),
-		panel.grid.major = element_blank(),
-		panel.grid.minor = element_blank(),
-		axis.line = element_line(colour = "black")) +
-	scale_fill_gradient(low = "blue", high = "red") +
-	scale_x_discrete(limits = plot_order ) +
-	ggtitle("Median Mutations by Type")
-
-number <- as.data.frame(table(sample_types$type))
-colnames(number) <- c("type", "freq")
-ggplot(number, aes(type, freq)) +
-	geom_point(size = 4) +
-	#ylim(0,200) +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-	scale_x_discrete(limits = types )
-
-# use same sort as median number of mutations plot
-number <- as.data.frame(table(sample_types$type))
-
-colnames(number) <- c("type", "freq")
-
-ggplot(number, aes(type, freq)) +
-	geom_point(size = 4) +
-	#ylim(0,200) +
-	theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-	scale_x_discrete(limits = plot_order)
-
-
-print("Another types loop")
-
-#	Error in `.rowNamesDF<-`(x, value = value) : invalid 'row.names' length
-#	Calls: rownames<- ... row.names<- -> row.names<-.data.frame -> .rowNamesDF<-
-#	Execution halted
-
-for( this_type in types ){
-	sigs_types_individual <- subset(sigs_types, type == this_type)
-	print( this_type )
-	print( nrow(sigs_types_individual) )
-	if( nrow(sigs_types_individual) == 0 ){
-		print( paste0("No data with this type: ",this_type) )
-		next
-	}
-	head(sigs_individual)
-	sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$zAPOBEC),]
-	rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
-	sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
-
-	#	Apparently in a loop, plot must be printed?
-	print(ggplot(sigs_types_individual_1, aes(as.numeric(order), mut_tot)) +
-		geom_point(shape = 18, size = 4) +
-		geom_smooth(span = 0.75) +
-		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
-		ggtitle(this_type) +
-		xlab("Sample") +
-		ylab("Mut Burden") +
-		#ylim(0,1600) +
-		theme_bw() +
-		theme(axis.text.x=element_text(angle = 45, hjust = 1),
-			panel.border = element_blank(),
-			panel.grid.major = element_blank(),
-			panel.grid.minor = element_blank(),
-			axis.line = element_line(colour = "black")))
-}
+#	if( exists("mut_med_quantiles") ){
+#		rm(mut_med_quantiles)
+#	}
+#	
+#	message("med quantiles loop")
+#	Sys.time()
+#	for( this_type in types ) {
+#		mut_sub <- subset(cell_line_mutload, type == this_type)
+#		if( exists("mut_med_quantiles") ){
+#			x <- as.data.frame(t(quantile(mut_sub$mut_tot)))
+#			mut_med_quantiles <- rbind(mut_med_quantiles, x)
+#		} else {
+#			mut_med_quantiles <- as.data.frame(t(quantile(mut_sub$mut_tot)))
+#		}
+#	}
+#	Sys.time()
+#	
+#	rownames(mut_med_quantiles) = types
+#	mut_med_quantiles$type <- rownames(mut_med_quantiles)
+#	colnames(mut_med_quantiles) <- c("low", "first", "med", "third", "high", "type")
+#	
+#	mut_med_quantiles
+#	
+#	mut_med_quantiles <- mut_med_quantiles[order(mut_med_quantiles$med),]
+#	head(mut_med_quantiles)
+#	
+#	plot_order <- as.vector(mut_med_quantiles[,"type"])
+#	head(plot_order)
+#	
+#	# Adjust plot size
+#	options(repr.plot.width=16, repr.plot.height=6)
+#	
+#	ggplot(mut_med_quantiles, aes(type, med)) +
+#		geom_col() +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1), legend.position = "none") +
+#		geom_errorbar(aes(ymin=first, ymax=third), width=.3) +
+#		scale_y_continuous(limits = c(0,3501),
+#			breaks = c(0,1200,2400,3600)) +
+#		xlab("Type") +
+#		ylab("Median Number of Mutations") +
+#		theme_bw() +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1),
+#			panel.border = element_blank(),
+#			panel.grid.major = element_blank(),
+#			panel.grid.minor = element_blank(),
+#			axis.line = element_line(colour = "black")) +
+#		scale_fill_gradient(low = "blue", high = "red") +
+#		scale_x_discrete(limits = plot_order ) +
+#		ggtitle("Median Mutations by Type")
+#	
+#	number <- as.data.frame(table(sample_types$type))
+#	colnames(number) <- c("type", "freq")
+#	ggplot(number, aes(type, freq)) +
+#		geom_point(size = 4) +
+#		#ylim(0,200) +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#		scale_x_discrete(limits = types )
+#	
+#	# use same sort as median number of mutations plot
+#	number <- as.data.frame(table(sample_types$type))
+#	
+#	colnames(number) <- c("type", "freq")
+#	
+#	ggplot(number, aes(type, freq)) +
+#		geom_point(size = 4) +
+#		#ylim(0,200) +
+#		theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#		scale_x_discrete(limits = plot_order)
+#	
+#	
+#	print("Another types loop")
+#	
+#	#	Error in `.rowNamesDF<-`(x, value = value) : invalid 'row.names' length
+#	#	Calls: rownames<- ... row.names<- -> row.names<-.data.frame -> .rowNamesDF<-
+#	#	Execution halted
+#	
+#	for( this_type in types ){
+#		sigs_types_individual <- subset(sigs_types, type == this_type)
+#		print( this_type )
+#		print( nrow(sigs_types_individual) )
+#		if( nrow(sigs_types_individual) == 0 ){
+#			print( paste0("No data with this type: ",this_type) )
+#			next
+#		}
+#		head(sigs_individual)
+#		sigs_types_individual_1 <- sigs_types_individual[order(sigs_types_individual$APOBEC),]
+#		rownames(sigs_types_individual_1) <- c(1:nrow(sigs_types_individual_1))
+#		sigs_types_individual_1[,"order"] <- rownames(sigs_types_individual_1)
+#	
+#		#	Apparently in a loop, plot must be printed?
+#		print(ggplot(sigs_types_individual_1, aes(as.numeric(order), mut_tot)) +
+#			geom_point(shape = 18, size = 4) +
+#			geom_smooth(span = 0.75) +
+#			theme(axis.text.x=element_text(angle = 45, hjust = 1)) +
+#			ggtitle(this_type) +
+#			xlab("Sample") +
+#			ylab("Mut Burden") +
+#			#ylim(0,1600) +
+#			theme_bw() +
+#			theme(axis.text.x=element_text(angle = 45, hjust = 1),
+#				panel.border = element_blank(),
+#				panel.grid.major = element_blank(),
+#				panel.grid.minor = element_blank(),
+#				axis.line = element_line(colour = "black")))
+#	}
 
 
 sigs_enrich <- merge(sigs_types, enrich_final, by = "sample")
@@ -599,14 +680,15 @@ Sys.time()
 options(repr.plot.width=10, repr.plot.height=10)
 
 
-ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
-	geom_point() #	+ ylim(0,5) + xlim(0,0.5)
+#	ggplot(sigs_enrich_tcw, aes(tca_tct,enrich_score)) +
+#		geom_point() #	+ ylim(0,5) + xlim(0,0.5)
+#	
+#	ggplot(sigs_enrich_tcw, aes(APOBEC, tca_tct)) +
+#		geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
+#	
+#	ggplot(sigs_enrich_tcw, aes(APOBEC, enrich_score)) +
+#		geom_point() #	+ xlim(0,0.8) + ylim(0,5)
 
-ggplot(sigs_enrich_tcw, aes(zAPOBEC, tca_tct)) +
-	geom_point() #	+ xlim(0,0.8) + ylim(0,0.5)
-
-ggplot(sigs_enrich_tcw, aes(zAPOBEC, enrich_score)) +
-	geom_point() #	+ xlim(0,0.8) + ylim(0,5)
 
 # Try to plot "Mutation Fraction"/"Trinucleotide Context" from "context"
 head(context)

@@ -184,6 +184,9 @@ ls()
 message("output.sigs.final$zAPOBEC")
 output.sigs.final$zAPOBEC <- output.sigs.final$weights.Signature.2 + output.sigs.final$weights.Signature.13
 
+#	319 is "unknown"
+#	320 is this newly created zAPOBED
+
 message("head(output.sigs.final[,c(1:30,319,320)])")
 head(output.sigs.final[,c(1:30,319,320)])
 
