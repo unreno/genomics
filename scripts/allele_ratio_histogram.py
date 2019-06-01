@@ -25,5 +25,8 @@ ratios = pd.read_csv(file_name,sep='\t',
 
 ratios.plot(kind='hist',title=base_name,bins=200,alpha=0.3,logy=True)
 
+#	Could also stack, then wouldn't need alpha
+#ratios.plot(kind='hist',title=base_name,bins=200,stacked=True,logy=True)
+
 plt.savefig(file_name+'.histogram.png')
 
