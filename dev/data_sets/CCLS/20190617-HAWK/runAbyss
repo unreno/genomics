@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+
+set -e	#	exit if any command fails
+set -u	#	Error on usage of unset variables
+set -o pipefail
+
+
+#abyssDir=/home/jake/.local/bin
+file=case_kmers.fasta
+suffix=25_49
+cutoff=49
+#$abyssDir/ABYSS -k25 -c0 -e0 $file -o case_abyss.fa
+ABYSS -k25 -c0 -e0 $file -o case_abyss.fa
+awk '!/^>/ { next } { getline seq } length(seq) >= 49 { print $0 "\n" seq }' case_abyss.fa > case_abyss.$suffix.fa
+
+file=control_kmers.fasta
+#$abyssDir/ABYSS -k25 -c0 -e0 $file -o control_abyss.fa
+ABYSS -k25 -c0 -e0 $file -o control_abyss.fa
+awk '!/^>/ { next } { getline seq } length(seq) >= 49 { print $0 "\n" seq }' control_abyss.fa > control_abyss.$suffix.fa
+

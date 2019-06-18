@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+
+set -e	#	exit if any command fails
+set -u	#	Error on usage of unset variables
+set -o pipefail
+
+
+CORES=40 #number of cores to use for blast searches
+KMERSIZE=31 # RD:61
+
+#modified from NIKS script
+
+#dir=/scratch/atif/1000_genomes/BEB		#directory for read files 
+#hawkDir=/scratch/atif/hawk			#directory where hawk is installed
+#jellyfishDir=/home/atif/jellyfish-Hawk/bin		#directory where jellyfish is installed
+#sortDir=/home/atif/coreutils/deps/bin		#directory where parallel sort is installed
+
+#dir=/raid/data/raw/CCLS/bam
+hawkDir=/home/jake/HAWK-0.9.8-beta
+#jellyfishDir=/usr/bin
+#sortDir=/usr/bin
+
+#cd ${dir}
+
+#for file in `ls -d Reads*`	# this would be more appropriately called a "dir" since we next cd into it?
+for file in $( ls -d /raid/data/raw/CCLS/bam/*bam )
+do
+	#OUTPREFIX=$file	#	seems like its a "subject"?
+	OUTPREFIX=$( basename $file	.recaled.bam )
+	
+	#cd ${file}
+
+#	mkdir ${OUTPREFIX}_kmers
+
+	#${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 20G <( zcat *.fastq.gz ) #change if not gzipped
+	#${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 20G \
+	jellyfish count -C -o ${OUTPREFIX}_kmers_jellyfish -m ${KMERSIZE} -t ${CORES} -s 20G \
+		<( samtools fastq $file )
+
+#	COUNT=$(ls ${OUTPREFIX}_kmers/tmp* |wc -l)
+#
+#	if [ $COUNT -eq 1 ]
+#	then
+# 		mv ${OUTPREFIX}_kmers/tmp_0 ${OUTPREFIX}_kmers_jellyfish
+#	else
+#		#${jellyfishDir}/jellyfish merge -o ${OUTPREFIX}_kmers_jellyfish ${OUTPREFIX}_kmers/tmp*
+#		jellyfish merge -o ${OUTPREFIX}_kmers_jellyfish ${OUTPREFIX}_kmers/tmp*
+#	fi
+#	rm -rf ${OUTPREFIX}_kmers
+#	
+#	COUNT=$(ls ${OUTPREFIX}_kmers_jellyfish |wc -l)
+#
+#	if [ $COUNT -eq 1 ]
+#	then
+
+		#${jellyfishDir}/jellyfish histo -f -o ${OUTPREFIX}.kmers.hist.csv -t ${CORES} ${OUTPREFIX}_kmers_jellyfish
+		jellyfish histo -f -o ${OUTPREFIX}.kmers.hist.csv -t ${CORES} ${OUTPREFIX}_kmers_jellyfish
+		awk '{print $2"\t"$1}' ${OUTPREFIX}.kmers.hist.csv > ${OUTPREFIX}_tmp
+		mv ${OUTPREFIX}_tmp ${OUTPREFIX}.kmers.hist.csv
+
+		#awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv >> ${dir}/total_kmer_counts.txt
+		awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv >> total_kmer_counts.txt
+
+		CUTOFF=1 
+		echo $CUTOFF > ${OUTPREFIX}_cutoff.csv
+
+
+		#${jellyfishDir}/jellyfish dump -c -L `expr $CUTOFF + 1` ${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt 
+		jellyfish dump -c -L `expr $CUTOFF + 1` ${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt 
+		#${sortDir}/sort --parallel=${CORES} -n -k 1 ${OUTPREFIX}_kmers.txt > ${OUTPREFIX}_kmers_sorted.txt
+		sort --parallel=${CORES} -n -k 1 ${OUTPREFIX}_kmers.txt > ${OUTPREFIX}_kmers_sorted.txt
+	
+		rm ${OUTPREFIX}_kmers_jellyfish	
+		rm ${OUTPREFIX}_kmers.txt		
+			
+		#echo "${dir}/Reads_${OUTPREFIX}/${OUTPREFIX}_kmers_sorted.txt" >> ${dir}/sorted_files.txt
+		echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
+		
+#	fi
+
+
+	#cd ..
+
+done
