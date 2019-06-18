@@ -219,3 +219,42 @@ ls *fasta | parallel --no-notice --joblog ~/parallel.1.log -j40 blastn -query {}
 
 
 
+
+
+
+20190610 - jellyfish
+
+Exploring counting k-mers in sample?
+
+Takes a few minutes
+nohup jellyfish count --threads 40 --canonical --mer-len 30 --size 1k --output 983899.30mer_counts.jf <( zcat 983899.?.fastq.gz ) &
+
+nohup jellyfish count --threads 40 --canonical --mer-len 30 --size 1k --output GM_983899.30mer_counts.jf <( zcat GM_983899.?.fastq.gz ) &
+
+
+This takes quite a while. over a day. Still running, but not doing anything? No load on io? Plenty of free memory? 0 load average?
+nohup jellyfish count --threads 40 --canonical --mer-len 30 --size 1k --if /raid/refs/fasta/jellyfish/SVA_HERV.unique_30mer.fasta --output 983899.SVA_HERV.30mer_counts.jf <( zcat 983899.?.fastq.gz ) &
+
+Not sure what to make of the output of this.
+nohup kat comp -m 30 -t 40 983899.30mer_counts.jf /raid/refs/fasta/jellyfish/SVA_HERV.30mer_counts.jf &
+
+nohup kat comp -m 30 -t 40 *983899.30mer_counts.jf -o 983899-kat-comp &
+
+The size actually matters here. Previously it seemed pointless as 1k or 10G did the same thing. Not here. 1k bad. 5G good.
+took 15 minutes-ish
+nohup jellyfish count --threads 40 --canonical --mer-len 30 --size 5G --if /raid/refs/fasta/jellyfish/SVA_HERV.unique_30mer.fasta --output 983899.SVA_HERV.30mer_counts.jf <( zcat 983899.?.fastq.gz ) &
+nohup jellyfish count --threads 40 --canonical --mer-len 30 --size 5G --if /raid/refs/fasta/jellyfish/SVA_HERV.unique_30mer.fasta --output GM_983899.SVA_HERV.30mer_counts.jf <( zcat GM_983899.?.fastq.gz ) &
+
+Still not sure what this can be used for though.
+
+
+
+Finished, but doesn't really seem finished?
+nohup ./mutscan --thread 40 --read1 983899.1.fastq.gz --read2 983899.2.fastq.gz -h 983899.mutscan.html > 983899.mutscan.txt &
+
+
+
+nohup jellyfish count --threads 40 --canonical --mer-len 60 --size 5G --output 983899.30mer_counts.jf <( zcat 983899.?.fastq.gz ) &
+
+
+

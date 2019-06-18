@@ -155,3 +155,29 @@ nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166.167.168.169.170.171.fa --v
 
 nohup bowtie2 --all -x hg38 -f -U BeAn_58058-50bp-166-171.fa --very-sensitive --no-unal -S BeAn_58058-50bp-166-171.hg38.e2e.sam &
 
+
+
+
+20190607
+Jellyfish
+
+jellyfish count -m 30 -s 1k -o jellyfish/SVA_HERV.30mer_counts.jf HERV*fasta SVA_?.fasta
+jellyfish dump jellyfish/SVA_HERV.30mer_counts.jf | paste -sd ' ' | sed 's/ >/\n>/g' | awk '( $1 == ">1" ){i++; print ">"i;print $2}' > jellyfish/SVA_HERV.unique_30mer.fasta
+- OR - ( no difference found )
+jellyfish count -U 1 -m 30 -s 1k -o jellyfish/SVA_HERV.unique_30mer_counts.jf HERV*fasta SVA_?.fasta
+jellyfish dump jellyfish/SVA_HERV.unique_30mer_counts.jf | paste -sd ' ' | sed 's/ >/\n>/g' | awk '{i++; print ">"i;print $2}' > jellyfish/SVA_HERV.unique_30mer.fasta
+
+
+bowtie2 --norc -p 40 --all -x hg19 --very-sensitive -f --no-unal -U jellyfish/SVA_HERV.unique_30mer.fasta -S jellyfish/SVA_HERV.unique_30mer.hg19.sam
+
+
+
+sam file could contain reverse complement so fix the following ... ( trying --norc above )
+
+SHOULDN'T IGNORE RC. 
+
+samtools view jellyfish/SVA_HERV.unique_30mer.hg19.sam | awk '{for(i=12;i<=NF;i++){if( $i ~ /^NM/ ){ split($i,a,":");if( a[3] <= 2 ){ print $1,$10; next }}}}' | sort -n | uniq -c | awk '( $1 <= 100 ){ print ">"$2; print $3 }' > jellyfish/SVA_HERV.unique_30mer.hg19.rare.fasta
+
+
+
+
