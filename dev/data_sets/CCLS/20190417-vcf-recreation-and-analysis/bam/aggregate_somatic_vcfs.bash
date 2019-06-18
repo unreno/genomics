@@ -272,7 +272,39 @@ for sample in ${base_sample} GM_${base_sample} ; do
 	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
 		base=${sample}.recaled
-		suffix=mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
+		suffix=mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.0.04-${AF}
+
+		f=${base}.${suffix}.vcf.gz
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
+		else
+			echo "Creating ${f}"
+			bcftools concat --output-type z --output ${f} \
+				${base}.[1-9].${suffix}.vcf.gz \
+				${base}.1?.${suffix}.vcf.gz \
+				${base}.2?.${suffix}.vcf.gz \
+				${base}.X.${suffix}.vcf.gz
+			chmod a-w ${f}
+		fi
+
+		f=${base}.${suffix}.allele_ratios.csv.gz
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			vcf_to_allele_ratios.bash ${base}.${suffix}.vcf.gz | gzip --best > ${f}
+			chmod a-w $f
+		fi
+
+		common_function "${base}.${suffix}"
+		count_trinuc_muts "${base}.${suffix}" "${sample}"
+
+	done	#	AF
+
+	for AF in $( seq 0.1 0.1 0.2 ) ; do
+
+		base=${sample}.recaled
+		suffix=mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}-0.45
 
 		f=${base}.${suffix}.vcf.gz
 		if [ -f ${f} ] && [ ! -w ${f} ] ; then
@@ -310,7 +342,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 
 	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
-		base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}
+		base=${base_sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.0.04-${AF}
 		tumor=${base}.vcf.gz
 		isec_dir=${base}-strelka
 		strelka=${base_sample}.strelka.filtered.vcf.gz
