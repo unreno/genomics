@@ -12,9 +12,19 @@ subjects_info.bash
 
 
 
-NA20527.1.M_111124_6_1.fastq.gz appears to ben incomplete as it has fewer reads than its mate.
+NA20527.1.M_111124_6_1.fastq.gz appears to en incomplete as it has fewer reads than its mate.
 
 -r--r--r-- 1 jake 2532793552 Oct 25 23:37 NA20527.1.M_111124_6_1.fastq.gz.145520236
 -r--r--r-- 1 jake 3387369698 Oct 26 00:21 NA20527.1.M_111124_6_2.fastq.gz.166586012
 
 and it appears to be this way on their server, but just locally.
+
+
+--------------------------------------------------
+
+20190617
+
+I downloaded all of this data in October 2018.
+Takes up about 2.5 TB.
+We aren't really using it at the moment so I am considering deleting it.
+
