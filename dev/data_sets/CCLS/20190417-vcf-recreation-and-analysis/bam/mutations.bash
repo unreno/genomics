@@ -8,12 +8,14 @@ set -u  #       Error on usage of unset variables
 
 set -x
 
-dir="mutations-201906017"
+date=$( date "+%Y%m%d%H%M%S" )
+dir="mutations-${date}"
 mkdir ${dir}
 cd ${dir}
 start_dir=${PWD}	#	includes full path
 
-for version in v2 v3 ; do
+#for version in v2 v3 ; do
+for version in v3 ; do
 	cd ${start_dir}
 	mkdir -p ${version}
 	cd ${version}
