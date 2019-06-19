@@ -168,6 +168,29 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 	common_function "${base_sample}.mutect.filtered.snps"
 	count_trinuc_muts "${base_sample}.mutect.filtered.snps" "${base_sample}"
 
+
+
+	f=${base_sample}.mutect.filtered.snps.passed.vcf.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		bcftools view -i "FILTER='PASS'" --output-type z --output-file ${f} ${base_sample}.mutect.filtered.snps.vcf.gz
+		chmod a-w $f
+	fi
+
+	f=${base_sample}.mutect.filtered.snps.passed.allele_ratios.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.snps.passed.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	common_function "${base_sample}.mutect.filtered.snps.passed"
+	count_trinuc_muts "${base_sample}.mutect.filtered.snps.passed" "${base_sample}"
+
 fi
 
 
