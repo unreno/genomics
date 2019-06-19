@@ -6,7 +6,118 @@ https://elifesciences.org/articles/32920
 https://github.com/atifrahman/HAWK
 
 
+ls -1d /raid/data/raw/CCLS/bam/*bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
+
+
+
+
+The current version of jellyfish (2.2.4) never finishes.
+Trying the included modified version 1.1.6.
 
 nohup ./countKmers &
 
+kmers are integer representations? why? memory?
+values aren't just 0,1,2 or 3 as suggested?
+Is it quaternary converted to decimal?
+
+Is this the "modified" that the repo refers to?
+Results very different than that initial test?
+
+
+
+
+~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin//jellyfish dump 122997_kmers_jellyfish | head
+>6429860
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>1
+GGGCGCCAGGGAAGTTCCCAGGTTCCCAGGA
+>18
+TATTTTCGGAACATCTGGATAAAAAGATTAA
+>1
+CAAGAAAACAAAATTGTTATGCAAAAGTGAA
+>1
+AGTATTTTGGAATCAAAAAAAGAAATGGGTA
+
+~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin//jellyfish dump -c 122997_kmers_jellyfish | head
+0 6429860
+3054894152550176040 1
+3746326721519945968 18
+1188967961405424352 1
+810621767986450092 1
+1812863757335218424 1
+170776745906502473 64
+914244747812470622 1
+56162142582784 1
+2296507410762408681 1
+
+jellyfish dump -c 122997_kmers_jellyfish | head
+Unknown format ''
+
+
+
+
+
+
+
+
+
+
+
+
+
+If current run fails, Try again at the command line and not in script?
+
+CORES=30 #number of cores to use for blast searches
+KMERSIZE=31 # RD:61
+jellyfishDir=/usr/bin
+file=/raid/data/raw/CCLS/bam/120207.recaled.bam
+OUTPREFIX=$( basename $file .recaled.bam )
+mkdir ${OUTPREFIX}_kmers
+${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 20G <( samtools fastq $file ) &
+
+That finishes quickly and cleanly, but actually is incomplete? And unclear. No error.
+
+
+ 1097  CORES=30 #number of cores to use for blast searches
+ 1098  KMERSIZE=31 # RD:61
+ 1106  dir=/raid/data/raw/CCLS/bam
+ 1107  hawkDir=/home/jake/HAWK-0.9.8-beta
+ 1108  jellyfishDir=/home/jake/HAWK-0.9.8-beta/supplements/jellyfish-Hawk
+ 1109  sortDir=/usr/bin
+ 1110  ls -d ${dir}/*bam
+ 1111  file=/raid/data/raw/CCLS/bam/120207.recaled.bam
+ 1112  OUTPREFIX=$( basename $file .recaled.bam )
+ 1113  echo $OUTPREFIX
+ 1114  mkdir ${OUTPREFIX}_kmers
+ 1115  ${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 20G <( samtools fastq $file )
+
+likely failed as dir missing "/bin" suffix
+
+
+
+ 1132  jellyfishDir=/usr/bin
+ 1133  ${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 20G <( samtools fastq $file )
+
+
+I guess this worked, but don't get it. Much faster in test than now.
+
+
+ 1213  COUNT=$(ls ${OUTPREFIX}_kmers/tmp* |wc -l)
+ 1214  echo $COUNT
+ 1217  COUNT=$(ls ${OUTPREFIX}_kmers_jellyfish |wc -l)
+ 1218  jellyfish merge -o ${OUTPREFIX}_kmers_jellyfish ${OUTPREFIX}_kmers/tmp*
+ 1221  mv ${OUTPREFIX}_kmers/tmp ${OUTPREFIX}_kmers_jellyfish
+ 1222  jellyfish histo -f -o ${OUTPREFIX}.kmers.hist.csv -t ${CORES} ${OUTPREFIX}_kmers_jellyfish
+ 1225  rmdir ${OUTPREFIX}_kmers
+ 1226  jellyfish histo -f -o ${OUTPREFIX}.kmers.hist.csv -t ${CORES} ${OUTPREFIX}_kmers_jellyfish &
+ 1230  awk '{print $2"\t"$1}' ${OUTPREFIX}.kmers.hist.csv > ${OUTPREFIX}_tmp
+ 1231  mv ${OUTPREFIX}_tmp ${OUTPREFIX}.kmers.hist.csv
+ 1233  awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv >> total_kmer_counts.txt
+ 1236  CUTOFF=1
+ 1237  echo $CUTOFF > ${OUTPREFIX}_cutoff.csv
+ 1238  jellyfish dump -c -L `expr $CUTOFF + 1` ${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt &
+ 1240  sort --parallel=${CORES} -n -k 1 ${OUTPREFIX}_kmers.txt > ${OUTPREFIX}_kmers_sorted.txt
+ 1242  rm 120207_kmers_jellyfish
+ 1243  rm 120207_kmers.txt
+ 1246  echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
 
