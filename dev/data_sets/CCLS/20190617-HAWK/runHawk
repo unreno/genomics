@@ -7,33 +7,42 @@ set -o pipefail
 
 
 hawkDir=/home/jake/HAWK-0.9.8-beta
-#eigenstratDir=/usr/bin
+
+#	included version doesn't run. "missing libgsl.so.0". Won't compile. "baseprog recipe failed"
+#eigenstratDir=${hawkDir}/supplements/EIG6.0.1-Hawk/bin
+#	Using "apt install eigensoft"
+eigenstratDir=/usr/bin
 isDiploid=1
 
-noInd=$(cat sorted_files.txt | wc -l);
+
+
+
+cat *_total_kmer_counts.txt > total_kmer_counts.txt
+ls -1 *_kmers_sorted.txt > sorted_files.txt
+
+
+
+noInd=$(cat sorted_files.txt | wc -l)
 
 
 $hawkDir/preProcess
 
 cat case_total_kmers.txt control_total_kmers.txt > gwas_eigenstratX.total
-cat case.ind control.ind > gwas_eigenstratX.ind
+cat 'case.ind' control.ind > gwas_eigenstratX.ind
 
-caseCount=$(cat case_sorted_files.txt | wc -l);
-controlCount=$(cat control_sorted_files.txt | wc -l);
+caseCount=$(cat case_sorted_files.txt | wc -l)
+controlCount=$(cat control_sorted_files.txt | wc -l)
 
 $hawkDir/hawk $caseCount $controlCount
 
 if [ "$isDiploid" == "0" ]; then
-	#$eigenstratDir/bin/smartpca -V -p $hawkDir/parfile.txt > log_eigen.txt
-	smartpca -V -p $hawkDir/parfile.txt > log_eigen.txt
+	$eigenstratDir/smartpca -V -p $hawkDir/parfile.txt > log_eigen.txt
 else
-	#$eigenstratDir/bin/smartpca -p $hawkDir/parfile.txt > log_eigen.txt
-	smartpca -p $hawkDir/parfile.txt > log_eigen.txt
+	$eigenstratDir/smartpca -p $hawkDir/parfile.txt > log_eigen.txt
 fi
 
 
-#$eigenstratDir/bin/evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
-evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
+$eigenstratDir/evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
 
 tail -${noInd} gwas_eigenstrat.pca > pcs.evec
 
@@ -46,7 +55,7 @@ head -200000 control_out_w_bonf_sorted.kmerDiff > control_out_w_bonf_top.kmerDif
 Rscript $hawkDir/log_reg_case.R
 Rscript $hawkDir/log_reg_control.R
 
-paste pvals_case_top.txt case_out_w_bonf_top.kmerDiff  > pvals_case_top_merged.txt
+paste pvals_case_top.txt case_ut_w_bonf_top.kmerDiff  > pvals_case_top_merged.txt
 sort -g -k 1 -t $'\t' pvals_case_top_merged.txt > pvals_case_top_merged_sorted.txt 
 
 paste pvals_control_top.txt control_out_w_bonf_top.kmerDiff  > pvals_control_top_merged.txt
@@ -54,7 +63,8 @@ sort -g -k 1 -t $'\t' pvals_control_top_merged.txt > pvals_control_top_merged_so
 
 $hawkDir/convertToFasta    
 
-rm case_out_w_bonf.kmerDiff
-rm case_out_wo_bonf.kmerDiff
-rm control_out_w_bonf.kmerDiff
-rm control_out_wo_bonf.kmerDiff        
+#rm case_out_w_bonf.kmerDiff
+#rm case_out_wo_bonf.kmerDiff
+#rm control_out_w_bonf.kmerDiff
+#rm control_out_wo_bonf.kmerDiff        
+

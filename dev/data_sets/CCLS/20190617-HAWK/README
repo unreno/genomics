@@ -6,7 +6,10 @@ https://elifesciences.org/articles/32920
 https://github.com/atifrahman/HAWK
 
 
-ls -1d /raid/data/raw/CCLS/bam/*bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
+ls /raid/data/raw/CCLS/bam/*bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
+
+ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
+
 
 
 
@@ -26,7 +29,7 @@ Results very different than that initial test?
 
 
 
-~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin//jellyfish dump 122997_kmers_jellyfish | head
+~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin/jellyfish dump 122997_kmers_jellyfish | head
 >6429860
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 >1
@@ -38,7 +41,7 @@ CAAGAAAACAAAATTGTTATGCAAAAGTGAA
 >1
 AGTATTTTGGAATCAAAAAAAGAAATGGGTA
 
-~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin//jellyfish dump -c 122997_kmers_jellyfish | head
+~/HAWK-0.9.8-beta/supplements/jellyfish-Hawk/bin/jellyfish dump -c 122997_kmers_jellyfish | head
 0 6429860
 3054894152550176040 1
 3746326721519945968 18
@@ -49,6 +52,8 @@ AGTATTTTGGAATCAAAAAAAGAAATGGGTA
 914244747812470622 1
 56162142582784 1
 2296507410762408681 1
+
+New jellyfish doesn't read old format
 
 jellyfish dump -c 122997_kmers_jellyfish | head
 Unknown format ''

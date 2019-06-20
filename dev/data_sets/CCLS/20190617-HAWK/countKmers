@@ -17,7 +17,8 @@ jellyfishDir=${hawkDir}/supplements/jellyfish-Hawk/bin	# the included version is
 #sortDir=/usr/bin # my normal version seems to be the parallel version
 
 
-for file in $( ls -d /raid/data/raw/CCLS/bam/*bam )
+#for file in $( ls -d /raid/data/raw/CCLS/bam/*bam )
+for file in $( ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam )
 do
 	OUTPREFIX=$( basename $file	.recaled.bam )
 
