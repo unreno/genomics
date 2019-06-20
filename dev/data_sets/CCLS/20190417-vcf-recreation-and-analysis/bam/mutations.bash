@@ -50,9 +50,9 @@ for version in v3 ; do
 	
 	
 	\rm -f mut_all_sort.tmp
-	zcat ../../983899.somatic/983899.mutect.filtered.snps.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
+	zcat ../../983899.somatic/983899.mutect.filtered.snps.passed.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
 	for sample in 983899 268325 439338 63185 634370 ; do
-	zcat ../../${sample}.somatic/${sample}.mutect.filtered.snps.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
+	zcat ../../${sample}.somatic/${sample}.mutect.filtered.snps.passed.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
 	done
 	sort -k1,1 -k2,2n mut_all_sort.tmp >> mut_all_sort.txt
 	\rm mut_all_sort.tmp

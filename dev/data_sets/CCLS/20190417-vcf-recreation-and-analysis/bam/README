@@ -139,5 +139,5 @@ echo ./aggregate_somatic_vcfs.bash $sample \>\> ${sample}.aggregate_somatic_vcfs
 done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
 
 
-mutations.bash
+nohup ./mutations.bash > mutations.out 2> mutations.err &
 
