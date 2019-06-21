@@ -39,7 +39,7 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 #	GT:AD:DP:GQ:PL
 #	1/1:0,0:0:9:92,9,0
 
-#		samtools = "samtools faidx /raid/refs/fasta/hg38.fa "$1":"$2-2"-"$2+2" "
+#		samtools = "samtools faidx /raid/refs/fasta/hg38.fa "$1":"$2-1"-"$2+1" "
 #		while(samtools | getline triref ){};
 #		close(samtools);
 

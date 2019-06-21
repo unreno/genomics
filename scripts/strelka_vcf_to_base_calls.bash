@@ -46,9 +46,9 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 			ad["G"]=g[format["TQSS"]]
 			ad["T"]=t[format["TQSS"]]
 	
-			samtools = "samtools faidx /raid/refs/fasta/hg38.fa "$1":"$2-2"-"$2+2" "
-			while(samtools | getline triref ){};
-			close(samtools);
+#			samtools = "samtools faidx /raid/refs/fasta/hg38.fa "$1":"$2-1"-"$2+1" "
+#			while(samtools | getline triref ){};
+#			close(samtools);
 
 			#print "CHROM","POS","REF","TRIREF","DP","A","C","G","T"
 			print $1, $2, $4, toupper(triref), total, ad["A"], ad["C"], ad["G"], ad["T"]
