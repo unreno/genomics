@@ -8,8 +8,9 @@ https://github.com/atifrahman/HAWK
 
 ls /raid/data/raw/CCLS/bam/*bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
 
-ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam | xargs -n 1 basename | sed -e 's".recaled.bam""' > gwas_info.txt
+ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam | xargs -n 1 basename | sed -e 's".recaled.bam""' | awk '{tn="case"}(/^GM_/){tn="control"}{print $1"\tU\t"tn }' > gwas_info.txt
 
+This is all expecting "case" and "control".
 
 
 

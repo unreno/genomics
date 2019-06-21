@@ -16,16 +16,17 @@ isDiploid=1
 
 
 
-
+#	my mods moved from countKmers script
 cat *_total_kmer_counts.txt > total_kmer_counts.txt
 ls -1 *_kmers_sorted.txt > sorted_files.txt
-
 
 
 noInd=$(cat sorted_files.txt | wc -l)
 
 
+#	split gwas_info / total_kmer_counts.txt / sorted_files.txt into case/control files
 $hawkDir/preProcess
+
 
 cat case_total_kmers.txt control_total_kmers.txt > gwas_eigenstratX.total
 cat 'case.ind' control.ind > gwas_eigenstratX.ind
@@ -33,7 +34,10 @@ cat 'case.ind' control.ind > gwas_eigenstratX.ind
 caseCount=$(cat case_sorted_files.txt | wc -l)
 controlCount=$(cat control_sorted_files.txt | wc -l)
 
+
+#	This can take a while
 $hawkDir/hawk $caseCount $controlCount
+
 
 if [ "$isDiploid" == "0" ]; then
 	$eigenstratDir/smartpca -V -p $hawkDir/parfile.txt > log_eigen.txt
