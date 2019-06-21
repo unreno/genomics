@@ -148,49 +148,62 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 		chmod a-w $f.tbi
 	fi
 
-	f=${base_sample}.mutect.filtered.snps.vcf.gz
+	f=${base_sample}.mutect.filtered.tumor.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view --types snps --output-type z --output-file ${f} ${base_sample}.mutect.filtered.vcf.gz
+		mkdir -p mutect_tmp
+		bcftools +split ${base_sample}.mutect.filtered.vcf.gz \
+			--output-type z --output mutect_tmp
+		bcftools view --output-type z --output-file ${f} mutect_tmp/${base_sample}.vcf.gz
 		chmod a-w $f
+		/bin/rm -rf mutect_tmp
 	fi
 
-	f=${base_sample}.mutect.filtered.snps.allele_ratios.csv.gz
+	f=${base_sample}.mutect.filtered.tumor.snps.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.snps.vcf.gz | gzip --best > ${f}
+		bcftools view --types snps --output-type z --output-file ${f} ${base_sample}.mutect.filtered.tumor.vcf.gz
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.mutect.filtered.snps" "${base_sample}"
-	count_trinuc_muts "${base_sample}.mutect.filtered.snps"
-
-
-
-	f=${base_sample}.mutect.filtered.snps.passed.vcf.gz
+	f=${base_sample}.mutect.filtered.tumor.snps.allele_ratios.csv.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		bcftools view -i "FILTER='PASS'" --output-type z --output-file ${f} ${base_sample}.mutect.filtered.snps.vcf.gz
+		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.tumor.snps.vcf.gz | gzip --best > ${f}
 		chmod a-w $f
 	fi
 
-	f=${base_sample}.mutect.filtered.snps.passed.allele_ratios.csv.gz
+	common_function "${base_sample}.mutect.filtered.tumor.snps" "${base_sample}"
+	count_trinuc_muts "${base_sample}.mutect.filtered.tumor.snps"
+
+
+
+	f=${base_sample}.mutect.filtered.tumor.snps.passed.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
-		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.snps.passed.vcf.gz | gzip --best > ${f}
+		bcftools view -i "FILTER='PASS'" --output-type z --output-file ${f} ${base_sample}.mutect.filtered.tumor.snps.vcf.gz
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.mutect.filtered.snps.passed" "${base_sample}"
-	count_trinuc_muts "${base_sample}.mutect.filtered.snps.passed"
+	f=${base_sample}.mutect.filtered.tumor.snps.passed.allele_ratios.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		vcf_to_allele_ratios.bash ${base_sample}.mutect.filtered.tumor.snps.passed.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
+	common_function "${base_sample}.mutect.filtered.tumor.snps.passed" "${base_sample}"
+	count_trinuc_muts "${base_sample}.mutect.filtered.tumor.snps.passed"
 
 fi
 
