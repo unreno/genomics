@@ -248,7 +248,7 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		echo "Write-protected ${f} exists. Skipping."
 	else
 		echo "Creating ${f}"
-		strelka_vcf_to_count_trinuc_muts_input.bash ${base_sample} ${base_sample}.strelka.filtered.vcf.gz > ${f}
+		strelka_vcf_to_ref_alt2_count_trinuc_muts_input.bash ${base_sample} ${base_sample}.strelka.filtered.vcf.gz > ${f}
 		chmod a-w ${f}
 	fi
 	count_trinuc_muts "${base_sample}.strelka.filtered.REF-ALT2"
