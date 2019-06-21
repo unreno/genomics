@@ -16,8 +16,6 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 }
 ( /^#/ ){ next; }
 {
-
-	#ref_ad=alt_ad1=alt_ad2=alt_ad3=0
 	split($8,format_i ,";")
 	split($9,info_i ,":")
 	split($10,values,":")
@@ -53,7 +51,7 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t"
 			close(samtools);
 
 			#print "CHROM","POS","REF","TRIREF","DP","A","C","G","T"
-			print $1,$2,$4, toupper(triref), total, ad["A"], ad["C"], ad["G"], ad["T"]
+			print $1, $2, $4, toupper(triref), total, ad["A"], ad["C"], ad["G"], ad["T"]
 		}
 	}
 }'
