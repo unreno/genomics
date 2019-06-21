@@ -26,9 +26,6 @@
 sample=$1
 shift
 
-#echo ${@}
-#echo $sample
-
 bcftools view --no-header --types snps ${@} | awk -v sample=$sample 'BEGIN{ FS=OFS="\t" }
 ( /^#/ ){ next; }
 {
