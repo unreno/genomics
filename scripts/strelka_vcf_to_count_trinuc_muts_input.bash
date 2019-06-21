@@ -23,9 +23,13 @@
 #	1	3105055	.	T	G	.	PASS	SOMATIC;QSS=78;TQSS=1;NT=ref;QSS_NT=78;TQSS_NT=1;SGT=TT->GT;DP=104;MQ=59.94;MQ0=0;ReadPosRankSum=-1.53;SNVSB=0;SomaticEVS=13.66	DP:FDP:SDP:SUBDP:AU:CU:GU:TU	52:0:0:0:2,2:0,0:8,8:42,42
 #	
 
+sample=$1
+shift
 
-bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t" }
-}
+#echo ${@}
+#echo $sample
+
+bcftools view --no-header --types snps ${@} | awk -v sample=$sample 'BEGIN{ FS=OFS="\t" }
 ( /^#/ ){ next; }
 {
 	split($8,format_i ,";")
@@ -51,29 +55,25 @@ bcftools view --types snps ${@} | awk 'BEGIN{ FS=OFS="\t" }
 		total=a[format["TQSS"]]+c[format["TQSS"]]+g[format["TQSS"]]+t[format["TQSS"]]
 
 		if( total > 0 ) {
-	
 			split("",ad)
 			ad["A"]=a[format["TQSS"]]
 			ad["C"]=c[format["TQSS"]]
 			ad["G"]=g[format["TQSS"]]
 			ad["T"]=t[format["TQSS"]]
 	
-			ref_ad=alt_ad1=alt_ad2=alt_ad3=0
-
-			ref_ad=ad[$4]
 			delete ad[$4]
-			alt_ad1=ad[$5]
 			delete ad[$5]
-			
-			asort(ad)
 
-			alt_ad2=ad[2]
-			alt_ad3=ad[1]
+			alt2="";alt2_ad=0;
+			for( k in ad ){
+				if( ad[k] > alt2_ad ){
+					alt2_ad=ad[k]
+					alt2=k
+				}
+			}
 
-			if( ref_ad > 0 && alt_ad2 > 0 )
-				print $1,$2,$4, $alt2, "+", sample
+			if( alt2_ad/total >= 0.02 )
+				print $1,$2,$4, alt2, "+", sample
 		}
-
 	}
-
 }'

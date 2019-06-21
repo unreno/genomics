@@ -61,23 +61,24 @@ common_function(){
 		chmod a-w $f
 	fi
 
+	if [ -n "${2:-}" ] ; then
+		f=${base_file}.count_trinuc_muts.input.txt
+		if [ -f ${f} ] && [ ! -w ${f} ] ; then
+			echo "Write-protected ${f} exists. Skipping."
+		else
+			echo "Creating ${f}"
+			bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${2}\n" \
+				${base_file}.vcf.gz \
+				> ${f}
+			chmod a-w ${f}
+		fi
+	fi
+
 }
 
 count_trinuc_muts(){
 	base_file=$1
-	sample=$2
-
-	f=${base_file}.count_trinuc_muts.input.txt
-	if [ -f ${f} ] && [ ! -w ${f} ] ; then
-		echo "Write-protected ${f} exists. Skipping."
-	else
-		echo "Creating ${f}"
-#		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${base_sample}\n" \
-		bcftools query -f "%CHROM\t%POS\t%REF\t%ALT\t+\t${sample}\n" \
-			${base_file}.vcf.gz \
-			> ${f}
-		chmod a-w ${f}
-	fi
+#	sample=$2
 
 	f=${base_file}.count_trinuc_muts.txt.gz
 	if [ -f ${f} ] && [ ! -w ${f} ] ; then
@@ -165,8 +166,8 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.mutect.filtered.snps"
-	count_trinuc_muts "${base_sample}.mutect.filtered.snps" "${base_sample}"
+	common_function "${base_sample}.mutect.filtered.snps" "${base_sample}"
+	count_trinuc_muts "${base_sample}.mutect.filtered.snps"
 
 
 
@@ -188,8 +189,8 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.mutect.filtered.snps.passed"
-	count_trinuc_muts "${base_sample}.mutect.filtered.snps.passed" "${base_sample}"
+	common_function "${base_sample}.mutect.filtered.snps.passed" "${base_sample}"
+	count_trinuc_muts "${base_sample}.mutect.filtered.snps.passed"
 
 fi
 
@@ -218,8 +219,8 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.strelka"
-	count_trinuc_muts "${base_sample}.strelka" "${base_sample}"
+	common_function "${base_sample}.strelka" "${base_sample}"
+	count_trinuc_muts "${base_sample}.strelka"
 
 	f=${base_sample}.strelka.filtered.vcf.gz
 	if [ -f $f ] && [ ! -w $f ] ; then
@@ -239,12 +240,20 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 		chmod a-w $f
 	fi
 
-	common_function "${base_sample}.strelka.filtered"
-	count_trinuc_muts "${base_sample}.strelka.filtered" "${base_sample}"
+	common_function "${base_sample}.strelka.filtered" "${base_sample}"
+	count_trinuc_muts "${base_sample}.strelka.filtered"
+
+	f=${base_sample}.strelka.filtered.REF-ALT2.count_trinuc_muts.input.txt
+	if [ -f ${f} ] && [ ! -w ${f} ] ; then
+		echo "Write-protected ${f} exists. Skipping."
+	else
+		echo "Creating ${f}"
+		strelka_vcf_to_count_trinuc_muts_input.bash ${base_sample} ${base_sample}.strelka.filtered.vcf.gz > ${f}
+		chmod a-w ${f}
+	fi
+	count_trinuc_muts "${base_sample}.strelka.filtered.REF-ALT2"
 
 fi
-
-
 
 
 
@@ -288,9 +297,10 @@ for sample in ${base_sample} GM_${base_sample} ; do
 	done
 
 	#	A LOT of data
-	#count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF" "${sample}"
+	#count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF"
 
-	count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias" "${sample}"
+	common_function "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias" "${sample}"
+	count_trinuc_muts "${sample}.recaled.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias"
 
 	for AF in $( seq 0.20 0.01 0.50 ) ; do
 
@@ -319,8 +329,8 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
-		common_function "${base}.${suffix}"
-		count_trinuc_muts "${base}.${suffix}" "${sample}"
+		common_function "${base}.${suffix}" "${sample}"
+		count_trinuc_muts "${base}.${suffix}"
 
 	done	#	AF
 
@@ -351,8 +361,8 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			chmod a-w $f
 		fi
 
-		common_function "${base}.${suffix}"
-		count_trinuc_muts "${base}.${suffix}" "${sample}"
+		common_function "${base}.${suffix}" "${sample}"
+		count_trinuc_muts "${base}.${suffix}"
 
 	done	#	AF
 

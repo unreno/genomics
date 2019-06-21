@@ -22,6 +22,34 @@ for version in v3 ; do
 	
 	ln -s ../../signatures.v3.rda
 	ln -s ../../sample_types.csv
+
+
+
+	
+	\rm -f mut_all_sort.tmp
+	zcat ../../983899.somatic/983899.strelka.filtered.REF-ALT2.count_trinuc_muts.txt.gz | head -n 1 > mut_all_sort.txt
+	for sample in 983899 268325 439338 63185 634370 ; do
+		zcat ../../${sample}.somatic/${sample}.strelka.filtered.REF-ALT2.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
+	done
+	sort -k1,1 -k2,2n mut_all_sort.tmp >> mut_all_sort.txt
+	\rm mut_all_sort.tmp
+	cp mut_all_sort.txt mut_all_sort-strelka-ALT2.txt
+	
+	../../Mutation-Signatures-${version}.r
+	mv mutations.pdf mutations-strelka-ALT2.pdf
+	mv mutations.csv mutations-strelka-ALT2.csv
+	
+	mkdir mutations-strelka-ALT2
+	cd mutations-strelka-ALT2
+	pdftk ../mutations-strelka-ALT2.pdf burst
+	for pdf in *pdf ; do
+	png=$( basename $pdf .pdf )
+	gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${png}.png ${pdf}
+	done
+	\rm pg_*pdf
+	cd ..
+	
+	
 	
 	\rm -f mut_all_sort.tmp
 	zcat ../../983899.somatic/983899.strelka.filtered.count_trinuc_muts.txt.gz | head -n 1 > mut_all_sort.txt
@@ -154,5 +182,4 @@ for version in v3 ; do
 	done
 
 done
-
 
