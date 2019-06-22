@@ -205,6 +205,15 @@ if [ -f ${bam_dir}/${base_sample}.recaled.bam ] && [ -f ${bam_dir}/GM_${base_sam
 	common_function "${base_sample}.mutect.filtered.tumor.snps.passed" "${base_sample}"
 	count_trinuc_muts "${base_sample}.mutect.filtered.tumor.snps.passed"
 
+	f=${base_sample}.mutect.filtered.tumor.snps.passed.base_counts.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		vcf_to_base_counts.bash ${base_sample}.mutect.filtered.tumor.snps.passed.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
+
 fi
 
 
@@ -255,6 +264,15 @@ if [ -f ${strelka_dir}/${base_sample}.hg38_num_noalts.loc/results/variants/somat
 
 	common_function "${base_sample}.strelka.filtered" "${base_sample}"
 	count_trinuc_muts "${base_sample}.strelka.filtered"
+
+	f=${base_sample}.strelka.filtered.base_counts.csv.gz
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		strelka_vcf_to_base_counts.bash ${base_sample}.strelka.filtered.vcf.gz | gzip --best > ${f}
+		chmod a-w $f
+	fi
 
 	f=${base_sample}.strelka.filtered.REF-ALT2.count_trinuc_muts.input.txt
 	if [ -f ${f} ] && [ ! -w ${f} ] ; then
