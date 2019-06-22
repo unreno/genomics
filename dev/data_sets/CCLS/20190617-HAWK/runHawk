@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 
+set -x
+
+
 set -e	#	exit if any command fails
 set -u	#	Error on usage of unset variables
 set -o pipefail
@@ -27,45 +30,81 @@ noInd=$(cat sorted_files.txt | wc -l)
 #	split gwas_info / total_kmer_counts.txt / sorted_files.txt into case/control files
 $hawkDir/preProcess
 
+#-rw-rw-r-- 1 jake            0 Jun 21 07:38 control_total_kmers.txt
+#-rw-rw-r-- 1 jake            0 Jun 21 07:38 control_sorted_files.txt
+#-rw-rw-r-- 1 jake            0 Jun 21 07:38 control.ind
+#-rw-rw-r-- 1 jake           39 Jun 21 07:38 case_total_kmers.txt
+#-rw-rw-r-- 1 jake           71 Jun 21 07:38 case_sorted_files.txt
+#-rw-rw-r-- 1 jake           41 Jun 21 07:38 case.ind
+
+
 
 cat case_total_kmers.txt control_total_kmers.txt > gwas_eigenstratX.total
 cat 'case.ind' control.ind > gwas_eigenstratX.ind
 
+#-rw-rw-r-- 1 jake           39 Jun 21 07:38 gwas_eigenstratX.total
+#-rw-rw-r-- 1 jake           41 Jun 21 07:38 gwas_eigenstratX.ind
+
+
+
 caseCount=$(cat case_sorted_files.txt | wc -l)
 controlCount=$(cat control_sorted_files.txt | wc -l)
 
-
-#	This can take a while
+date
+#	This can take a while (not sure how it ended)
 $hawkDir/hawk $caseCount $controlCount
+date
 
+#-rw-rw-r-- 1 jake            0 Jun 21 07:39 control_out_wo_bonf.kmerDiff
+#-rw-rw-r-- 1 jake            0 Jun 21 07:39 case_out_wo_bonf.kmerDiff
+#-rw-rw-r-- 1 jake   1015772985 Jun 22 00:47 gwas_eigenstratX.snp
+#-rw-rw-r-- 1 jake    158009131 Jun 22 00:47 gwas_eigenstratX.geno
+#-rw-rw-r-- 1 jake            0 Jun 22 00:47 control_out_w_bonf.kmerDiff
+#-rw-rw-r-- 1 jake            0 Jun 22 00:47 case_out_w_bonf.kmerDiff
+#-rw-rw-r-- 1 jake           11 Jun 22 00:47 total_kmers.txt
 
+#	This aborts duing initial test (not enough data)
 if [ "$isDiploid" == "0" ]; then
 	$eigenstratDir/smartpca -V -p $hawkDir/parfile.txt > log_eigen.txt
 else
 	$eigenstratDir/smartpca -p $hawkDir/parfile.txt > log_eigen.txt
 fi
+date
 
 
 $eigenstratDir/evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
+date
 
 tail -${noInd} gwas_eigenstrat.pca > pcs.evec
 
+date
 sort -g  -k 4 -t $'\t' case_out_w_bonf.kmerDiff > case_out_w_bonf_sorted.kmerDiff
+date
 head -200000 case_out_w_bonf_sorted.kmerDiff > case_out_w_bonf_top.kmerDiff
+date
 
 sort -g  -k 4 -t $'\t' control_out_w_bonf.kmerDiff > control_out_w_bonf_sorted.kmerDiff
+date
 head -200000 control_out_w_bonf_sorted.kmerDiff > control_out_w_bonf_top.kmerDiff
+date
 
 Rscript $hawkDir/log_reg_case.R
+date
 Rscript $hawkDir/log_reg_control.R
+date
 
 paste pvals_case_top.txt case_ut_w_bonf_top.kmerDiff  > pvals_case_top_merged.txt
+date
 sort -g -k 1 -t $'\t' pvals_case_top_merged.txt > pvals_case_top_merged_sorted.txt 
+date
 
 paste pvals_control_top.txt control_out_w_bonf_top.kmerDiff  > pvals_control_top_merged.txt
+date
 sort -g -k 1 -t $'\t' pvals_control_top_merged.txt > pvals_control_top_merged_sorted.txt
+date
 
 $hawkDir/convertToFasta    
+date
 
 #rm case_out_w_bonf.kmerDiff
 #rm case_out_wo_bonf.kmerDiff
