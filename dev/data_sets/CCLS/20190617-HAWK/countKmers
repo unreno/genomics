@@ -22,12 +22,10 @@ for file in $( ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,6343
 do
 	OUTPREFIX=$( basename $file	.recaled.bam )
 
-
-	if [ ${OUTPREFIX} == "120207" ] ; then
-		echo "Skipping"
-		continue
-	fi
-
+	#if [ ${OUTPREFIX} == "120207" ] ; then
+	#	echo "Skipping"
+	#	continue
+	#fi
 
 	f=${OUTPREFIX}_kmers_jellyfish
 	if [ -f $f ] && [ ! -w $f ] ; then
@@ -37,7 +35,16 @@ do
 
 		mkdir ${OUTPREFIX}_kmers
 
-		${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 5G <( samtools fastq $file )
+#	I think that perhaps this samtools fastq should have some flags added to filter out only high quality, proper pair aligned reads?
+#	Sadly "samtools fastq" does not have a -q quality filter as does "samtools view". Why not?
+#	I suppose that I could pipe one to the other like ...
+#		<( samtools view -h -q 40 -f 2 ${file} | samtools fastq - )
+
+		date
+		${jellyfishDir}/jellyfish count -C -o ${OUTPREFIX}_kmers/tmp -m ${KMERSIZE} -t ${CORES} -s 5G \
+			<( samtools view -h -q 40 -f 2 ${file} | samtools fastq - )
+		date
+
 
 		COUNT=$(ls ${OUTPREFIX}_kmers/tmp* |wc -l)
 
@@ -52,23 +59,26 @@ do
 		chmod a-w $f
 	fi
 
-	f=${OUTPREFIX}.kmers.jellyfish.hist.csv
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		${jellyfishDir}/jellyfish histo -f -o ${f} -t ${CORES} ${OUTPREFIX}_kmers_jellyfish
-		chmod a-w $f
-	fi
-
 	f=${OUTPREFIX}.kmers.hist.csv
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
 		echo "Creating $f"
+
+		f2=${OUTPREFIX}.kmers.jellyfish.hist.csv
+		if [ -f $f2 ] && [ ! -w $f2 ] ; then
+			echo "Write-protected $f2 exists. Skipping."
+		else
+			echo "Creating $f2"
+			${jellyfishDir}/jellyfish histo -f -o ${f2} -t ${CORES} ${OUTPREFIX}_kmers_jellyfish
+			chmod a-w $f2
+		fi
+
 		#	swap, for some reason
 		awk '{print $2"\t"$1}' ${OUTPREFIX}.kmers.jellyfish.hist.csv > ${f}
 		chmod a-w $f
+
+		rm -rf $f2
 	fi
 
 
@@ -82,28 +92,30 @@ do
 		chmod a-w $f
 	fi
 
-
-	f=${OUTPREFIX}_kmers.txt
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		${jellyfishDir}/jellyfish dump -c -L 2 ${OUTPREFIX}_kmers_jellyfish > ${f}
-		chmod a-w $f
-	fi
-
 	f=${OUTPREFIX}_kmers_sorted.txt
 	if [ -f $f ] && [ ! -w $f ] ; then
 		echo "Write-protected $f exists. Skipping."
 	else
+
+		f2=${OUTPREFIX}_kmers.txt
+		if [ -f $f2 ] && [ ! -w $f2 ] ; then
+			echo "Write-protected $f2 exists. Skipping."
+		else
+			echo "Creating $f2"
+			${jellyfishDir}/jellyfish dump -c -L 2 ${OUTPREFIX}_kmers_jellyfish > ${f2}
+			chmod a-w $f2
+		fi
+
 		echo "Creating $f"
 		sort --parallel=${CORES} -n -k 1 ${OUTPREFIX}_kmers.txt > ${f}
 		chmod a-w $f
+
+		rm -rf $f2
 	fi
-	
-#		rm ${OUTPREFIX}_kmers_jellyfish	
-#		rm ${OUTPREFIX}_kmers.txt		
-			
-#		echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
-		
+
+#	rm ${OUTPREFIX}_kmers_jellyfish
+#	rm ${OUTPREFIX}_kmers.txt
+
+#	echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
+
 done
