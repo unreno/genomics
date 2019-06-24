@@ -223,12 +223,27 @@ date
 
 
 
-Rscript $hawkDir/log_reg_case.R
-date
-Rscript $hawkDir/log_reg_control.R
+f=pvals_case_top.txt
+if [ -f $f ] && [ ! -w $f ] ; then
+	echo "Write-protected $f exists. Skipping."
+else
+	echo "Creating $f"
+	#Rscript $hawkDir/log_reg_case.R
+	Rscript log_reg_case.R
+	chmod a-w $f
+fi
 date
 
-
+f=pvals_control_top.txt
+if [ -f $f ] && [ ! -w $f ] ; then
+	echo "Write-protected $f exists. Skipping."
+else
+	echo "Creating $f"
+	#Rscript $hawkDir/log_reg_control.R
+	Rscript log_reg_control.R
+	chmod a-w $f
+fi
+date
 
 
 f=pvals_case_top_merged.txt
@@ -236,7 +251,7 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	paste pvals_case_top.txt case_ut_w_bonf_top.kmerDiff  > ${f}
+	paste pvals_case_top.txt case_out_w_bonf_top.kmerDiff  > ${f}
 	chmod a-w $f
 fi
 date
