@@ -69,6 +69,7 @@ Unknown format ''
 
 
 
+nohup ./countKmers > countKmers.out 2> countKmers.err &
 
 nohup ./runHawk > runHawk.out 2> runHawk.err &
 
