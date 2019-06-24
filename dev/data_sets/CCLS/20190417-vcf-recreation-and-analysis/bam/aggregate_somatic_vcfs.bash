@@ -87,7 +87,7 @@ count_trinuc_muts(){
 		echo "Creating ${f}"
 		/home/jake/.github/jakewendt/Mutation-Signatures/count_trinuc_muts_v8.pl pvcf \
 			/raid/refs/fasta/hg38_num_noalts.fa \
-			${base_file}.count_trinuc_muts.input.txt | gzip --best >> ${f}
+			${base_file}.count_trinuc_muts.input.txt | gzip --best > ${f}
 		chmod a-w ${f}
 	fi
 
@@ -365,7 +365,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 	done	#	AF
 
-	for AF in $( seq 0.1 0.1 0.2 ) ; do
+	for AF in $( seq 0.1 0.1 0.3 ) ; do
 
 		base=${sample}.recaled
 		suffix=mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}-0.45

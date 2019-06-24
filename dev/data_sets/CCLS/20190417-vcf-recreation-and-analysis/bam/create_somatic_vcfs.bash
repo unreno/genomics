@@ -271,7 +271,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 	done	#	AF
 
-	for AF in $( seq 0.1 0.1 0.2 ) ; do
+	for AF in $( seq 0.1 0.1 0.3 ) ; do
 
 		f=${sample}.recaled.${chr}.mpileup.MQ60.call.SNP.DP200.annotate.GNOMAD_AF.Bias.AD.${AF}-0.45.vcf.gz 
 		if [ -f $f ] && [ ! -w $f ] ; then
