@@ -112,7 +112,7 @@ for version in v3 ; do
 	for maxAF in 0.40 0.45 ; do
 	for gAF in 0.001 0.01 ; do
 
-		core=recaled.mpileup.MQ60.call.SNP.DP20-200.gnomad.gAF0-${gAF}
+		core=recaled.mpileup.MQ60.call.SNP.DP20-200.gnomad.gAF0-${gAF}.Bias
 
 		\rm -f mut_all_sort.tmp
 		zcat ../../983899.somatic/983899.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
