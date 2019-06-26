@@ -108,13 +108,16 @@ for version in v3 ; do
 
 
 
-	for minAF in 0.1 0.2 0.3 ; do
+	for minAF in 0.10 0.20 0.30 ; do
 	for maxAF in 0.40 0.45 ; do
 	for gAF in 0.001 0.01 ; do
 
 		core=recaled.mpileup.MQ60.call.SNP.DP20-200.gnomad.gAF0-${gAF}.Bias
 
 		\rm -f mut_all_sort.tmp
+
+		ls -l ../../983899.somatic/983899.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz
+
 		zcat ../../983899.somatic/983899.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
 		for sample in GM_983899 GM_268325 GM_439338 GM_63185 GM_634370 983899 268325 439338 63185 634370 ; do
 			zcat ../../*.somatic/${sample}.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
