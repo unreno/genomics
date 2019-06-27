@@ -157,7 +157,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 			fi
 		
 		
-			for gAF in 0.001 0.01 ; do
+			for gAF in 0.0001 0.001 0.01 ; do
 
 				#	Select only unknown and rare gnomad SNPs.
 			

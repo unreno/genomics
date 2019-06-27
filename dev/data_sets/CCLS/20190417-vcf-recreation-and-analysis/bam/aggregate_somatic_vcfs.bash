@@ -303,7 +303,7 @@ for sample in ${base_sample} GM_${base_sample} ; do
 
 	for minDP in 10 20 ; do
 		for maxDP in 200 ; do
-			for gAF in 0.001 0.01 ; do
+			for gAF in 0.0001 0.001 0.01 ; do
 
 				base=${sample}.recaled
 				suffix=""

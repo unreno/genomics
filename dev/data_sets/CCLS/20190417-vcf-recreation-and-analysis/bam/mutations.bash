@@ -110,7 +110,7 @@ for version in v3 ; do
 
 	for minAF in 0.10 0.20 0.30 ; do
 	for maxAF in 0.40 0.45 ; do
-	for gAF in 0.001 0.01 ; do
+	for gAF in 0.0001 0.001 0.01 ; do
 
 		core=recaled.mpileup.MQ60.call.SNP.DP20-200.gnomad.gAF0-${gAF}.Bias
 
