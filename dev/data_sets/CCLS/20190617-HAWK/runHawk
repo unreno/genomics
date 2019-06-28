@@ -42,7 +42,7 @@ fi
 noInd=$(cat sorted_files.txt | wc -l)
 
 
-f=sorted_files.txt
+f="case.ind"
 if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
@@ -94,7 +94,7 @@ else
 	echo "Creating $f"
 	#	This can take about a day
 	#	It produces 7 files
-#	$hawkDir/hawk $caseCount $controlCount
+	$hawkDir/hawk $caseCount $controlCount
 	chmod a-w $f
 
 	#-rw-rw-r-- 1 jake            0 Jun 21 07:39 control_out_wo_bonf.kmerDiff

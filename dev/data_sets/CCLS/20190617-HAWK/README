@@ -68,10 +68,11 @@ Unknown format ''
 
 
 
+perhaps don't use the canonical flag when extracting from bam?
 
-nohup ./countKmers > countKmers.out 2> countKmers.err &
+nohup ./countKmers > countKmers.out 2>&1 &
 
-nohup ./runHawk > runHawk.out 2> runHawk.err &
+nohup ./runHawk > runHawk.out 2>&1 &
 
 
 
