@@ -68,11 +68,20 @@ Unknown format ''
 
 
 
+
+the 2 log_reg_c*.R scripts should be 1 that take command line options?
+
+
+
+
+mv countKmers.* [469]* 26* case* control* GM_* gwas_* log_eigen.txt pcs.evec pvals_c* runHawk.* sorted_files.txt total_kmer* 20190628-only-Q40-reads-in-bams/
+
 perhaps don't use the canonical flag when extracting from bam?
 
 nohup ./countKmers > countKmers.out 2>&1 &
 
 nohup ./runHawk > runHawk.out 2>&1 &
+
 
 
 

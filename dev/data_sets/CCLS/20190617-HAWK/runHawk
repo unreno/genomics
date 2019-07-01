@@ -229,7 +229,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 else
 	echo "Creating $f"
 	#Rscript $hawkDir/log_reg_case.R
-	Rscript log_reg_case.R
+	#Rscript log_reg_case.R
+	./log_reg.R -c 'case'
 	chmod a-w $f
 fi
 date
@@ -240,7 +241,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 else
 	echo "Creating $f"
 	#Rscript $hawkDir/log_reg_control.R
-	Rscript log_reg_control.R
+	#Rscript log_reg_control.R
+	./log_reg.R -c 'control'
 	chmod a-w $f
 fi
 date
