@@ -24,6 +24,8 @@ gunzip -k viral*fna.gz
 cat viral*fna > viral.fa
 RepeatMasker -pa 40 viral.fa
 
-
+Why not
+zcat viral*.fna.gz > viral.fa
+zcat refseqgene*.fna.gz > viral.fa
 
 
