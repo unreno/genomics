@@ -23,9 +23,9 @@ This is all expecting "Case" and "Control".
 
 
 
-nohup ./countKmers -p /raid/data/raw/MS-20190422/ -u _R1.fastq.gz -e fastq.gz > countKmers.out 2>&1 &
+nohup hawk_countKmers.bash -p /raid/data/raw/MS-20190422/ -u _R1.fastq.gz -e fastq.gz > countKmers.out 2>&1 &
 
-nohup ./runHawk > runHawk.out 2>&1 &
+nohup hawk_runHawk.bash > runHawk.out 2>&1 &
 
 
 
