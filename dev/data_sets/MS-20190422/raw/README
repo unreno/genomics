@@ -20,8 +20,3 @@ echo "sickle pe -g -t sanger -f ${r1} -r ${r2} -o ${base}_R1.fastq.gz -p ${base}
 done | parallel --no-notice --joblog parallel.log -j40 &
 
 
-
-Gender discovery
-
-nohup ./gender_discovery.bash >> ./gender_discovery.out 2>&1 &
-
