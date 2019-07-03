@@ -36,7 +36,7 @@ while [ $# -ne 0 ] ; do
 		-t|--t*)
 			shift; threads=$1; shift ;;
 		-c|--c*)
-			shift; canonical='--canonical';;
+			shift; canonical='--both-strands';;		#	in jellyfish 2, this is --canonical
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
@@ -113,7 +113,7 @@ do
 			fi
 			echo $command
 
-			mkdir ${OUTPREFIX}_kmers
+			mkdir -p ${OUTPREFIX}_kmers
 
 			#	I think that perhaps this samtools fastq should have some flags added to filter out only high quality, proper pair aligned reads?
 			#	Sadly "samtools fastq" does not have a -q quality filter as does "samtools view". Why not?
@@ -161,7 +161,7 @@ do
 			awk '{print $2"\t"$1}' ${OUTPREFIX}.kmers.jellyfish.hist.csv > ${f}
 			chmod a-w $f
 
-			rm -rf $f2
+			rm -f $f2
 		fi
 
 
@@ -198,13 +198,13 @@ do
 			sort --parallel=${threads} -n -k 1 ${OUTPREFIX}_kmers.txt > ${f}
 			chmod a-w $f
 
-			rm -rf $f2
+			rm -f $f2
 		fi
 
 	fi
 
-#	rm ${OUTPREFIX}_kmers_jellyfish
-#	rm ${OUTPREFIX}_kmers.txt
+	rm -f ${OUTPREFIX}_kmers_jellyfish
+#	rm -f ${OUTPREFIX}_kmers.txt
 
 #	echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
 
