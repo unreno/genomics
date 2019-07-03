@@ -10,16 +10,16 @@ script=$( basename $0 )
 path='/raid/data/raw/CCLS/bam'
 unique_extension='.recaled.bam'
 threads=40
-
+canonical=''
 
 function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "$script [--path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER]"
+	echo "$script [--path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--canonical]"
 	echo
 	echo "Example:"
-	echo "$script -p /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz"
+	echo "$script -p /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
 	echo "$script -p /raid/data/raw/CCLS -u .recaled.bam"
 	echo
 	exit
@@ -35,6 +35,8 @@ while [ $# -ne 0 ] ; do
 			shift; extension=$1; shift ;;
 		-t|--t*)
 			shift; threads=$1; shift ;;
+		-c|--c*)
+			shift; canonical='--canonical';;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
@@ -49,6 +51,7 @@ done
 echo "Path : ${path}"
 echo "Unique Extension : ${unique_extension}"
 echo "Extension : ${extension}"
+echo "Canonical : ${canonical}"
 
 
 #base_dir=$PWD
@@ -121,11 +124,7 @@ do
 			#		particularly when select high quality mappings
 
 			date
-			#${jellyfishDir}/jellyfish count --canonical --output ${OUTPREFIX}_kmers/tmp --mer-len ${KMERSIZE} --threads ${threads} --size 5G \
-			#	<( samtools view -h -q 40 -f 2 ${file} | samtools fastq - )
-			#${jellyfishDir}/jellyfish count --output ${OUTPREFIX}_kmers/tmp --mer-len ${KMERSIZE} --threads ${threads} --size 5G \
-			#	<( samtools view -h -q 40 -f 2 ${file} | samtools fastq - )
-			${jellyfishDir}/jellyfish count --output ${OUTPREFIX}_kmers/tmp --mer-len ${KMERSIZE} --threads ${threads} --size 5G \
+			${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp --mer-len ${KMERSIZE} --threads ${threads} --size 5G \
 				<( ${command} )
 			date
 
@@ -172,7 +171,6 @@ do
 		else
 			echo "Creating $f"
 			awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv > ${f}
-	#		awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv >> total_kmer_counts.txt
 			chmod a-w $f
 		fi
 
