@@ -19,3 +19,9 @@ base=$(basename $r1 _R1_001.fastq.gz)
 echo "sickle pe -g -t sanger -f ${r1} -r ${r2} -o ${base}_R1.fastq.gz -p ${base}_R2.fastq.gz -s /dev/null > ${base}.sickle.log 2> ${base}.sickle.err"
 done | parallel --no-notice --joblog parallel.log -j40 &
 
+
+
+Gender discovery
+
+nohup ./gender_discovery.bash >> ./gender_discovery.out 2>&1 &
+
