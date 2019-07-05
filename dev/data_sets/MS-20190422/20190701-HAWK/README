@@ -25,6 +25,12 @@ This is all expecting "Case" and "Control".
 
 nohup hawk_countKmers.bash --canonical --path /raid/data/raw/MS-20190422/ --unique_extension _R1.fastq.gz --extension fastq.gz >> countKmers.out 2>&1 &
 
+
+
+
+
+gwas_info.txt
+
 nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
 
 
