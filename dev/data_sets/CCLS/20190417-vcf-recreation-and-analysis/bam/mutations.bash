@@ -119,7 +119,8 @@ for version in v3 ; do
 		ls -l ../../983899.somatic/983899.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz
 
 		zcat ../../983899.somatic/983899.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz | head -1 > mut_all_sort.txt
-		for sample in GM_983899 GM_268325 GM_439338 GM_63185 GM_634370 983899 268325 439338 63185 634370 ; do
+	#	for sample in GM_983899 GM_268325 GM_439338 GM_63185 GM_634370 983899 268325 439338 63185 634370 ; do
+		for sample in 983899 268325 439338 63185 634370 120207 122997 186069 201771 209605 266836 321666 341203 36077 492023 495910 506458 530196 607654 673944 73753 780690 811386 813891 833536 853767 866648 868614 871719 900420 919207 972727 99776 ; do
 			zcat ../../*.somatic/${sample}.${core}.AF${minAF}-${maxAF}.count_trinuc_muts.txt.gz | tail -n +2 >> mut_all_sort.tmp
 		done
 		sort -k1,1 -k2,2n mut_all_sort.tmp >> mut_all_sort.txt
