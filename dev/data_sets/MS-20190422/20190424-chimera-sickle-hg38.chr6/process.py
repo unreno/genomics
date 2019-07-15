@@ -69,33 +69,38 @@ for key in groups.keys():
 	all.to_csv('hkle_'+key+'.csv')
 
 
+	vcf = all
+	vcf.reset_index(inplace=True)
+	vcf[vcf.columns] = vcf[vcf.columns].astype(str)
+	for col in vcf:
+		if( str(col) not in ['position','hkle','status','direction'] ):
+			z=vcf[col].astype(int) <= 0
+			vcf.loc[z, col] = '0/0'
+			vcf.loc[~z, col] = '1/1'
+	
+	vcf.insert(1,'FORMAT','GT')
+	vcf.insert(1,'INFO','HKLE='+vcf['hkle']+';PUP='+vcf['status']+';DIR='+vcf['direction'])
+	vcf.insert(1,'FILTER','.')
+	vcf.insert(1,'QUAL','.')
+	#vcf.insert(1,'ALT','N')
+	#	can't have duplicate ALTs, so add 
+	vcf.insert(1,'ALT','<INS_MEI:'+vcf['hkle']+'/'+vcf['status']+'/'+vcf['direction']+'>')
+	#	Could search the index for the actual value
+	vcf.insert(1,'REF','N')
+	vcf.insert(1,'ID','.')
+	vcf.insert(0,'#CHROM','chr6')
+	vcf.rename(index=str, columns={'position': 'POS'},inplace=True)
+	vcf.drop(['hkle','status','direction'],axis='columns',inplace=True)
 
-
-	#	OUTPUT TO VCF
-
-##fileformat=VCFv4.1
-##FILTER=<ID=PASS,Description="All filters passed">
-##fileDate=20150218
-##reference=ftp://ftp.1000genomes.ebi.ac.uk//vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz
-##source=1000GenomesPhase3Pipeline
-
-#	#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  HG00096 HG00097 HG00099 HG00100 HG00101
-#	22      36962078        rs4359745       A       G       100     PASS    AC=150;AF=0.0299521;AN=5008;NS=2504;DP=20576;EAS_AF=0;AMR_AF=0.0086;AFR_AF=0.1089;EUR_AF=0;SAS_AF=0;AA=A|||;VT=SNP      GT      0|0     0|0     0|0     0|0     0|0
-
-	vcf = pd.DataFrame(data={'#CHROM': [],'POS': [], 'ID':[], 'REF':[],
-		'ALT':[], 'QUAL':[], 'FILTER':[], 'INFO':[], 'FORMAT':[]})
-	vcf['POS'] = all['pos']
-	vcf['#CHROM'] = 'chr6'
-	vcf['ID'] = '.'
-	vcf['REF'] = '.'
-	vcf['ALT'] = '.'
-	vcf['QUAL'] = 0
-	vcf['FILTER'] = '.'
-	vcf['INFO'] = '.'
-	vcf['FORMAT'] = 'GT'
-
-
-	all.to_csv('hkle_'+key+'.vcf', sep='\t', index=False)
+	with open('hkle_'+key+'.vcf', 'w+') as f:
+		f.write('##fileformat=VCFv4.2\n')
+		f.write('##ALT=<ID=INS:MEI:HERVK,Description="HERVK insertion">\n')
+		f.write('##INFO=<ID=HKLE,Number=1,Type=String,Description="HKLE detected">\n')
+		f.write('##INFO=<ID=PUP,Number=1,Type=String,Description="Paired or Unpaired detection">\n')
+		f.write('##INFO=<ID=DIR,Number=1,Type=String,Description="Direction of detection">\n')
+		f.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">\n')
+	with open('hkle_'+key+'.vcf', 'a') as f:
+		vcf.to_csv(f, sep='\t', index=False)
 
 
 
