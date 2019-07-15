@@ -86,6 +86,12 @@ for key in groups.keys():
 	#	can't have duplicate ALTs, so add 
 	vcf.insert(1,'ALT','<INS_MEI:'+vcf['hkle']+'/'+vcf['status']+'/'+vcf['direction']+'>')
 	#	Could search the index for the actual value
+	#	samtools faidx /raid/refs/fasta/hg38.fa chr6:33464261-33464261 | tail -n 1 | tr a-z A-Z
+	#	import subprocess
+	#	output = subprocess.getoutput("ls -l")
+	#	or
+	#	import os
+	#	output = os.popen('ls -l').read()
 	vcf.insert(1,'REF','N')
 	vcf.insert(1,'ID','.')
 	vcf.insert(0,'#CHROM','chr6')
