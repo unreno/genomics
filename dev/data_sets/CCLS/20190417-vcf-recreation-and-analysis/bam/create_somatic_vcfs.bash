@@ -42,16 +42,20 @@ for sample in ${base_sample} GM_${base_sample} ; do
 		continue
 	fi
 
-	f=${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz
-	if [ -f $f ] && [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' \
-			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa ${bam_dir}/${sample}.recaled.bam \
-			| bcftools call --keep-alts --multiallelic-caller --output-type z --output $f
-		chmod a-w $f
-	fi
+#	Cleaning up disk and likely won't need to reproduce from here.
+#	This saves just short of a TB
+#		rm -f *.somatic/*call.vcf.gz
+#
+#	f=${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz
+#	if [ -f $f ] && [ ! -w $f ] ; then
+#		echo "Write-protected $f exists. Skipping."
+#	else
+#		echo "Creating $f"
+#		bcftools mpileup --max-depth 999999 --min-MQ 60 --annotate 'FORMAT/AD,FORMAT/DP' \
+#			--regions ${chr} --fasta-ref /raid/refs/fasta/hg38_num_noalts.fa ${bam_dir}/${sample}.recaled.bam \
+#			| bcftools call --keep-alts --multiallelic-caller --output-type z --output $f
+#		chmod a-w $f
+#	fi
 
 	f=${sample}.recaled.${chr}.mpileup.MQ60.call.vcf.gz.csi
 	if [ -f $f ] && [ ! -w $f ] ; then
