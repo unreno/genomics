@@ -284,8 +284,16 @@ else
 fi
 date
 
-$hawkDir/convertToFasta    
+f=control_kmers.fasta
+if [ -f $f ] && [ ! -w $f ] ; then
+	echo "Write-protected $f exists. Skipping."
+else
+	echo "Creating $f"
+	$hawkDir/convertToFasta    
+	chmod a-w case_kmers.fasta control_kmers.fasta
+fi
 date
+
 
 #rm case_out_w_bonf.kmerDiff
 #rm case_out_wo_bonf.kmerDiff
