@@ -1,15 +1,37 @@
 #!/usr/bin/env bash
 
 
-for base in 983899 268325 439338 63185 634370 ; do
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+	base=$( basename ${bam} .recaled.bam )
 	echo ${base}
-	for sample in ${base} GM_${base} ; do
-		echo ${sample}
+	#for q in 40 60 ; do
+	q=60
 		for chr in X Y ; do
 			echo ${chr}
-			samtools view -c -@ 39 /raid/data/raw/CCLS/bam/${sample}.recaled.bam ${chr}
+
+			f=${base}.${chr}.${q}.count.txt	
+			if [ -f $f ] && [ ! -w $f ] ; then
+				echo "Write-protected $f exists. Skipping."
+			else
+				echo "Creating $f"
+				samtools view -c -f 2 -q ${q} -@ 39 ${bam} ${chr} > ${f}
+				chmod a-w $f
+			fi
+
 		done
-	done
+
+		f=${base}.XY.${q}.ratio.txt
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			X=$( cat ${base}.X.${q}.count.txt )
+			Y=$( cat ${base}.Y.${q}.count.txt )
+			echo "${X} / ${Y}" | bc -l > ${f}
+			chmod a-w $f
+		fi
+
+	#done
 done
 
 

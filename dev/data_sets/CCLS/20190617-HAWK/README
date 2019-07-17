@@ -85,3 +85,29 @@ nohup ./runHawk > runHawk.out 2>&1 &
 
 
 
+
+Ok. Let's try this with ALL the samples and guess at gender.
+
+
+nohup ./find_gender.bash >> find_gender.out 2>&1 &
+
+
+nohup hawk_countKmers.bash --proper_pair_only --bam_quality 60 --source_path /raid/data/raw/CCLS/bam --unique_extension .recaled.bam >> countKmers.out 2>&1 &
+
+for f in *XY.60.ratio.txt ; do
+base=$( basename $f .XY.60.ratio.txt )
+ratio=$( cat $f )
+sex=M
+if (( $(echo "$ratio > 100" |bc -l) )); then
+sex=F
+fi
+cc=Case
+if [[ ${base} =~ "GM_" ]] ; then
+cc=Control
+fi
+echo -e "${base}\t${sex}\t${cc}"
+done > gwas_info.txt
+
+nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
+
+
