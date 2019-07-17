@@ -7,28 +7,31 @@ set -o pipefail
 
 
 script=$( basename $0 )
-path='/raid/data/raw/CCLS/bam'
+source_path='/raid/data/raw/CCLS/bam'
 unique_extension='.recaled.bam'
 threads=40
 canonical=''
+bam_quality=40
+proper_pair_only=''
 
 function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "$script [--path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--canonical]"
+	echo "$script [--source_path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--bam_quality INTEGER] [--canonical] [--proper_pair_only]"
 	echo
 	echo "Example:"
-	echo "$script -p /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
-	echo "$script -p /raid/data/raw/CCLS -u .recaled.bam"
+	echo "$script -s /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
+	echo "$script -s /raid/data/raw/CCLS -b 40 -p -u .recaled.bam"
+	echo "$script -s /raid/data/raw/MS -b 40 -u .bam"
 	echo
 	exit
 }
 
 while [ $# -ne 0 ] ; do
 	case $1 in
-		-p|--p*)
-			shift; path=$1; shift ;;
+		-s|--s*)
+			shift; source_path=$1; shift ;;
 		-u|--u*)
 			shift; unique_extension=$1; shift ;;
 		-e|--e*)
@@ -37,6 +40,10 @@ while [ $# -ne 0 ] ; do
 			shift; threads=$1; shift ;;
 		-c|--c*)
 			shift; canonical='--both-strands';;		#	in jellyfish 2, this is --canonical
+		-p|--p*)
+			shift; proper_pair_only='-f 2';;
+		-b|--b*)
+			shift; bam_quality=$1; shift ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
@@ -48,7 +55,7 @@ done
 
 : ${extension:=${unique_extension}}
 
-echo "Path : ${path}"
+echo "Source Path : ${source_path}"
 echo "Unique Extension : ${unique_extension}"
 echo "Extension : ${extension}"
 echo "Canonical : ${canonical}"
@@ -70,7 +77,7 @@ jellyfishDir=${hawkDir}/supplements/jellyfish-Hawk/bin	# the included version is
 #for file in $( ls -d /raid/data/raw/CCLS/bam/*bam )
 #for file in $( ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam )
 
-for file in $( ls ${path}/*${unique_extension} )
+for file in $( ls ${source_path}/*${unique_extension} )
 do
 	OUTPREFIX=$( basename $file	${unique_extension} )
 
@@ -97,16 +104,16 @@ do
 		else
 			echo "Creating $f"
 
-			ls -l ${path}/${OUTPREFIX}*${extension}
+			ls -l ${source_path}/${OUTPREFIX}*${extension}
 			echo ${extension}
 
 			if [ ${extension:(-1)} == 'q' ] ; then
-				command="cat ${path}/${OUTPREFIX}*${extension}"
+				command="cat ${source_path}/${OUTPREFIX}*${extension}"
 			elif [ ${extension:(-4)} == 'q.gz' ] ; then
-				command="zcat ${path}/${OUTPREFIX}*${extension}"
+				command="zcat ${source_path}/${OUTPREFIX}*${extension}"
 			elif [ ${extension:(-3)} == 'bam' ] ; then
 				#	this may not work for multiple matches
-				command="samtools view -h -q 40 -f 2 ${path}/${OUTPREFIX}*${extension} | samtools fastq -"
+				command="samtools view -h -q ${bam_quality} ${proper_pair_only} ${source_path}/${OUTPREFIX}*${extension} | samtools fastq -"
 			else
 				echo "Unknown filetype so exiting"
 				exit
@@ -124,8 +131,9 @@ do
 			#		particularly when select high quality mappings
 
 			date
-			${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp --mer-len ${KMERSIZE} --threads ${threads} --size 5G \
-				<( ${command} )
+			${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
+				--mer-len ${KMERSIZE} --threads ${threads} --size 5G \
+				<( eval ${command} )
 			date
 
 
