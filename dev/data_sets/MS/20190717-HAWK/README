@@ -1,0 +1,20 @@
+
+
+ls /raid/data/raw/MS/*bam | xargs -n 1 basename  | sed -e 's".bam""' | awk '{tn="Case";sex="U"}(/^K/){tn="Control"}{print $1"\t"sex"\t"tn }' > gwas_info.txt
+
+This is all expecting "Case" and "Control".
+
+
+
+
+nohup hawk_countKmers.bash --source_path /raid/data/raw/MS --unique_extension .bam >> countKmers.out 2>&1 &
+
+
+
+
+
+nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
+
+
+
+
