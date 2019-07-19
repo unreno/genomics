@@ -4,16 +4,15 @@
 //
 
 
-
-
-
 //	https://techoverflow.net/2013/11/03/c-iterating-lines-in-a-gz-file-using-boostiostreams/
 //	https://www.boost.org/doc/libs/1_54_0/libs/iostreams/doc/classes/gzip.html
-
-
-
-
-
+#include <fstream>
+#include <iostream>
+//	These MUST be before kmer.h as there are multiple declarations here that are also in kmer.h
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+//
 
 
 #include <iostream>
@@ -30,6 +29,8 @@ using namespace std;
 #include "kmer.h"
 
 #include "specialfunctions.h"
+
+
 
 #define VERSION "0.9.8-beta"
 
@@ -65,9 +66,6 @@ public:
 	char significanceType;
 	char forPCA;
 	char forPval;
-
-
-
 	Kmer(int noCases, int noControls);
 	~Kmer();
 	void show();
@@ -87,10 +85,7 @@ public:
 	long long int totalTests;
 	vector <Kmer *> kmers[HASH_TABLE_LENGTH];
 	pthread_mutex_t hashTableBuckets_mutex[HASH_TABLE_LENGTH];
-
 	long long int totalKmers_Bucket[HASH_TABLE_LENGTH];
-
-
 	long long int * totalKmerCountsCase;
 	long long int * totalKmerCountsControl;
 	HashTable();
@@ -99,7 +94,6 @@ public:
 	void computePvalues();
 	void computeLikelihoodRatios();
 	void dumpKmers(double sigLevel);
-
 };
 
 HashTable *ht;
@@ -222,32 +216,22 @@ double logFactorial( int k ) {
 	return result;
 }
 
-
 double poissonProb(int k, double lambda) {
 	if(lambda<=0)
 		return 0;
 	if(k<0)
 		k=0;
-
-//	return	exp( -lambda + (k*log(lambda)) - logFactorial(k) );
 	return	( -lambda + (k*log(lambda)) - logFactorial(k) );
-
-//    return alglib::poissondistribution(count, rate)-alglib::poissondistribution(count-1, rate);
-
 }
-
 
 Kmer::Kmer (int noCases, int noControls) {
 	caseCounts=new unsigned short[noCases];
 	for(int i=0;i<noCases;i++)
 		caseCounts[i]=0;
-//	caseCounts=(char *)calloc(noCases,sizeof(char));
-
 
 	controlCounts=new unsigned short[noControls];
 	for(int i=0;i<noControls;i++)
 		controlCounts[i]=0;
-//	controlCounts=(char *)calloc(noControls,sizeof(char));
 
 	pVal=0;
 	significanceType='n';
@@ -265,7 +249,6 @@ void Kmer::freeMemory() {
 //	free(controlCounts);
 }
 
-
 void Kmer::show() {
 	char kmerString[100];
 
@@ -279,7 +262,6 @@ void Kmer::show() {
 	}
 	cout<<pVal<<" "<<significanceType<<endl;
 }
-
 
 HashTable::HashTable() {
 	totalKmerCountsCase=new long long int[noCases];
@@ -298,7 +280,6 @@ HashTable::HashTable() {
 	totalKmers=0;
 	totalTests=0;
 }
-
 
 void HashTable::insertKmer(long long int val, int count, int isCase, int sampleNo) {
 	unsigned long int index=getHash(val) % HASH_TABLE_LENGTH;
@@ -363,7 +344,6 @@ void HashTable::computePvalues() {
 					kmers[i][j]->significanceType='a';
 				} else if(kmerCountCase/(double)noCases > (kmerCountCase+kmerCountControl)/(double)(noCases+noControls)) {
 					kmers[i][j]->significanceType='p';
-
 				}
 			}
 		}
@@ -506,13 +486,10 @@ void * dump_thread(void *threadid) {
 
 	for(int i=tid;i<HASH_TABLE_LENGTH;i+=NUM_THREADS) {
 		for(int j=0;j<ht->kmers[i].size();j++) {
-
 			// for eigenstrat
-			if(ht->kmers[i][j]->forPCA=='y' && rand()/((double)(RAND_MAX)+1)<0.01)	//ht->kmers[i][j]->pVal<=pValThreshold && rand()/((double)(RAND_MAX)+1)<0.001) {
+			if(ht->kmers[i][j]->forPCA=='y' && rand()/((double)(RAND_MAX)+1)<0.01) {
 				pthread_mutex_lock(&eigenFile_mutex);
-
 				fprintf(eigenSNPFile,"%s\t%d\t%lf\t%d\n",getKmer(ht->kmers[i][j]->kmer, kmerString, 31),1,0.0,0);
-
 				for(int k=0;k<noCases;k++) {
 					fprintf(eigenGenoFile,"%d\t",ht->kmers[i][j]->caseCounts[k]>0?1:0);
 				}
@@ -522,14 +499,9 @@ void * dump_thread(void *threadid) {
 				fprintf(eigenGenoFile,"\n");
 				pthread_mutex_unlock(&eigenFile_mutex);
 			}
-
-
 			if(ht->kmers[i][j]->pVal<=pValThreshold && ht->kmers[i][j]->forPval=='y') {
 				if(ht->kmers[i][j]->significanceType=='p') {
-					//      fprintf(caseFile,"%s\t%d\t%d\n",getKmer(kmers[i][j]->kmer, kmerString, 31),kmers[i][j]->caseCounts[0],kmers[i][j]->controlCounts[0]);
-
 					pthread_mutex_lock(&caseOutFile_mutex);
-
 					fprintf(caseFile,"%s\t%d\t%d\t%e\t",getKmer(ht->kmers[i][j]->kmer, kmerString, 31),(int)ht->kmers[i][j]->meanCase,(int)ht->kmers[i][j]->meanControl,ht->kmers[i][j]->pVal);
 
 					for(int k=0;k<noCases;k++) {
@@ -541,8 +513,6 @@ void * dump_thread(void *threadid) {
 					fprintf(caseFile,"\n");
 					pthread_mutex_unlock(&caseOutFile_mutex);
 				} else if(ht->kmers[i][j]->significanceType=='a') {
-					//     fprintf(controlFile,"%s\t%d\t%d\n",getKmer(kmers[i][j]->kmer, kmerString, 31),kmers[i][j]->caseCounts[0],kmers[i][j]->controlCounts[0]);
-
 					pthread_mutex_lock(&controlOutFile_mutex);
 					fprintf(controlFile,"%s\t%d\t%d\t%e\t",getKmer(ht->kmers[i][j]->kmer, kmerString, 31),(int)ht->kmers[i][j]->meanCase,(int)ht->kmers[i][j]->meanControl,ht->kmers[i][j]->pVal);
 					for(int k=0;k<noCases;k++) {
@@ -556,7 +526,6 @@ void * dump_thread(void *threadid) {
 				}
 			}
 		}
-
 	}
 
 	for(int i=tid;i<HASH_TABLE_LENGTH;i+=NUM_THREADS) {
@@ -566,9 +535,7 @@ void * dump_thread(void *threadid) {
 		}
 		ht->kmers[i].clear();
 	}
-
 	pthread_exit(NULL);
-
 }
 
 
@@ -601,10 +568,8 @@ void HashTable::dumpKmers(double sigLevel) {
 
 	fclose(caseFile);
 	fclose(controlFile);
-
 	fclose(eigenSNPFile);
 	fclose(eigenGenoFile);
-
 }
 
 void HashTable::show() {
@@ -632,7 +597,6 @@ Factorials::Factorials(int max) {
 double Factorials::getFactorial(int number) {
 	return factorials[number];
 }
-
 
 
 void getKeyVal(char *s, KeyVal* kv) {
@@ -814,7 +778,6 @@ int main(int argc, const char * argv[]) {
 
 	for(int i=0;i<noCases;i++) {
 		fscanf(sortedFile,"%s\n",kmerFilename);
-		//	sprintf(kmerFilename,"%d_case_kmers_sorted.txt",(i+1));
 		kmerFilesCases[i]=fopen(kmerFilename,"r");
 
 		if(kmerFilesCases[i]==NULL) {
@@ -823,12 +786,10 @@ int main(int argc, const char * argv[]) {
 
 		valsCases[i]=-1;
 		countsCases[i]=-1;
-
 	}
 	sortedFile=fopen("control_sorted_files.txt","r");
 	for(int i=0;i<noControls;i++) {
 		fscanf(sortedFile,"%s\n",kmerFilename);
-		//      	sprintf(kmerFilename,"%d_control_kmers_sorted.txt",(i+1));
 		kmerFilesControls[i]=fopen(kmerFilename,"r");
 
 		if(kmerFilesControls[i]==NULL) {
@@ -925,7 +886,6 @@ int main(int argc, const char * argv[]) {
 		pVal=atof(temp);
 
 		if(pVal<SIG_LEVEL/ht->totalKmers) {
-			//			fprintf(caseFileOut,"%s\t%d\t%d\n",kmerString,count1,count2);
 			fputs(line2,caseFileOut);
 		}
 	}
@@ -946,7 +906,6 @@ int main(int argc, const char * argv[]) {
 		pVal=atof(temp);
 
 		if(pVal<SIG_LEVEL/ht->totalKmers) {
-			//	fprintf(controlFileOut,"%s\t%d\t%d\n",kmerString,count1,count2);
 			fputs(line2,controlFileOut);
 		}
 	}
