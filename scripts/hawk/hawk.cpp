@@ -3,6 +3,19 @@
 //  kmer
 //
 
+
+
+
+
+//	https://techoverflow.net/2013/11/03/c-iterating-lines-in-a-gz-file-using-boostiostreams/
+//	https://www.boost.org/doc/libs/1_54_0/libs/iostreams/doc/classes/gzip.html
+
+
+
+
+
+
+
 #include <iostream>
 #include <string>
 #include <limits>
