@@ -49,18 +49,33 @@ blastn -db human.rna -query control_kmers.fasta -num_threads 40 -outfmt 6 -out c
 awk '{print $2}' case_kmers.blastn.nt.txt | sort | uniq -c | sort -n | tail
 awk '{print $2}' control_kmers.blastn.nt.txt | sort | uniq -c | sort -n | tail
 
-awk '{print $2}' control_kmers.blastn.nt.txt | sort | uniq  > control_kmers.blastn.nt.uniq.txt
-awk '{print $2}' case_kmers.blastn.nt.txt | sort | uniq  > case_kmers.blastn.nt.uniq.txt
-comm *.blastn.nt.uniq.txt
+awk '{print $2}' control_kmers.blastn.nt.txt | sort | uniq  > control_kmers.blastn.nt.uniqsaccvers.txt
+awk '{print $2}' case_kmers.blastn.nt.txt | sort | uniq  > case_kmers.blastn.nt.uniqsaccvers.txt
+comm *.blastn.nt.uniqsaccvers.txt
+
+blastdbcmd -db /raid/refs/blast/nt -entry_batch case_kmers.blastn.nt.uniqsaccvers.txt -outfmt '%a %t' -out case_kmers.blastn.nt.uniq_desc.txt
+blastdbcmd -db /raid/refs/blast/nt -entry_batch control_kmers.blastn.nt.uniqsaccvers.txt -outfmt '%a %t' -out control_kmers.blastn.nt.uniq_desc.txt
 
 
 blastn -db nt -gilist /raid/refs/blast/Bacteria.gilist -query case_kmers.fasta -num_threads 40 -outfmt 6 -out case_kmers.blastn.ntBacteria.txt &
 blastn -db nt -gilist /raid/refs/blast/Bacteria.gilist -query control_kmers.fasta -num_threads 40 -outfmt 6 -out control_kmers.blastn.ntBacteria.txt &
 
+awk '{print $2}' control_kmers.blastn.ntBacteria.txt | sort | uniq  > control_kmers.blastn.ntBacteria.uniqsaccvers.txt
+awk '{print $2}' case_kmers.blastn.ntBacteria.txt | sort | uniq  > case_kmers.blastn.ntBacteria.uniqsaccvers.txt
+comm *.blastn.ntBacteria.uniqsaccvers.txt
+
+blastdbcmd -db /raid/refs/blast/nt -entry_batch case_kmers.blastn.ntBacteria.uniqsaccvers.txt -outfmt '%a %t' -out case_kmers.blastn.ntBacteria.uniq_desc.txt
+blastdbcmd -db /raid/refs/blast/nt -entry_batch control_kmers.blastn.ntBacteria.uniqsaccvers.txt -outfmt '%a %t' -out control_kmers.blastn.ntBacteria.uniq_desc.txt
+
+
 blastn -db nt -gilist /raid/refs/blast/Viruses.gilist -query case_kmers.fasta -num_threads 40 -outfmt 6 -out case_kmers.blastn.ntViruses.txt &
 blastn -db nt -gilist /raid/refs/blast/Viruses.gilist -query control_kmers.fasta -num_threads 40 -outfmt 6 -out control_kmers.blastn.ntViruses.txt &
 
-awk '{print $2}' control_kmers.blastn.ntViruses.txt | sort | uniq  > control_kmers.blastn.ntViruses.uniq.txt
-awk '{print $2}' case_kmers.blastn.ntViruses.txt | sort | uniq  > case_kmers.blastn.ntViruses.uniq.txt
-comm *.blastn.ntViruses.uniq.txt
+awk '{print $2}' control_kmers.blastn.ntViruses.txt | sort | uniq  > control_kmers.blastn.ntViruses.uniqsaccvers.txt
+awk '{print $2}' case_kmers.blastn.ntViruses.txt | sort | uniq  > case_kmers.blastn.ntViruses.uniqsaccvers.txt
+comm *.blastn.ntViruses.uniqsaccvers.txt
+
+blastdbcmd -db /raid/refs/blast/nt -entry_batch case_kmers.blastn.ntViruses.uniqsaccvers.txt -outfmt '%a %t' -out case_kmers.blastn.ntViruses.uniq_desc.txt
+blastdbcmd -db /raid/refs/blast/nt -entry_batch control_kmers.blastn.ntViruses.uniqsaccvers.txt -outfmt '%a %t' -out control_kmers.blastn.ntViruses.uniq_desc.txt
+
 
