@@ -34,7 +34,14 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	ls -1 *_kmers_sorted.txt > ${f}
+
+
+
+#	ls -1 *_kmers_sorted.txt > ${f}
+	ls -1 *_kmers_sorted.txt.gz > ${f}
+
+
+
 	chmod a-w $f
 fi
 
