@@ -14,6 +14,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 //
 
+//#include <stdio.h>
 
 #include <iostream>
 #include <string>
@@ -115,15 +116,15 @@ long long int getInt(char *s) {
 		val=val<<2;
 
 		ch=s[i];
-		if(ch=='A') {
+		if(ch=='A')
 			val=val|0;
-		} else if(ch=='C') {
+		else if(ch=='C')
 			val=val|1;
-		} else if(ch=='G') {
+		else if(ch=='G')
 			val=val|2;
-		} else {
+		else
 			val=val|3;
-		}
+
 		i++;
 
 	}
@@ -380,30 +381,28 @@ void * likelihoodRatio_thread(void *threadid) {
 
 			for(int k=0;k<noCases;k++) {
 				meanCase+=ht->kmers[i][j]->caseCounts[k];
-				if(ht->kmers[i][j]->caseCounts[k]>0) {
+				if(ht->kmers[i][j]->caseCounts[k]>0)
 					presentCount++;
-				}
 			}
 			for(int k=0;k<noControls;k++) {
 				meanControl+=ht->kmers[i][j]->controlCounts[k];
-				if(ht->kmers[i][j]->controlCounts[k]>0) {
+				if(ht->kmers[i][j]->controlCounts[k]>0)
 					presentCount++;
-				}
 			}
 
 			mean=(meanCase+meanControl)/(double)(noKmersCases+noKmersControls);
 			presentRatio=presentCount/(double)(noCases+noControls);
 
-			if(presentRatio>=0.01 && presentRatio<=0.99) {
-		 		ht->kmers[i][j]->forPCA='y';
-			} else {
+			if(presentRatio>=0.01 && presentRatio<=0.99)
+				ht->kmers[i][j]->forPCA='y';
+			else
 				ht->kmers[i][j]->forPCA='n';
-			}
-			if(presentRatio>=0.05) {
+
+			if(presentRatio>=0.05)
 				ht->kmers[i][j]->forPval='y';
-			} else {
+			else
 				ht->kmers[i][j]->forPval='n';
-			}
+
 			likelihoodNull=0;
 			likelihoodAlt=0;
 
@@ -425,9 +424,8 @@ void * likelihoodRatio_thread(void *threadid) {
 */
 			likelihoodRatio=likelihoodAlt-likelihoodNull;
 
-			if(likelihoodRatio<0) {
+			if(likelihoodRatio<0)
 				likelihoodRatio=0;
-			}
 
 			double pVal=alglib::chisquarecdistribution(1, 2*likelihoodRatio);
 
@@ -440,13 +438,12 @@ void * likelihoodRatio_thread(void *threadid) {
 			ht->kmers[i][j]->meanCase=meanCase;
 			ht->kmers[i][j]->meanControl=meanControl;
 
-			if(meanCase>meanControl) {
+			if(meanCase>meanControl)
 				ht->kmers[i][j]->significanceType='p';
-			} else if(meanCase<meanControl) {
+			else if(meanCase<meanControl)
 				ht->kmers[i][j]->significanceType='a';
-			} else {
+			else
 				ht->kmers[i][j]->significanceType='n';
-			}
 		}
 	}
 	pthread_exit(NULL);
@@ -458,17 +455,15 @@ void HashTable::computeLikelihoodRatios() {
 	long t;
 	void *status;
 	for(t=0; t<NUM_THREADS; t++) {
-	  rc = pthread_create(&threads[t], NULL, likelihoodRatio_thread, (void *)t);
-	  if (rc){
-		 exit(-1);
-	  }
+		rc = pthread_create(&threads[t], NULL, likelihoodRatio_thread, (void *)t);
+		if (rc)
+			exit(-1);
 	}
 
 	for(t=0; t<NUM_THREADS; t++) {
 		rc = pthread_join(threads[t], &status);
-		if (rc) {
+		if (rc)
 			exit(-1);
-		}
 	}
 
 }
@@ -554,16 +549,14 @@ void HashTable::dumpKmers(double sigLevel) {
 	void *status;
 	for(t=0; t<NUM_THREADS; t++) {
 		rc = pthread_create(&threads[t], NULL, dump_thread, (void *)t);
-	  if (rc){
-		 exit(-1);
-	  }
+		if (rc)
+			exit(-1);
 	}
 
 	for(t=0; t<NUM_THREADS; t++) {
 		rc = pthread_join(threads[t], &status);
-		if (rc) {
+		if (rc)
 			exit(-1);
-		}
 	}
 
 	fclose(caseFile);
@@ -612,17 +605,20 @@ void getKeyVal(char *s, KeyVal* kv) {
 	kv->val=val;
 	while(1) {
 		ch=s[i];
-		if(ch=='\0'||ch=='\n') {
+		if(ch=='\0'||ch=='\n')
 			break;
-		}
+
 		countVal=countVal*10+ch-'0';
 		i++;
 	}
 	kv->count=countVal;
 }
 
-FILE ** kmerFilesCases;
-FILE ** kmerFilesControls;
+/* JAKE */
+char ** kmerFilesCaseFilenames;
+char ** kmerFilesControlFilenames;
+//FILE ** kmerFilesCases;
+//FILE ** kmerFilesControls;
 long long int *valsCases;
 long long int *valsControls;
 unsigned short int * countsCases;
@@ -640,8 +636,8 @@ void * readCases(void *threadid) {
 	long long int val;
 	int count;
 
-	char *line= new char[MAX_REC_LEN];
-	int MAX_FILE_READ=MAX_REC_LEN/sizeof(line[0]);
+//	char *line= new char[MAX_REC_LEN];
+//	int MAX_FILE_READ=MAX_REC_LEN/sizeof(line[0]);
 
 	for(int i=threadNo;i<noCases;i+=NUM_THREADS/2) {
 		if(valsCases[i]!=-1 && valsCases[i]<valBar) {
@@ -650,6 +646,28 @@ void * readCases(void *threadid) {
 			countsCases[i]=-1;
 		}
 		if(valsCases[i]==-1) {
+
+			std::ifstream file(kmerFilesCaseFilenames[i], std::ios_base::in | std::ios_base::binary);
+			boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+			inbuf.push(boost::iostreams::gzip_decompressor());
+			inbuf.push(file);
+			//Convert streambuf to istream
+			std::istream instream(&inbuf);
+			//Iterate lines
+			std::string line;
+			while( instream >> val >> count ) {
+				if(val<valBar) {
+					ht->insertKmer(val, count, 1, i);
+				} else {
+					valsCases[i]=val;
+					countsCases[i]=count;
+					break;
+				}
+			}
+			//Cleanup
+			file.close();
+
+/*
 			while(fscanf(kmerFilesCases[i],"%lld %d\n",&val,&count)!=EOF) {
 				if(val<valBar) {
 					ht->insertKmer(val, count, 1, i);
@@ -659,10 +677,14 @@ void * readCases(void *threadid) {
 					break;
 				}
 			}
+*/
+
+
+
 		}
 	}
 
-	delete []line;
+//	delete []line;
 	pthread_exit(NULL);
 }
 
@@ -683,6 +705,28 @@ void * readControls(void *threadid) {
 			countsControls[i]=-1;
 		}
 		if(valsControls[i]==-1) {
+
+			std::ifstream file(kmerFilesControlFilenames[i], std::ios_base::in | std::ios_base::binary);
+			boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+			inbuf.push(boost::iostreams::gzip_decompressor());
+			inbuf.push(file);
+			//Convert streambuf to istream
+			std::istream instream(&inbuf);
+			//Iterate lines
+			std::string line;
+			while( instream >> val >> count ) {
+				if(val<valBar) {
+					ht->insertKmer(val, count, 1, i);
+				} else {
+					valsCases[i]=val;
+					countsCases[i]=count;
+					break;
+				}
+			}
+			//Cleanup
+			file.close();
+
+/*
 			while(fscanf(kmerFilesControls[i],"%lld %d\n",&val,&count)!=EOF) {
 				if(val<valBar) {
 					ht->insertKmer(val, count, 0, i);
@@ -691,8 +735,8 @@ void * readControls(void *threadid) {
 					countsControls[i]=count;
 					break;
 				}
-
 			}
+*/
 		}
 	}
 
@@ -717,9 +761,8 @@ void printHelp() {
 
 
 int main(int argc, const char * argv[]) {
-	if(argc<2) {
+	if(argc<2)
 		printHelp();
-	}
 	if(strcmp(argv[1],"--help")==0 || strcmp(argv[1],"-h")==0)
 		printHelp();
 
@@ -751,8 +794,11 @@ int main(int argc, const char * argv[]) {
 	fclose(eigenSNPFile);
 	fclose(eigenGenoFile);
 
-	kmerFilesCases=new FILE*[noCases];
-	kmerFilesControls=new FILE*[noControls];
+	/* JAKE */
+	kmerFilesCaseFilenames=new char*[noCases];
+	kmerFilesControlFilenames=new char*[noControls];
+	//kmerFilesCases=new FILE*[noCases];
+	//kmerFilesControls=new FILE*[noControls];
 	char *kmerFilename;
 	kmerFilename=new char[5000];
 
@@ -778,11 +824,17 @@ int main(int argc, const char * argv[]) {
 
 	for(int i=0;i<noCases;i++) {
 		fscanf(sortedFile,"%s\n",kmerFilename);
-		kmerFilesCases[i]=fopen(kmerFilename,"r");
 
+		kmerFilesCaseFilenames[i]=kmerFilename;
+
+/*
+		kmerFilesCases[i]=fopen(kmerFilename,"r");
 		if(kmerFilesCases[i]==NULL) {
 			cout<<kmerFilename<<" file doesn't exist"<<endl;
 		}
+		// fclose(kmerFilesCases[i]);	// close if I'm not using?
+*/
+
 
 		valsCases[i]=-1;
 		countsCases[i]=-1;
@@ -790,11 +842,18 @@ int main(int argc, const char * argv[]) {
 	sortedFile=fopen("control_sorted_files.txt","r");
 	for(int i=0;i<noControls;i++) {
 		fscanf(sortedFile,"%s\n",kmerFilename);
-		kmerFilesControls[i]=fopen(kmerFilename,"r");
 
+
+		kmerFilesControlFilenames[i]=kmerFilename;
+
+/*
+		kmerFilesControls[i]=fopen(kmerFilename,"r");
 		if(kmerFilesControls[i]==NULL) {
 			cout<<kmerFilename<<" file doesn't exist"<<endl;
 		}
+		// fclose(kmerFilesControls[i]);	// close if I'm not using?
+*/
+
 
 		valsControls[i]=-1;
 		countsControls[i]=-1;
@@ -816,33 +875,28 @@ int main(int argc, const char * argv[]) {
 			thArgsCase[i]->valBar=valBar;
 			thArgsCase[i]->threadID=i;
 			rc = pthread_create(&caseThreads[i], NULL, readCases, (void *)thArgsCase[i]);
-			if (rc) {
-				 exit(-1);
-			}
+			if (rc)
+				exit(-1);
 		}
 		for(int i=0;i<NUM_THREADS/2;i++) {
 			thArgsControl[i]=new ThreadArg;
 			thArgsControl[i]->valBar=valBar;
 			thArgsControl[i]->threadID=i;
 			rc = pthread_create(&controlThreads[i], NULL, readControls, (void *)thArgsControl[i]);
-			if (rc) {
-				 exit(-1);
-			}
+			if (rc)
+				exit(-1);
 		}
-
 		for(int i=0;i<NUM_THREADS/2;i++) {
 			rc = pthread_join(caseThreads[i], &status);
 			delete thArgsCase[i];
-			if (rc) {
+			if (rc)
 				exit(-1);
-			}
 		}
 		for(int i=0;i<NUM_THREADS/2;i++) {
 			rc = pthread_join(controlThreads[i], &status);
 			delete thArgsControl[i];
-			if (rc) {
+			if (rc)
 				exit(-1);
-			}
 		}
 
 		ht->computeLikelihoodRatios();
