@@ -108,6 +108,20 @@ fi
 echo -e "${base}\t${sex}\t${cc}"
 done > gwas_info.txt
 
+for f in *YX.60.ratio.txt ; do
+base=$( basename $f .YX.60.ratio.txt )
+ratio=$( cat $f )
+sex=M
+if (( $(echo "$ratio > 0.01" |bc -l) )); then
+sex=F
+fi
+cc=Case
+if [[ ${base} =~ "GM_" ]] ; then
+cc=Control
+fi
+echo -e "${base}\t${sex}\t${cc}"
+done > gwas_info.txt
+
 nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
 
 

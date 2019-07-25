@@ -31,6 +31,17 @@ for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
 			chmod a-w $f
 		fi
 
+		f=${base}.YX.${q}.ratio.txt
+		if [ -f $f ] && [ ! -w $f ] ; then
+			echo "Write-protected $f exists. Skipping."
+		else
+			echo "Creating $f"
+			X=$( cat ${base}.X.${q}.count.txt )
+			Y=$( cat ${base}.Y.${q}.count.txt )
+			echo "${Y} / ${X}" | bc -l > ${f}
+			chmod a-w $f
+		fi
+
 	#done
 done
 
