@@ -21,9 +21,8 @@ function usage(){
 	echo "$script [--source_path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--bam_quality INTEGER] [--canonical] [--proper_pair_only]"
 	echo
 	echo "Example:"
-	echo "$script -s /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
-	echo "$script -s /raid/data/raw/CCLS -b 40 -p -u .recaled.bam"
-	echo "$script -s /raid/data/raw/MS -b 40 -u .bam"
+	echo "$script -p /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
+	echo "$script -p /raid/data/raw/CCLS -b 40 -u .recaled.bam"
 	echo
 	exit
 }
@@ -89,12 +88,15 @@ do
 	#fi
 
 
-	if [   -f ${OUTPREFIX}.kmers.hist.csv ] \
-	&& [ ! -w ${OUTPREFIX}.kmers.hist.csv ] \
-	&& [   -f ${OUTPREFIX}_kmers_sorted.txt ] \
-	&& [ ! -w ${OUTPREFIX}_kmers_sorted.txt ] \
-	&& [   -f ${OUTPREFIX}_total_kmer_counts.txt ] \
-	&& [ ! -w ${OUTPREFIX}_total_kmer_counts.txt ] ; then
+#	if [   -f ${OUTPREFIX}.kmers.hist.csv ] \
+#	&& [ ! -w ${OUTPREFIX}.kmers.hist.csv ] \
+#	&& [   -f ${OUTPREFIX}_kmers_sorted.txt ] \
+#	&& [ ! -w ${OUTPREFIX}_kmers_sorted.txt ] \
+#	&& [   -f ${OUTPREFIX}_total_kmer_counts.txt ] \
+#	&& [ ! -w ${OUTPREFIX}_total_kmer_counts.txt ] ; then
+
+	if [   -f ${OUTPREFIX}_kmers_sorted.txt.gz ] \
+	&& [ ! -w ${OUTPREFIX}_kmers_sorted.txt.gz ] ; then
 		echo "Write-protected final products exist. Skipping."
 	else
 
@@ -182,38 +184,47 @@ do
 			chmod a-w $f
 		fi
 
-		f=${OUTPREFIX}_kmers_sorted.txt
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
+		f1=${OUTPREFIX}_kmers_sorted.txt.gz
+		if [ -f $f1 ] && [ ! -w $f1 ] ; then
+			echo "Write-protected $f1 exists. Skipping."
 		else
 
-			#	Original version does this with CUTOFF. I have no idea why.
-			#	Set it to 1, output it to a file, then add 1 and use as the lower limit. Everytime? Why not just fixed as 2?
-			#	CUTOFF=1
-			#	echo $CUTOFF > ${OUTPREFIX}_cutoff.csv
-			#	${jellyfishDir}/jellyfish dump -c -L `expr $CUTOFF + 1` ${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt
-
-			f2=${OUTPREFIX}_kmers.txt
+			f2=${OUTPREFIX}_kmers_sorted.txt
 			if [ -f $f2 ] && [ ! -w $f2 ] ; then
 				echo "Write-protected $f2 exists. Skipping."
 			else
+
+				#	Original version does this with CUTOFF. I have no idea why.
+				#	Set it to 1, output it to a file, then add 1 and use as the lower limit.
+				#	Everytime? Why not just fixed as 2?
+				#
+				#	CUTOFF=1
+				#	echo $CUTOFF > ${OUTPREFIX}_cutoff.csv
+				#	${jellyfishDir}/jellyfish dump -c -L `expr $CUTOFF + 1` \
+				#		${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt
+
+				f3=${OUTPREFIX}_kmers.txt
+				if [ -f $f3 ] && [ ! -w $f3 ] ; then
+					echo "Write-protected $f3 exists. Skipping."
+				else
+					echo "Creating $f3"
+					${jellyfishDir}/jellyfish dump --column --lower-count 2 ${OUTPREFIX}_kmers_jellyfish > ${f3}
+					chmod a-w $f3
+				fi
+
 				echo "Creating $f2"
-				${jellyfishDir}/jellyfish dump --column --lower-count 2 ${OUTPREFIX}_kmers_jellyfish > ${f2}
+				sort --parallel=${threads} -n -k 1 ${f3} > ${f2}
 				chmod a-w $f2
+
+				rm -f $f3
 			fi
 
-			echo "Creating $f"
-			sort --parallel=${threads} -n -k 1 ${OUTPREFIX}_kmers.txt > ${f}
-			chmod a-w $f
+			gzip --best $f2
 
-			rm -f $f2
 		fi
 
+		rm -f ${OUTPREFIX}_kmers_jellyfish
+
 	fi
-
-	rm -f ${OUTPREFIX}_kmers_jellyfish
-#	rm -f ${OUTPREFIX}_kmers.txt
-
-#	echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
 
 done
