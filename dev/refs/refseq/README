@@ -10,11 +10,11 @@ rsync -avz --progress --include=README --include="*fna.gz" --include="*gtf.gz" -
 rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/H_sapiens/RefSeqGene/ RefSeqGene/
 
 
-rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/viral/ viral/
+rsync -avz --progress --include=README.txt --include="*fna.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/viral/ viral/
 
-rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/fungi/ fungi/
+rsync -avz --progress --include=README.txt --include="*fna.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/fungi/ fungi/
 
-rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/bacteria/ bacteria/
+rsync -avz --progress --include=README.txt --include="*fna.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/release/bacteria/ bacteria/
 
 
 
@@ -22,10 +22,32 @@ Mask viral references for repeats prior to creating a blast database.
 For some reason the source file needs to be writable so when it is copied it is writeable. Weak kung fu.
 gunzip -k viral*fna.gz
 cat viral*fna > viral.fa
+
+# fasta file may need minor mods before doing this.
 RepeatMasker -pa 40 viral.fa
 
 Why not
 zcat viral*.fna.gz > viral.fa
 zcat refseqgene*.fna.gz > viral.fa
+
+nohup zcat fungi*.fna.gz > fungi.both.fa &
+nohup RepeatMasker -pa 40 fungi.both.fa > RepeatMasker.out &
+
+FastaDB:_cleanIndexAndCompact - ERROR: Multiple fasta seqs appear on one line (XM_013470399.1 Rasamsonia emersonii CBS 393.64 Dol-P-Glc:Glc(1)Man(9)GlcNAc(2)-PP-Dol alpha-1->3-glucosyltransferase mRNA) and possibly more! Ignoring all entries on this line.
+FastaDB:_cleanIndexAndCompact - ERROR: Multiple fasta seqs appear on one line (XM_014690284.1 Metarhizium brunneum ARSEF 3297 5'->3' exoribonculease Dhp1 partial mRNA) and possibly more! Ignoring all entries on this line.
+
+Many more
+
+
+These are not just xml tags. Need to change all > that are not first into _.
+Suggestion: Convert all > to _, then convert ^_ back to >
+
+
+
+
+
+
+nohup zcat bacteria*.fna.gz > bacteria.both.fa &
+nohup RepeatMasker -pa 40 bacteria.both.fa > RepeatMasker.out &
 
 
