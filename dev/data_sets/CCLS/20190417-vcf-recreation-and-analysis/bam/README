@@ -167,3 +167,37 @@ done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
 nohup ./mutations.bash > mutations.out 2> mutations.err &
 
 
+
+
+
+
+
+
+
+
+
+20190808
+
+
+Custom reorder several csv files ...
+
+./reorder_mutations_csv.py mutations-20190716071807/v3/mutations-manual-0.001-0.10-0.40.csv
+./reorder_mutations_csv.py mutations-20190716071807/v3/mutations-manual-0.0001-0.10-0.40.csv
+./reorder_mutations_csv.py mutations-20190716071807/v3/mutations-manual-0.001-0.20-0.40.csv
+./reorder_mutations_csv.py mutations-20190716071807/v3/mutations-manual-0.0001-0.20-0.40.csv
+
+
+Manually extract APOBEC mutations TCA and TCT with C>G and C>T and combine ratio.
+
+Added trinuc_muts_counts_ratios.py to aggregate_somatic_vcfs.bash
+
+for sample in 983899 268325 439338 63185 634370 120207 122997 186069 201771 209605 266836 321666 341203 36077 492023 495910 506458 530196 607654 673944 73753 780690 811386 813891 833536 853767 866648 868614 871719 900420 919207 972727 99776 ; do
+echo ./aggregate_somatic_vcfs.bash $sample \>\> ${sample}.aggregate_somatic_vcfs.log 2\>\&1
+done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
+
+
+
+
+
+
+

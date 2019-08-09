@@ -111,6 +111,17 @@ count_trinuc_muts(){
 		chmod a-w $f
 	fi
 
+	#f=${base_file}.count_trinuc_muts.counts.txt.ratios.csv
+	f=${base_file}.count_trinuc_muts.counts.txt.apobec_ratio.txt
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		trinuc_muts_counts_ratios.py ${base_file}.count_trinuc_muts.counts.txt
+		chmod a-w $f
+		chmod a-w ${base_file}.count_trinuc_muts.counts.txt.ratios.csv
+	fi
+
 }
 
 

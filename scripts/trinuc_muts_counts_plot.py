@@ -43,8 +43,8 @@ for nt1 in nucleotides:
 				mut=nt1+'['+nt2+'>'+nt3+']'+nt4
 				rcmut=complements[nt4]+'['+complements[nt2]+'>'+complements[nt3]+']'+complements[nt1]
 
-				mut_row=sample[sample['trinuc'] == mut]
-				rcmut_row=sample[sample['trinuc'] == rcmut]
+				mut_row=sample[sample['trinuc'].astype(str) == mut]
+				rcmut_row=sample[sample['trinuc'].astype(str) == rcmut]
 
 				mut_row_count=len(mut_row)
 				rcmut_row_count=len(rcmut_row)

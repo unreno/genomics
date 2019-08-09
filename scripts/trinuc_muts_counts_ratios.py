@@ -43,8 +43,16 @@ for nt1 in nucleotides:
 				mut=nt1+'['+nt2+'>'+nt3+']'+nt4
 				rcmut=complements[nt4]+'['+complements[nt2]+'>'+complements[nt3]+']'+complements[nt1]
 
-				mut_row=sample[sample['trinuc'] == mut]
-				rcmut_row=sample[sample['trinuc'] == rcmut]
+#/home/jake/.local/lib/python3.5/site-packages/pandas/core/ops.py:1649: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+
+#				mut_row=sample[sample['trinuc'] == mut]
+#				rcmut_row=sample[sample['trinuc'] == rcmut]
+#				#	I'm guessing that there is a nan in there. converting to str makes warning go away
+#				mut_row=sample.loc[sample['trinuc'].astype(str) == mut]
+#				rcmut_row=sample.loc[sample['trinuc'].astype(str) == rcmut]
+				mut_row=sample[sample['trinuc'].astype(str) == mut]
+				rcmut_row=sample[sample['trinuc'].astype(str) == rcmut]
+
 
 				mut_row_count=len(mut_row)
 				rcmut_row_count=len(rcmut_row)
@@ -75,9 +83,31 @@ sample.reset_index(drop=True, inplace=True)
 
 sample['total']=sample['count']+sample['rc_count']
 
-total_total = sample.total.sum()
+total_total = sample['total'].sum()
 
-print(sample)
+sample['ratio']=sample['total']/total_total
+
+print( sample )
+
+sample.to_csv(file_name+'.ratios.csv', index=False)
+
+
+#	https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4758883/
+#However, if unrestrained, APOBEC enzymes can also act as potent mutators of chromosomal DNA, where they deaminate cytidines preferentially within the trinucleotide sequences, TCA and TCT (referred to collectively as TCW; the mutated base is underlined) (Refsland and Harris, 2013). Consequently, APOBEC-mutagenized tumors contain an over-abundance of C to T and C to G substitutions within TCW sequences (Roberts et al., 2013, Alexandrov et al., 2013, Burns et al., 2013b). This mutatio
+
+apobec_mutations=[ 'T[C>G]A', 'T[C>T]A', 'T[C>G]T', 'T[C>T]T' ]
+
+apobec = sample.loc[sample['trinuc'].isin(apobec_mutations)]
+
+print(apobec)
+
+print()
+print("Total APOBEC-related ratio: "+apobec['ratio'].sum().astype(str))
+print()
+
+
+with open(file_name+'.apobec_ratio.txt', 'w') as writer:
+	writer.write( apobec['ratio'].sum().astype(str) )
 
 
 #sample.plot(x='trinuc', y='total', kind='bar', title=base_name )
