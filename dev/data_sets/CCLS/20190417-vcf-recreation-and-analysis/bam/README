@@ -195,6 +195,7 @@ for sample in 983899 268325 439338 63185 634370 120207 122997 186069 201771 2096
 echo ./aggregate_somatic_vcfs.bash $sample \>\> ${sample}.aggregate_somatic_vcfs.log 2\>\&1
 done | parallel -j 40 --no-notice --joblog parallel.aggregate.log &
 
+./collect_apobec_ratios.bash > collected_apobec_ratios.csv
 
 
 
