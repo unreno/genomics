@@ -82,3 +82,23 @@ Keeps crashing during use?
 
 makeblastdb -in /raid/refs/refseq/viral.fa.masked -dbtype nucl -out viral.masked -title viral.masked -parse_seqids
 
+
+
+
+
+
+
+
+
+
+# Extract viral fasta entries
+
+blastdbcmd can filter by seqid so ...
+
+blastdbcmd -db nt -entry all -outfmt "%K,%i" | awk -F, '( $1 == 'Viruses' ){ print $2 }' > Viruses.seqidlist
+
+
+blastdbcmd -db nt -entry_batch seqidlist 
+
+
+
