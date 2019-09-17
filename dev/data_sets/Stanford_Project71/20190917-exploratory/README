@@ -1,0 +1,19 @@
+
+
+
+./process.bash
+
+
+
+
+tail -q -n 1 *hg38.loc.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *mature.loc.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *hairpin.loc.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *viral.masked.loc.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *hg38.e2e.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *mature.e2e.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *hairpin.e2e.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+tail -q -n 1 *viral.masked.e2e.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}'
+
+
+
