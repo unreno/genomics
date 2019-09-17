@@ -101,4 +101,10 @@ blastdbcmd -db nt -entry all -outfmt "%K,%i" | awk -F, '( $1 == 'Viruses' ){ pri
 blastdbcmd -db nt -entry_batch seqidlist 
 
 
+zcat ~/mature.fa.gz | makeblastdb -dbtype nucl -out mature -title mature -parse_seqids
+zcat ~/hairpin.fa.gz | makeblastdb -dbtype nucl -out hairpin -title hairpin -parse_seqids
+makeblastdb -in /raid/refs/fasta/hg38.fa -dbtype nucl -out hg38 -title hg38 -parse_seqids
+
+
+
 
