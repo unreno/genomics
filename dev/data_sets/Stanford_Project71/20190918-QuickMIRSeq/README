@@ -1,0 +1,16 @@
+
+
+
+copy config files from QuickMIRSeq demo run
+
+
+
+seq 1 77 | awk '{print $1"_R1";print $1"_R2"}' > allIDs.txt
+
+seq 1 77 | awk '{print $1"_R1\t"$1;print $1"_R2\t"$1}' > sample.annotation.txt
+
+
+
+nohup ./command.sh > command.out 2> command.err &
+
+
