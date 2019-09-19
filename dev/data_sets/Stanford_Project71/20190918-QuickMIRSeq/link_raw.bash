@@ -8,11 +8,15 @@ for f in /raid/data/raw/Stanford_Project71/71*fastq.gz ; do
 	l=$( basename $f .gz )
 	l=${l#71-}
 	l=${l/_001./.}
-	l=${l/S*_L001_/}
+	#l=${l/_S*_L001/}
+	l=${l/_S*_L001_R*/}
 
 	#ln -s $f fastq/$l
 
-	gunzip -c $f > fastq/$l
+	echo $f $l
+
+	#gunzip -c $f > fastq/$l
+	gunzip -c $f >> fastq/$l.fastq
 
 done
 

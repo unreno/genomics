@@ -5,12 +5,38 @@ copy config files from QuickMIRSeq demo run
 
 
 
+cat *.fastq | paste - - - - | cut -f 2 | awk '{print length($0)}' | uniq -c
+
+
 seq 1 77 | awk '{print $1"_R1";print $1"_R2"}' > allIDs.txt
 
 seq 1 77 | awk '{print $1"_R1\t"$1;print $1"_R2\t"$1}' > sample.annotation.txt
 
 
 
-nohup ./command.sh > command.out 2> command.err &
+nohup ./command.bash > command.out 2> command.err &
 
+All reads are fairly uniq, so QuickMIRSeq fails
+
+
+
+
+
+Join lanes and try again
+seq 1 77 > allIDs.txt
+
+\rm sample.annotation.txt
+
+./command.bash 
+
+
+
+
+
+
+Can't use an undefined value as an ARRAY reference at
+	/home/jake/.local/QuickMIRSeq/QuickMIRSeq.pl line 1533 (#2)
+    (F) A value used as either a hard reference or a symbolic reference must
+    be a defined value.  This helps to delurk some insidious errors.
+    
 

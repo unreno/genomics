@@ -2,6 +2,12 @@
 
 
 
+
+
+set -e  #       exit if any command fails
+set -u  #       Error on usage of unset variables
+set -o pipefail
+
 set -x
 
 
@@ -44,8 +50,8 @@ export PATH=$QuickMIRSeq:$PATH
 
 
 echo "Running QuickMIRSeq.pl"
-#perl  $QuickMIRSeq/QuickMIRSeq.pl  allIDs.txt run.config
-perl  $QuickMIRSeq/QuickMIRSeq.pl  headIDs.txt run.config
+perl  $QuickMIRSeq/QuickMIRSeq.pl  allIDs.txt run.config
+#perl  $QuickMIRSeq/QuickMIRSeq.pl  headIDs.txt run.config
 echo "QuickMIRSeq.pl Finished"
 
 
