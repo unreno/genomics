@@ -1,0 +1,30 @@
+
+
+
+https://www.nature.com/articles/sdata201821
+
+
+
+cp ~/.local/miARma1.7.2/Examples/basic_examples/miRNAs/Known_miRNAs/Known_miRNAs_pipeline.ini ./Known_miRNAs_pipeline.ini
+
+
+head -2 /raid/data/raw/E-GEOD-105052/E-GEOD-105052.sdrf.txt | awk 'BEGIN{FS=OFS="\t"}{for(i=1;i<=NF;i++){print i,$i}}'
+
+
+awk 'BEGIN{FS=OFS="\t"}{print $33,$34,$5,$7,$12,$36}' /raid/data/raw/E-GEOD-105052/E-GEOD-105052.sdrf.txt
+
+awk 'BEGIN{FS=OFS="\t"}{print $33,$5,$12}' /raid/data/raw/E-GEOD-105052/E-GEOD-105052.sdrf.txt
+
+Edit typos and add underscore to disease name
+
+
+
+
+docker run -v /raid/data/raw/E-GEOD-105052/fastq/trimmed/:/reads/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/known-results/:/results/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
+
+docker run -v /raid/data/raw/E-GEOD-105052/fastq/trimmed/:/reads/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/denovo-results/:/results/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_miRNAs_DeNovo.ini
+
+
+docker run -v /raid/data/raw/E-GEOD-105052/fastq/trimmed/:/home/miARma/miARma/reads/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/denovo-results/:/results/ -v /raid/data/working/E-GEOD-105052/20190923-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_miRNAs_DeNovo.ini
+
+

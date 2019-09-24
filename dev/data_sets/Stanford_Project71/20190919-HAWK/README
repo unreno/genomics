@@ -1,0 +1,22 @@
+
+
+
+link_raw.bash
+
+
+nohup hawk_countKmers.bash -s /raid/data/working/Stanford_Project71/20190919-HAWK/fastq-laned-trimmed-m -u _R1.fastq -e fastq --canonical >> countKmers.out 2>&1 &
+
+
+
+
+Something like
+
+ls /raid/data/raw/MS/*bam | xargs -n 1 basename  | sed -e 's".bam""' | awk '{tn="Case";sex="U"}(/^K/){tn="Control"}{print $1"\t"sex"\t"tn }' > gwas_info.txt
+
+This is all expecting "Case" and "Control".
+
+
+
+nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
+
+
