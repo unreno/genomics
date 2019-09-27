@@ -90,6 +90,7 @@ makeblastdb -in /raid/refs/refseq/viral.fa.masked -dbtype nucl -out viral.masked
 
 
 
+blastdbcmd -entry all -db hairpin
 
 # Extract viral fasta entries
 
@@ -105,6 +106,13 @@ zcat ~/mature.fa.gz | makeblastdb -dbtype nucl -out mature -title mature -parse_
 zcat ~/hairpin.fa.gz | makeblastdb -dbtype nucl -out hairpin -title hairpin -parse_seqids
 makeblastdb -in /raid/refs/fasta/hg38.fa -dbtype nucl -out hg38 -title hg38 -parse_seqids
 
+
+
+cat /raid/refs/fasta/human_hairpin.ACTG.fa | makeblastdb -dbtype nucl -out hairpin -title hairpin -parse_seqids
+
+cat /raid/refs/fasta/human_mature.ACTG.fa | makeblastdb -dbtype nucl -out mature -title mature -parse_seqids
+
+blastdbcmd -db mature -entry all
 
 
 

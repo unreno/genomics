@@ -17,3 +17,42 @@ tail -q -n 1 *viral.masked.e2e.bam.bowtie2.err | awk -F% '{s+=$1}END{print s/NR}
 
 
 
+
+
+Some Bowtie 2 options specify a function rather than an individual number or setting. In these cases the user specifies three parameters: (a) a function type F, (b) a constant term B, and (c) a coefficient A. The available function types are constant (C), linear (L), square-root (S), and natural log (G). The parameters are specified as F,B,A - that is, the function type, the constant term, and the coefficient are separated by commas with no whitespace. The constant term and coefficient may be negative and/or floating-point numbers.
+
+For example, if the function specification is L,-0.4,-0.6, then the function defined is:
+
+f(x) = -0.4 + -0.6 * x
+If the function specification is G,1,5.4, then the function defined is:
+
+f(x) = 1.0 + 5.4 * ln(x)
+See the documentation for the option in question to learn what the parameter x is for. For example, in the case if the --score-min option, the function f(x) sets the minimum alignment score necessary for an alignment to be considered valid, and x is the read length.
+
+
+
+Mature scoring is probably too low to adjust?
+
+  --score-min <func> min acceptable alignment score w/r/t read length
+                     (G,20,8 for local, L,-0.6,-0.6 for end-to-end)
+
+--score-min G,20,8
+--score-min G,10,8
+--score-min G,1,6
+
+
+
+
+Matrix
+               subject1 ... subject77
+total fa reads
+hsa-1-*
+hsa-2-*
+hsa-...-*
+
+
+
+./process.bash
+./merge.py
+./deseq2.py
+

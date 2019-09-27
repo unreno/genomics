@@ -33,8 +33,15 @@ ENV PERL5LIB=/home/miARma/miARma/lib/Perl:/home/miARma/miARma/lib
 ENV PATH="/home/miARma/miARma:${PATH}"
 
 
-#	docker run -v /raid/data/working/tmp:/mnt --rm -it miarma /home/miARma/miARma/miARma /mnt/Known_miRNAs_pipeline.ini
+
+RUN wget -P /home/miARma/miARma/ ftp://mirbase.org/pub/mirbase/22.1/genomes/hsa.gff3
+
 
 
 WORKDIR /home/miARma/miARma
+
+
+#	docker build --file miARma.Dockerfile --tag miarma /
+#	docker run -v /raid/data/working/tmp:/mnt --rm -it miarma /home/miARma/miARma/miARma /mnt/Known_miRNAs_pipeline.ini
+
 

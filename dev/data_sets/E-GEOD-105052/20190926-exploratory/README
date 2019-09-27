@@ -1,0 +1,9 @@
+
+echo "id,cc" > metadata.csv
+awk 'BEGIN{FS="\t";OFS=","}(NR>1){print $33,$12}' /raid/data/raw/E-GEOD-105052/E-GEOD-105052.sdrf.txt | sed 's/ /_/g' >> metadata.csv
+
+
+./process.bash
+./merge.py
+./deseq2.py
+

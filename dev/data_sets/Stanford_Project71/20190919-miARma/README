@@ -18,7 +18,7 @@ http://www.hzrna.com/1189.html
 http://bioinfoguide.com/index.php?id=16:mirna-seq-and-rna-seq-analysis
 
 
-docker run -v /raid/data/working/tmp:/mnt --rm -it miarma /home/miARma/miARma/miARma /mnt/Known_miRNAs_pipeline.ini
+#docker run -v /raid/data/working/tmp:/mnt --rm -it miarma /home/miARma/miARma/miARma /mnt/Known_miRNAs_pipeline.ini
 
 
 
@@ -27,19 +27,32 @@ docker run -v /raid/data/working/tmp:/mnt --rm -it miarma /home/miARma/miARma/mi
 cp ~/.local/miARma1.7.2/Examples/basic_examples/miRNAs/Known_miRNAs/Known_miRNAs_pipeline.ini ./data/Known_miRNAs_pipeline.ini
 
 
-docker run -v /raid/data/raw/Stanford_Project71/fastq-trimmed-m/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma PERL5LIB=/home/miARma/miARma/lib/Perl:/home/miARma/miARma/lib /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
+#docker run -v /raid/data/raw/Stanford_Project71/fastq-trimmed-m/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma PERL5LIB=/home/miARma/miARma/lib/Perl:/home/miARma/miARma/lib /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
 
 
 
-docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
+#docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
 
 
 
 
 
-docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/home/miARma/miARma/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/denovo-results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_miRNAs_DeNovo.ini
+#docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/home/miARma/miARma/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/denovo-results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_miRNAs_DeNovo.ini
 
 
 
-docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/mRNA-results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_mRNAs_pipeline_bowtie.ini
+#docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/mRNA-results/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ --rm -it miarma /home/miARma/miARma/miARma /data/miARma_mRNAs_pipeline_bowtie.ini
+
+
+
+
+
+
+#docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap-2/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/known-results-2/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ -v /raid/refs/Homo_sapiens/UCSC/hg38/Sequence/BowtieIndex/:/hg38_bowtie/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
+
+docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap-2/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/known-results-2/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ -v /raid/refs/bowtie/:/bowtie/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
+
+
+
+docker run -v /raid/data/raw/Stanford_Project71/fastq-bbmap-2/:/reads/ -v /raid/data/working/Stanford_Project71/20190919-miARma/known-results-2/:/results/ -v /raid/data/working/Stanford_Project71/20190919-miARma/data/:/data/ -v /raid/refs/:/refs/ --rm -it miarma /home/miARma/miARma/miARma /data/Known_miRNAs_pipeline.ini
 

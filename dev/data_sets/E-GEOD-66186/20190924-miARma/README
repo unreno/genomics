@@ -1,0 +1,30 @@
+
+
+head -2 /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt | awk 'BEGIN{FS=OFS="\t"}{for(i=1;i<=NF;i++){print i,$i}}'
+
+
+awk 'BEGIN{FS=OFS="\t"}{print $32,$33,$11,$36,$38}' /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt
+
+
+awk 'BEGIN{FS=OFS="\t"}(NR==1){print "Filename\tName\tType"}(NR>1){sub(" ","_",$36);print $32,$32,$36}' /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt > data/targets1.txt
+
+awk 'BEGIN{FS=OFS="\t"}(NR==1){print "Filename\tName\tType"}(NR>1){print $32,$32,$38}' /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt > data/targets2.txt
+
+
+cat<<EOF>data/contrast1.txt
+Name
+Comp=previously_treated-untreated
+EOF
+
+cat<<EOF>data/contrast2.txt
+Name
+Comp=irradiation-none
+EOF
+
+
+docker run -v /raid/data/raw/E-GEOD-66186/fastq/:/reads/ -v /raid/data/working/E-GEOD-66186/20190924-miARma/results-1/:/results/ -v /raid/data/working/E-GEOD-66186/20190924-miARma/data/:/data/ -v /raid/refs/Homo_sapiens/UCSC/hg38/Sequence/BowtieIndex/:/hg38_bowtie/ --rm -it miarma /home/miARma/miARma/miARma /data/miRNA_pipeline1.ini
+
+docker run -v /raid/data/raw/E-GEOD-66186/fastq/:/reads/ -v /raid/data/working/E-GEOD-66186/20190924-miARma/results-2/:/results/ -v /raid/data/working/E-GEOD-66186/20190924-miARma/data/:/data/ -v /raid/refs/Homo_sapiens/UCSC/hg38/Sequence/BowtieIndex/:/hg38_bowtie/ --rm -it miarma /home/miARma/miARma/miARma /data/miRNA_pipeline2.ini
+
+
+

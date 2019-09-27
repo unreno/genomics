@@ -242,3 +242,113 @@ MS_2x151nano_Project71_1-77_Gilly091219-141020880/FASTQ_Generation_2019-09-13_09
 
 
 
+
+
+
+
+---
+
+
+
+
+~/.local/bbmap_38.68/bbmerge.sh in1=01_R1.fastq in2=01_R2.fastq outa=adapters.fa
+
+~/.local/bbmap_38.68/bbduk.sh -Xmx1g in1=01_R1.fastq in2=01_R2.fastq out1=01_R1.trimmed.fastq out2=01_R2.trimmed.fastq ref=adapters.fa ktrim=r k=23 mink=11 hdist=1 tpe tbo ordered=t
+
+~/.local/bbmap_38.68/bbduk.sh -Xmx1g in1=01_R1.fastq in2=01_R2.fastq out1=01_R1.trimmed2.fastq out2=01_R2.trimmed2.fastq ref=adapters2.fa ktrim=r k=23 mink=11 hdist=1 tpe tbo ordered=t
+
+
+
+
+
+
+...where "ktrim=r" is for right-trimming (3' adapters), "ktrim=l" is for left-trimming (5' adapters), and "ktrim=N" just masks the kmers with "N". "k" specifies the kmer size to use (must be at most the length of the adapters) while "mink" allows it to use shorter kmers at the ends of the read (for example, k=11 for the last 11 bases). "hdist" means "hamming distance"; this allows one mismatch. Instead of "ref=file" you can alternately (or additionally) say "literal=ACTGGT,TTTGGTG" for those two literal strings. The BBTools package currently includes Truseq and Nextera adapters sequences in /bbmap/resources/ as truseq.fa.gz, truseq_rna.fa.gz, and nextera.fa.gz. You can specify whether or not BBDuk looks for the reverse-complement of the reference sequences as well as the forward sequence with the flag "rcomp=t" or "rcomp=f"; by default it looks for both. You can also restrict kmer operations such as adapter-trimming to only read 1 or read 2 with the "skipr1" or "skipr2" flags, or restrict them to the leftmost or rightmost X bases of a read with the restrictleft or restrictright flags. For normal paired-end fragment libraries, I recommend adding the flags "tbo", which specifies to also trim adapters based on pair overlap detection (which does not require known adapter sequences), and "tpe", which specifies to trim both reads to the same length (in the event that an adapter kmer was only detected in one of them).
+
+Skipping tpe
+
+for i in $( seq -w 1 77 ) ; do
+~/.local/bbmap_38.68/bbduk.sh -Xmx1g in1=fastq-laned/${i}_R1.fastq in2=fastq-laned/${i}_R2.fastq out1=fastq-bbmap-laned/${i}_R1.fastq out2=fastq-bbmap-laned/${i}_R2.fastq ref=fastq-bbmap-laned/adapters2.fa ktrim=r k=23 mink=11 hdist=1 tbo ordered=t
+done
+
+
+
+
+for i in $( seq -w 1 77 ) ; do
+cat fastq-bbmap-laned/${i}_R?.fastq > fastq-bbmap/${i}.fastq
+done
+
+
+
+
+
+
+for i in $( seq -w 1 77 ) ; do
+cutadapt -j 40 -m 5 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o fastq-trimmed-m/${i}_R1.fastq -p fastq-trimmed-m/${i}_R2.fastq ${i}_R1.fastq ${i}_R2.fastq
+done
+
+
+
+
+for i in $( seq -w 1 77 ) ; do
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o fastq-trimmed/${i}_R1.trimmed.fastq -p fastq-trimmed/${i}_R2.trimmed.fastq fastq-laned/${i}_R1.fastq fastq-laned/${i}_R2.fastq
+done
+
+
+
+
+for i in $( seq -w 1 77 ) ; do
+cat fastq-laned-trimmed-m/${i}_R?.fastq > fastq-trimmed-m/${i}.fastq
+done
+
+
+
+
+for i in $( seq -w 1 77 ) ; do
+cat fastq-laned-trimmed/${i}_R?.fastq > fastq-trimmed/${i}.fastq
+done
+
+
+
+
+
+cutadapt -f fastq -a TGGAATTCTCGGGTGCCAAGG -g GTTCAGAGTTCTACAGTCCGACGATC -e 0.15 -O 10 -m 14 fastq-laned/77_R1.fastq -o 77_R1.trimmed.fastq
+
+TGGAATTCTCGGGTGCCAAGG
+GTTCAGAGTTCTACAGTCCGACGATC
+
+CCTTGGCACCCGAGAATTCCA
+GATCGTCGGACTGTAGAACTCTGAAC
+
+cutadapt -f fastq -a CCTTGGCACCCGAGAATTCCA -g GATCGTCGGACTGTAGAACTCTGAAC -e 0.15 -O 10 -m 14 fastq-laned/77_R1.fastq -o 77_R1.trimmed.fastq
+
+
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -a AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -e 0.15 -O 10 -m 14 fastq-laned/77_R1.fastq -o 77_R1.trimmed.fastq
+
+
+
+cat fastq-laned/*_R1.fastq > fastq-laned/R1.fastq
+cat fastq-laned/*_R2.fastq > fastq-laned/R2.fastq
+~/.local/bbmap_38.68/bbmerge.sh in1=fastq-laned/R1.fastq in2=fastq-laned/R2.fastq outa=fastq-laned/adapters.fastq
+
+
+mkdir fastq-bbmap-laned-found
+for i in $( seq -w 1 77 ) ; do
+~/.local/bbmap_38.68/bbduk.sh -Xmx1g in1=fastq-laned/${i}_R1.fastq in2=fastq-laned/${i}_R2.fastq out1=fastq-bbmap-laned-found/${i}_R1.fastq out2=fastq-bbmap-laned-found/${i}_R2.fastq ref=adapters-found.fa ktrim=r k=23 mink=11 hdist=1 tbo ordered=t
+done
+
+mkdir fastq-bbmap-laned-given
+for i in $( seq -w 1 77 ) ; do
+~/.local/bbmap_38.68/bbduk.sh -Xmx1g in1=fastq-laned/${i}_R1.fastq in2=fastq-laned/${i}_R2.fastq out1=fastq-bbmap-laned-given/${i}_R1.fastq out2=fastq-bbmap-laned-given/${i}_R2.fastq ref=adapters-given.fa ktrim=r k=23 mink=11 hdist=1 tbo ordered=t
+done
+
+mkdir fastq-bbmap-found
+for i in $( seq -w 1 77 ) ; do
+cat fastq-bbmap-laned-found/${i}_R1.fastq fastq-bbmap-laned-found/${i}_R2.fastq | sed -E 's/ ([[:digit:]]):.*$/\/\1/' > fastq-bbmap-found/${i}.fastq
+done
+
+mkdir fastq-bbmap-given
+for i in $( seq -w 1 77 ) ; do
+cat fastq-bbmap-laned-given/${i}_R1.fastq fastq-bbmap-laned-given/${i}_R2.fastq | sed -E 's/ ([[:digit:]]):.*$/\/\1/' > fastq-bbmap-given/${i}.fastq
+done
+
+

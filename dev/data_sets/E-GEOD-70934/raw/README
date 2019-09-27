@@ -1,0 +1,5 @@
+
+wget https://www.ebi.ac.uk/arrayexpress/files/E-GEOD-70934/E-GEOD-70934.sdrf.txt
+
+head -2 E-GEOD-70934.sdrf.txt | awk 'BEGIN{FS=OFS="\t"}{for(i=1;i<=NF;i++){print i,$i}}'
+

@@ -1,0 +1,5 @@
+
+
+bowtie-build --threads 40 ../fasta/hg38_no_alts.fa.gz hg38_no_alts
+
+

@@ -1,0 +1,34 @@
+
+wget https://www.ebi.ac.uk/arrayexpress/files/E-GEOD-66186/E-GEOD-66186.sdrf.txt
+
+head -2 E-GEOD-66186.sdrf.txt | awk 'BEGIN{FS=OFS="\t"}{for(i=1;i<=NF;i++){print i,$i}}'
+
+./getfiles.bash
+
+
+mkdir fastq
+for gz in *fastq.gz ; do
+fq=$( basename $gz .gz )
+gunzip -c $gz > fastq/$fq
+done
+
+
+
+
+~/.local/bbmap_38.68/bbmerge.sh in=test.fastq outa=adapters.fa
+
+cat adapters.fa 
+>Read1_adapter
+N
+>Read2_adapter
+N
+
+
+so no adapters apparently
+
+
+
+
+
+
+

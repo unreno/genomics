@@ -9,3 +9,16 @@ done
 
 
 bowtie2-build $( ls /raid/refs/fasta/virii/*fasta | paste -sd "," ) virii
+
+
+ONLY USE ACTG!!!!!
+
+
+convert fasta with U's to T's like ...
+sed '/^>/! s/U/T/g'
+
+
+
+bowtie2-build ../fasta/human_hairpin.ACTG.fa hairpin
+bowtie2-build ../fasta/human_mature.ACTG.fa mature
+

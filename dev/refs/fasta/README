@@ -181,3 +181,16 @@ samtools view jellyfish/SVA_HERV.unique_30mer.hg19.sam | awk '{for(i=12;i<=NF;i+
 
 
 
+
+
+20190925
+wget ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz
+wget ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
+
+
+zcat hairpin.fa.gz | awk '(/^>/){hsa=0}(/^>hsa/){hsa=1}{if(hsa==1){print}}' | sed '/^>/! s/U/T/g' > human_hairpin.ACTG.fa
+
+zcat mature.fa.gz | awk '(/^>/){hsa=0}(/^>hsa/){hsa=1}{if(hsa==1){print}}' | sed '/^>/! s/U/T/g' > human_mature.ACTG.fa
+
+
+
