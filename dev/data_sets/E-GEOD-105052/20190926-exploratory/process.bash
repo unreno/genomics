@@ -22,6 +22,7 @@ for fastq in /raid/data/raw/E-GEOD-105052/fastq/trimmed/*.fastq ; do
 			echo "Creating $f"
 			#bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -1 ${r1} -2 ${r2} \
 			bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -U ${fastq} \
+				--score-min G,1,7 \
 				--no-unal 2> ${f}.bowtie2.err \
 				| samtools view -o ${f} - #> ${f}.samtools.log 2> ${f}.samtools.err
 			chmod a-w $f

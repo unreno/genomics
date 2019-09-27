@@ -40,10 +40,12 @@ print(metadata)
 dds <- DESeqDataSetFromMatrix(
 	colData = metadata,
 	countData = df,
-	design = ~ disease,
+	design = ~ treated + radiated,
 	tidy = TRUE )
 print(dds)
-#	design = ~ disease + sex,
+
+
+#	dds$cc <- relevel( dds$cc, "Control" )
 
 
 dds <- DESeq(dds)
@@ -74,8 +76,7 @@ par(mfrow=c(2,3))
 
 for( id in rownames(res[1:6,])){
 	print(id)
-	#plotCounts(dds, gene=id, intgroup=c('disease','sex'))
-	plotCounts(dds, gene=id, intgroup=c('disease'))
+	plotCounts(dds, gene=id, intgroup=c( 'treated', 'irradiated' ) )
 }
 #	plotCounts(dds, gene="ENSG00000152583", intgroup="dex")
 #	plotCounts(dds, gene="ENSG00000179094", intgroup="dex")
