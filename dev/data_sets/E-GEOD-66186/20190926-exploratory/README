@@ -1,4 +1,7 @@
 
+
+head -2 /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt | awk 'BEGIN{FS=OFS="\t"}{for(i=1;i<=NF;i++){print i,$i}}'
+
 echo "id,treated,radiated" > metadata.csv
 awk 'BEGIN{FS="\t";OFS=","}(NR>1){print $32,$36,$38}' /raid/data/raw/E-GEOD-66186/E-GEOD-66186.sdrf.txt | sed 's/ /_/g' >> metadata.csv
 

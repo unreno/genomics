@@ -99,6 +99,10 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 			samtools view -F 4 ${base}.${ref}.loc.bam | awk '{print $3}' | sort | uniq -c | awk '{print $2,$1}' >> ${f}
 			c=$( grep -c "^>" ${base}.fa )
 			echo "total_reads ${c}" >> ${f}
+
+			a=$( samtools view -c -F 4 ${base}.${ref}.loc.bam )
+			echo "unaligned $[${c}-${a}]" >> ${f}
+
 			chmod a-w $f
 		fi
 

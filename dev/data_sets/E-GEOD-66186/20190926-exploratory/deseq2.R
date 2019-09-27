@@ -72,11 +72,14 @@ res <- res[order(res$padj),]
 head(res)
 
 
+#par(mfrow=c(4,3))
 par(mfrow=c(2,3))
 
 for( id in rownames(res[1:6,])){
 	print(id)
-	plotCounts(dds, gene=id, intgroup=c( 'treated', 'irradiated' ) )
+	#plotCounts(dds, gene=id, intgroup=c( 'treated', 'radiated' ) )
+	#plotCounts(dds, gene=id, intgroup=c( 'treated' ) )
+	plotCounts(dds, gene=id, intgroup=c( 'radiated' ) )
 }
 #	plotCounts(dds, gene="ENSG00000152583", intgroup="dex")
 #	plotCounts(dds, gene="ENSG00000179094", intgroup="dex")

@@ -86,6 +86,10 @@ for fastq in /raid/data/raw/E-GEOD-105052/fastq/trimmed/*.fastq ; do
 			c=$( grep -c "^@${base}" ${fastq} )
 
 			echo "total_reads ${c}" >> ${f}
+
+			a=$( samtools view -c -F 4 ${base}.${ref}.loc.bam )
+			echo "unaligned $[${c}-${a}]" >> ${f}
+
 			chmod a-w $f
 		fi
 
