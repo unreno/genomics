@@ -107,3 +107,46 @@ with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log1
 
 
 
+#	From manual https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
+#
+#	print("DESeq")
+#	dds <- DESeq(dds)
+#	print("plotMA")
+#	plotMA(dds)
+#	print("results")
+#	res <- results(dds)
+#	print("plotMA")
+#	plotMA(res)
+#
+#	# using rlog transformed data:
+#	#dds <- makeExampleDESeqDataSet(betaSD=1)
+#	print("rlog")
+#	rld <- rlog(dds)
+#	print("plotPCA")
+#	#plotPCA(rld)
+#	plotPCA(rld, intgroup=c( 'disease' ))
+#	# also possible to perform custom transformation:
+#	print("estimateSizeFactors")
+#	dds <- estimateSizeFactors(dds)
+#	# shifted log of normalized counts
+#	print("SummarizedExperiment")
+#	se <- SummarizedExperiment(log2(counts(dds, normalized=TRUE) + 1), colData=colData(dds))
+#
+#	# the call to DESeqTransform() is needed to
+#	# trigger our plotPCA method.
+#	print("plotPCA")
+#	#plotPCA( DESeqTransform( se ) )
+#	plotPCA( DESeqTransform( se ), intgroup=c( 'disease' ) )
+#
+#	print("estimateSizeFactors")
+#	dds <- estimateSizeFactors(dds)
+#	print("plotSparsity")
+#	plotSparsity(dds)
+#
+#	print("varianceStabilizingTransformation")
+#	vsd <- varianceStabilizingTransformation(dds)
+#	print("dist(t(assay(vsd)))")
+#	dists <- dist(t(assay(vsd)))
+#	print("plot(hclust(dists))")
+#	plot(hclust(dists))
+#
