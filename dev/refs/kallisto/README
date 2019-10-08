@@ -35,3 +35,21 @@ kallisto index --index $b $f
 done
 
 
+kallisto index --kmer-size=15 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=15 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+kallisto index --kmer-size=21 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=21 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=21 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+NO - kallisto index --kmer-size=23 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+NO - kallisto index --kmer-size=23 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+NO - kallisto index --kmer-size=23 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+The shortest mature reference is 16bp so should use a kmer size less than that
+
+kallisto index --kmer-size=15 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=15 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa 
+

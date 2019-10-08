@@ -1,0 +1,33 @@
+
+
+
+$ cat adapters-given.fa 
+>Read 1
+AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+>Read 2
+AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+
+
+nohup samtools view -c /raid/data/raw/CCLS/bam/983899.recaled.bam > 983899.read.count.txt &
+
+nohup samtools fastq /raid/data/raw/CCLS/bam/983899.recaled.bam | grep -c AGATCGGAAGAGCACACGTCTGAACTCCAGTCA > 983899.adapter1.count.txt &
+
+nohup samtools fastq /raid/data/raw/CCLS/bam/983899.recaled.bam | grep -c AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT > 983899.adapter2.count.txt &
+
+nohup ~/.local/bbmap_38.68/bbmerge.sh in1=<( samtools fastq -f 64 /raid/data/raw/CCLS/bam/983899.recaled.bam ) in2=<( samtools fastq -f 128 /raid/data/raw/CCLS/bam/983899.recaled.bam ) outa=adapters-found.fa > bbmerge.out 2> bbmerge.err &
+
+
+It seems that bbmerge infers file type by extension so the redirects fail.
+
+It also seems that it would expect that bam files need to be sorted by name.
+
+
+
+
+
+nohup samtools fastq /raid/data/raw/CCLS/bam/983899.recaled.bam | ~/.local/bbmap_38.68/bbduk.sh in=stdin.fq out=983899.trimmed.fastq ref=adapters-given.fa ktrim=r k=23 mink=11 hdist=1 tbo ordered=t > bbduk.out 2> bbduk.err &
+
+
+Nope
+
+

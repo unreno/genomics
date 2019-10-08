@@ -46,7 +46,7 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 
 	done
 
-	for ref in mature ; do
+	for ref in mature mirna ; do
 
 		#	G,20,8 = 20 + 8 * ln(x) where x is ~150 ~> 60
 		#	G,1,8 = 1 + 8 * ln(x) where x is ~150  ~> 40
@@ -68,7 +68,29 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 	done
 
 	#for ref in viral.masked hairpin mature ; do
-	for ref in hairpin mature ; do
+	for ref in hairpin mature mirna ; do
+
+		f="${base}.${ref}"
+		if [ -e "${f}" ] && [ ! -w "${f}" ] ; then
+			echo "Write protected ${f} exists. Skipping"
+		else
+			echo "Running kallisto"
+
+			kallisto quant -b 40 --threads 40 \
+				--pseudobam \
+				--single-overhang --single -l 146.0 -s 17.6 \
+				--index /raid/refs/kallisto/${ref}.idx \
+				--output-dir ./${f} \
+				${fastq}
+
+			chmod a-w ${f}
+
+			kallistostatus=$?
+			if [ $kallistostatus -ne 0 ] ; then
+				echo "Kallisto failed." 
+				mv ${f} ${f}.FAILED
+			fi
+		fi
 
 		f=${base}.${ref}.e2e.bam
 		if [ -f $f ] && [ ! -w $f ] ; then
@@ -82,29 +104,33 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 			chmod a-w $f
 		fi
 
-		f=${base}.${ref}.loc.bam.counts
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			#samtools view -f  64 -F 4 ${base}.${ref}.loc.bam | awk '{print $1"/1",$3}' >  ${f}.tmp
-			#samtools view -f 128 -F 4 ${base}.${ref}.loc.bam | awk '{print $1"/2",$3}' >> ${f}.tmp
-			#sort ${f}.tmp | uniq | awk '{print $2}' | sort | uniq -c > ${f}
+		for x in loc e2e ; do
 
-			#	first awk/sort/uniq is to ensure that a read doesn't get counted for aligning
-			#	to the same ref multiple times (really only needed for blast output)
-			#samtools view -F 4 ${base}.${ref}.loc.bam | awk '{print $1,$3}' | sort | uniq | awk '{print $2}' | sort | uniq -c > ${f}
+			f=${base}.${ref}.${x}.bam.counts
+			if [ -f $f ] && [ ! -w $f ] ; then
+				echo "Write-protected $f exists. Skipping."
+			else
+				echo "Creating $f"
+				#samtools view -f  64 -F 4 ${base}.${ref}.${x}.bam | awk '{print $1"/1",$3}' >  ${f}.tmp
+				#samtools view -f 128 -F 4 ${base}.${ref}.${x}.bam | awk '{print $1"/2",$3}' >> ${f}.tmp
+				#sort ${f}.tmp | uniq | awk '{print $2}' | sort | uniq -c > ${f}
+	
+				#	first awk/sort/uniq is to ensure that a read doesn't get counted for aligning
+				#	to the same ref multiple times (really only needed for blast output)
+				#samtools view -F 4 ${base}.${ref}.${x}.bam | awk '{print $1,$3}' | sort | uniq | awk '{print $2}' | sort | uniq -c > ${f}
+	
+				echo "ref ${base}" > ${f}
+				samtools view -F 4 ${base}.${ref}.${x}.bam | awk '{print $3}' | sort | uniq -c | awk '{print $2,$1}' >> ${f}
+				c=$( grep -c "^>" ${base}.fa )
+				echo "total_reads ${c}" >> ${f}
+	
+				a=$( samtools view -c -F 4 ${base}.${ref}.${x}.bam )
+				echo "unaligned $[${c}-${a}]" >> ${f}
+	
+				chmod a-w $f
+			fi
 
-			echo "ref ${base}" > ${f}
-			samtools view -F 4 ${base}.${ref}.loc.bam | awk '{print $3}' | sort | uniq -c | awk '{print $2,$1}' >> ${f}
-			c=$( grep -c "^>" ${base}.fa )
-			echo "total_reads ${c}" >> ${f}
-
-			a=$( samtools view -c -F 4 ${base}.${ref}.loc.bam )
-			echo "unaligned $[${c}-${a}]" >> ${f}
-
-			chmod a-w $f
-		fi
+		done
 
 	done
 
@@ -191,5 +217,17 @@ done
 #
 #done
 
+
+
+
+for ref in hairpin mature mirna ; do
+
+	paste *.${ref}/abundance.tsv | cut -f "1,2,$(seq 5 5 385 | tr '\n' ',' | sed 's/,$//i' )" > ${ref}.transcript_tpms_all_samples.tsv
+	ls -1 *.${ref}/abundance.tsv | perl -ne 'chomp $_; if ($_ =~ /(\S+)\.\w+\/abundance\.tsv/){print "\t$1"}' | perl -ne 'print "target_id\tlength$_\n"' > ${ref}.header.tsv
+	cat ${ref}.header.tsv ${ref}.transcript_tpms_all_samples.tsv | grep -v "tpm" > ${ref}.transcript_tpms_all_samples.tsv2
+	mv ${ref}.transcript_tpms_all_samples.tsv2 ${ref}.transcript_tpms_all_samples.tsv
+	rm -f ${ref}.header.tsv
+
+done
 
 

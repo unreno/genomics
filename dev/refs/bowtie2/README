@@ -21,4 +21,5 @@ sed '/^>/! s/U/T/g'
 
 bowtie2-build ../fasta/human_hairpin.ACTG.fa hairpin
 bowtie2-build ../fasta/human_mature.ACTG.fa mature
+bowtie2-build ../fasta/human_mirna.ACTG.fa mirna
 

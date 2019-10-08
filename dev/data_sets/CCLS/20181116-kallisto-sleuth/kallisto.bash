@@ -56,7 +56,7 @@ for normalbam in /raid/data/raw/CCLS/bam/GM_*.recaled.bam ; do
 				kallistostatus=$?
 				if [ $kallistostatus -ne 0 ] ; then
 					echo "Kallisto failed." 
-					mv ${basename}.Homo_sapiens.GRCh38.rna ${basename}.Homo_sapiens.GRCh38.rna.FAILED
+					mv ${base}.Homo_sapiens.GRCh38.rna ${base}.Homo_sapiens.GRCh38.rna.FAILED
 				fi
 			fi
 

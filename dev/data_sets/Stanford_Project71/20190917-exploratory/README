@@ -51,8 +51,34 @@ hsa-2-*
 hsa-...-*
 
 
+Awk Sum Squares Standard Deviation (stddev)
+
+zcat /raid/data/raw/Stanford_Project71/test2/R1.bbduk.fastq.gz /raid/data/raw/Stanford_Project71/test2/R2.bbduk.fastq.gz | paste - - - - | cut -f 2 | awk '{ l=length; sum+=l; sumsq+=(l)^2; print "Avg:",sum/NR,"\tStddev:\t"sqrt((sumsq-sum^2/NR)/NR)}'
+
+Avg: 146.042 	Stddev:	17.6123
+
+
+REF /home/jake/.github/unreno/genomics/dev/data_sets/CCLS/20181116-kallisto-sleuth
+
+Made mature, hairpin and mirna indexes with kmer size of 21. Default of 31 found virtually no mature sequences.
+Produced a lot of "-nan" entries
+The shortest mature reference is 16bp so should use a kmer size less than that.
+
+kallisto index --kmer-size=15 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=15 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+
+
 
 ./process.bash
 ./merge.py
+
+
+Awaiting Meta Data
+
 ./deseq2.py
+
+./sleuth.Rscript
+
 
