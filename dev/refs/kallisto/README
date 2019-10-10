@@ -53,3 +53,14 @@ kallisto index --kmer-size=15 --index mirna.idx ../fasta/human_mirna.ACTG.fa
 kallisto index --kmer-size=15 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
 kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa 
 
+kallisto index --kmer-size=13 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=13 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=13 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+kallisto index --kmer-size=11 --index mirna.idx ../fasta/human_mirna.ACTG.fa 
+kallisto index --kmer-size=11 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
+kallisto index --kmer-size=11 --index mature.idx ../fasta/human_mature.ACTG.fa 
+
+
+
+

@@ -8,7 +8,14 @@ echo "id,disease,sex,age,cardiopathy,diabetic,neuropathy" > metadata.csv
 awk 'BEGIN{FS="\t";OFS=","}(NR>1){print $33,$12,$8,$9,$13,$14,$16}' /raid/data/raw/E-GEOD-105052/E-GEOD-105052.sdrf.txt | sed 's/ /_/g' >> metadata.csv
 
 
+cat /raid/data/raw/E-GEOD-105052/fastq/trimmed/*.fastq | paste - - - - | cut -f 2 | awk '{ l=length; sum+=l; sumsq+=(l)^2; print "Avg:",sum/NR,"\tStddev:\t"sqrt((sumsq-sum^2/NR)/NR)}'
+
+Avg: 42.4732 	Stddev:	5.46411
+
+
+
 ./process.bash
 ./merge.py
-./deseq2.py
+
+./deseq2.R
 

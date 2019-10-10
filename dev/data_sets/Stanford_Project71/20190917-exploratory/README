@@ -68,6 +68,13 @@ kallisto index --kmer-size=15 --index mirna.idx ../fasta/human_mirna.ACTG.fa
 kallisto index --kmer-size=15 --index hairpin.idx ../fasta/human_hairpin.ACTG.fa 
 kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa 
 
+Sleuth errors on mature, likely because the numbers are so small.
+Should probably use smaller kmers.
+
+
+
+
+
 
 
 
@@ -77,7 +84,7 @@ kallisto index --kmer-size=15 --index mature.idx ../fasta/human_mature.ACTG.fa
 
 Awaiting Meta Data
 
-./deseq2.py
+./deseq2.R
 
 ./sleuth.Rscript
 

@@ -1,0 +1,24 @@
+
+
+
+Unaligned fastq data should be canonical as we don't know which direction it is.
+
+nohup hawk_countKmers.bash -s /raid/data/raw/Stanford_Project71/fastq-bbmap-given -u .fastq -k 13 --canonical >> countKmers.out 2>&1 &
+
+
+
+
+This is all expecting "Case" and "Control".
+
+gwas_info.txt MUST be TAB separated.
+
+tail -n +2 /raid/data/raw/Stanford_Project71/metadata.csv | sed 's/,/\tF\t/' > gwas_info.txt
+
+
+
+This is with kmersize of 13
+
+
+nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
+
+

@@ -95,6 +95,33 @@ for fastq in /raid/data/raw/E-GEOD-105052/fastq/trimmed/*.fastq ; do
 
 	done
 
+	for ref in mirna hairpin mature ; do
+
+		f="${base}.${ref}"
+		if [ -e "${f}" ] && [ ! -w "${f}" ] ; then
+			echo "Write protected ${f} exists. Skipping"
+		else
+			echo "Running kallisto"
+
+			kallisto quant -b 40 --threads 40 \
+				--pseudobam \
+				--single-overhang --single -l 42.4732 -s 5.46411 \
+				--index /raid/refs/kallisto/${ref}.idx \
+				--output-dir ./${f} \
+				${fastq}
+
+			chmod a-w ${f}
+
+			kallistostatus=$?
+			if [ $kallistostatus -ne 0 ] ; then
+				echo "Kallisto failed." 
+				mv ${f} ${f}.FAILED
+			fi
+		fi
+
+	done
+
+
 #		f=${base}.fa
 #		if [ -f $f ] && [ ! -w $f ] ; then
 #			echo "Write-protected $f exists. Skipping."
@@ -177,5 +204,18 @@ done
 #
 #done
 
+
+
+
+
+for ref in hairpin mature mirna ; do
+
+	paste *.${ref}/abundance.tsv | cut -f "1,2,$(seq 5 5 385 | tr '\n' ',' | sed 's/,$//i' )" > ${ref}.transcript_tpms_all_samples.tsv
+	ls -1 *.${ref}/abundance.tsv | perl -ne 'chomp $_; if ($_ =~ /(\S+)\.\w+\/abundance\.tsv/){print "\t$1"}' | perl -ne 'print "target_id\tlength$_\n"' > ${ref}.header.tsv
+	cat ${ref}.header.tsv ${ref}.transcript_tpms_all_samples.tsv | grep -v "tpm" > ${ref}.transcript_tpms_all_samples.tsv2
+	mv ${ref}.transcript_tpms_all_samples.tsv2 ${ref}.transcript_tpms_all_samples.tsv
+	rm -f ${ref}.header.tsv
+
+done
 
 

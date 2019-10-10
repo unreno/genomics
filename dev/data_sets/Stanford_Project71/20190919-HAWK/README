@@ -13,8 +13,15 @@ Something like
 
 ls /raid/data/raw/MS/*bam | xargs -n 1 basename  | sed -e 's".bam""' | awk '{tn="Case";sex="U"}(/^K/){tn="Control"}{print $1"\t"sex"\t"tn }' > gwas_info.txt
 
-This is all expecting "Case" and "Control".
+This is all expecting "Case" and "Control" TO BE LAST
 
+gwas_info.txt MUST be TAB separated.
+
+tail -n +2 /raid/data/raw/Stanford_Project71/metadata.csv | sed 's/,/\tF\t/' > gwas_info.txt
+
+
+
+This is with kmersize above of 31
 
 
 nohup hawk_runHawk.bash >> runHawk.out 2>&1 &

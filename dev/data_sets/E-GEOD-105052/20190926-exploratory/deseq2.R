@@ -58,9 +58,12 @@ summary(res) #summary of results
 
 
 plotMA( res, ylim = c(-1, 1) )
+plotMA( res, ylim = c(-2, 2) )
+plotMA( res, ylim = c(-5, 5) )
 
 
 plotDispEsts( dds, ylim = c(1e-6, 1e1) )
+plotDispEsts( dds, ylim = c(1e-6, 1e4) )
 
 
 hist( res$pvalue, breaks=20, col="grey" )
@@ -72,18 +75,11 @@ head(res)
 
 par(mfrow=c(2,3))
 
-for( id in rownames(res[1:6,])){
+for( id in rownames(res[1:12,])){
 	print(id)
 	#plotCounts(dds, gene=id, intgroup=c('disease','sex'))
 	plotCounts(dds, gene=id, intgroup=c('disease'))
 }
-#	plotCounts(dds, gene="ENSG00000152583", intgroup="dex")
-#	plotCounts(dds, gene="ENSG00000179094", intgroup="dex")
-#	plotCounts(dds, gene="ENSG00000116584", intgroup="dex")
-#	plotCounts(dds, gene="ENSG00000189221", intgroup="dex")
-#	plotCounts(dds, gene="ENSG00000120129", intgroup="dex")
-#	plotCounts(dds, gene="ENSG00000148175", intgroup="dex")
-
 
 
 
@@ -97,6 +93,25 @@ with(res, plot(log2FoldChange, -log10(pvalue), pch=20, main="Volcano plot", xlim
 with(subset(res, padj<.01 ), points(log2FoldChange, -log10(pvalue), pch=20, col="blue"))
 with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="red"))
 
+with(subset(res, padj<.001 ), points(log2FoldChange, -log10(pvalue), pch=20, col="green"))
+with(subset(res, padj<.001 & abs(log2FoldChange)>2), points(log2FoldChange, -log10(pvalue), pch=20, col="yellow"))
+
+#legend("topright",
+#	c('a','b','c','d','e'),
+#	col=c(2:5,1))
+legend("topright",
+	legend=c('All','padj<0.01','padj<0.01 & abs>2','padj<0.001','padj<0.001 & abs>2'),
+	col=c('black','blue','red','green','yellow'),
+	pch = 20,
+	lty=1:2, cex=0.8)
+
+
+
+#	col=c('black','blue','red','green','yellow'))
+#						c(species.interest, "Noise"),
+#						lty=rep(1, length(species.interest)+1),
+#						cex=1.5,
+#						col=c((1+1):(length(species.interest)+1),1))
 
 
 #
@@ -113,40 +128,51 @@ with(subset(res, padj<.01 & abs(log2FoldChange)>2), points(log2FoldChange, -log1
 
 #	From manual https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
 
-print("DESeq")
-dds <- DESeq(dds)
-print("plotMA")
-plotMA(dds)
-print("results")
-res <- results(dds)
-print("plotMA")
-plotMA(res)
+#	print("DESeq")
+#	dds <- DESeq(dds)
+#	print("plotMA")
+#	plotMA(dds)
+#	print("results")
+#	res <- results(dds)
+#	print("plotMA")
+#	plotMA(res)
 
 # using rlog transformed data:
 #dds <- makeExampleDESeqDataSet(betaSD=1)
+
+
+
 print("rlog")
 rld <- rlog(dds)
 print("plotPCA")
 #plotPCA(rld)
 plotPCA(rld, intgroup=c( 'disease' ))
+
+
+
+
 # also possible to perform custom transformation:
 print("estimateSizeFactors")
 dds <- estimateSizeFactors(dds)
 # shifted log of normalized counts
 print("SummarizedExperiment")
 se <- SummarizedExperiment(log2(counts(dds, normalized=TRUE) + 1), colData=colData(dds))
-
 # the call to DESeqTransform() is needed to
 # trigger our plotPCA method.
 print("plotPCA")
 #plotPCA( DESeqTransform( se ) )
 plotPCA( DESeqTransform( se ), intgroup=c( 'disease' ) )
 
+
+
+#	Concentration of counts over total sum of counts
 print("estimateSizeFactors")
 dds <- estimateSizeFactors(dds)
 print("plotSparsity")
 plotSparsity(dds)
 
+
+#	Cluster Dendrogram
 print("varianceStabilizingTransformation")
 vsd <- varianceStabilizingTransformation(dds)
 print("dist(t(assay(vsd)))")

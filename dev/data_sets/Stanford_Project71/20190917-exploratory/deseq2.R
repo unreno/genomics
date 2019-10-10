@@ -28,13 +28,21 @@
 #head(dat_csv)
 
 
+pdf("DESeq2.plots.pdf")
 
 #	BiocManager::install(c('DESeq2','parathyroidSE'))
 library( "DESeq2" )
 df = read.csv('mirna.loc.bam.counts.csv')
+#df = read.csv('hairpin.loc.bam.counts.csv')
+#df = read.csv('mature.loc.bam.counts.csv')
 head(df)
 
-metadata = read.csv('metadata.csv')
+message("Reading metadata.csv")
+metadata = read.csv('metadata.csv',
+	header=TRUE,
+	stringsAsFactors = FALSE,
+	colClasses='character')
+
 print(metadata)
 
 dds <- DESeqDataSetFromMatrix(
@@ -70,6 +78,14 @@ hist( res$pvalue, breaks=20, col="grey" )
 
 res <- res[order(res$padj),]
 head(res)
+
+message("Looping over top 5")
+for(gene in row.names(head(res,5))){
+	message(gene)
+	print(plotCounts(dds, gene=gene, intgroup="cc"))
+}
+message("end loop over top 5")
+	
 
 
 #	par(mfrow=c(2,3))

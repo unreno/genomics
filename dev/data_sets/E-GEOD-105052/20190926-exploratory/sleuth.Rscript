@@ -34,12 +34,13 @@ for( val in c( 'mature','hairpin','mirna' ) ){
 	
 	#	specify colClasses as sample ids are numbers and R will strip leading zeroes
 	message("Reading metadata.csv")
-	metadata <- read.table('/raid/data/raw/Stanford_Project71/metadata.csv', sep=',',
+	#id,disease,sex,age,cardiopathy,diabetic,neuropathy
+	metadata <- read.table('metadata.csv', sep=',',
 		header=TRUE,
 		stringsAsFactors = FALSE,
 		colClasses='character')
 	
-	metadata <- dplyr::select(metadata, c( 'id','cc') )
+	metadata <- dplyr::select(metadata, c( 'id','disease') )
 	
 	metadata[is.na(metadata)] <- 0
 	
@@ -121,7 +122,7 @@ for( val in c( 'mature','hairpin','mirna' ) ){
 	#	  contrasts can be applied only to factors with 2 or more levels
 	message("Fitting full")
 	#so <- sleuth_fit(so, ~gender+smoke+tissue, 'full')
-	so <- sleuth_fit(so, ~cc, 'full')
+	so <- sleuth_fit(so, ~disease, 'full')
 	
 	message("Fitting reduced")
 	#so <- sleuth_fit(so, ~gender+smoke, 'reduced')
@@ -163,15 +164,15 @@ for( val in c( 'mature','hairpin','mirna' ) ){
 	sleuth_table_select <- dplyr::filter(sleuth_table, qval <= 0.05)
 	print(head(sleuth_table_select,20))
 	
-	message("Looping over top 5")
+	message("Looping over top 10")
 	#print(head(sleuth_table[order(sleuth_table$pval),],5)[['target_id']])
-	for(ref in head(sleuth_table[order(sleuth_table$pval),],5)[['target_id']]){
+	for(ref in head(sleuth_table[order(sleuth_table$pval),],10)[['target_id']]){
 #	for(ref in head(sleuth_table[order(sleuth_table$pval),],5) ){
 ##		print(plot_bootstrap(so, ref$target_id, units = "est_counts", color_by = "cc"))
 		print(ref)
-		print(plot_bootstrap(so, ref, units = "est_counts", color_by = "cc"))
+		print(plot_bootstrap(so, ref, units = "est_counts", color_by = "disease"))
 	}
-	message("end loop over top 5")
+	message("end loop over top 10")
 	
 	#print(plot_bootstrap(so, "hsa-mir-3908-hairpin", units = "est_counts", color_by = "cc"))
 	#print(plot_bootstrap(so, "hsa-mir-4430-hairpin", units = "est_counts", color_by = "cc"))
@@ -204,11 +205,11 @@ for( val in c( 'mature','hairpin','mirna' ) ){
 	#	plot_pca(so, color_by = 'tissue')
 	
 	
-	message("plot_pca(so, color_by = 'cc')")
-	print(plot_pca(so, color_by = 'cc'))
+	message("plot_pca(so, color_by = 'disease')")
+	print(plot_pca(so, color_by = 'disease'))
 	
-	message("plot_pca(so, text_labels = TRUE, color_by = 'cc')")
-	print(plot_pca(so, text_labels = TRUE, color_by = 'cc'))
+	message("plot_pca(so, text_labels = TRUE, color_by = 'disease')")
+	print(plot_pca(so, text_labels = TRUE, color_by = 'disease'))
 	
 	
 	

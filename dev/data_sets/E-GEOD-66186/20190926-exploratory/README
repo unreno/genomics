@@ -9,5 +9,5 @@ awk 'BEGIN{FS="\t";OFS=","}(NR>1){print $32,$36,$38}' /raid/data/raw/E-GEOD-6618
 
 ./process.bash
 ./merge.py
-./deseq2.py
+./deseq2.R
 
