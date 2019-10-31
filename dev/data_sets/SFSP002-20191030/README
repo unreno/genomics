@@ -1,0 +1,9 @@
+
+
+lftp -c 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true; open -u r191007_150PE_MS2_150PEnano_Francis,AiWohngaiwo9Noh -e "mirror -c; quit" ftp://gslanalyzer.qb3.berkeley.edu:990'
+
+
+lftp -u r191007_150PE_MS2_150PEnano_Francis,AiWohngaiwo9Noh -e 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true' ftp://gslanalyzer.qb3.berkeley.edu:990
+
+
+

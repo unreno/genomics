@@ -1,0 +1,15 @@
+
+
+
+
+#	nohup aws --profile herv s3 sync --delete s3://herv/ /data/shared/francislab/s3/herv/
+
+
+
+#	nohup wget --no-clobber --recursive http://sfgf-download-2.stanford.edu/~sfgf/191008_J00118_0508_AHCHWFBBXY-SFGF-Shaw-GS-13361/ &
+
+
+for f in $PWD/191008_J00118_0508_AHCHWFBBXY-L00*tar ; do echo $f ; echo "tar -C $PWD -xvf $f" | qsub ; done
+
+
+

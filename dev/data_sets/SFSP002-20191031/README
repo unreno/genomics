@@ -1,0 +1,23 @@
+
+
+
+Find and trim adapters ( but shouldn't be any )
+
+
+Find barcodes
+
+Re-demultiplex based on barcodes
+
+Send largest fasta files to Shahil
+
+
+
+collapse / consensus on UMI
+
+
+
+align to hg38 / NA12878
+
+
+HERV/SVA search
+

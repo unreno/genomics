@@ -1,11 +1,100 @@
 
-
-Getting this monster for testing
-
-nohup wget --background ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Homo_sapiens/UCSC/hg19/Homo_sapiens_UCSC_hg19.tar.gz
-
+#	Getting this monster for testing.
+#	nohup wget --background ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Homo_sapiens/UCSC/hg19/Homo_sapiens_UCSC_hg19.tar.gz
+#	nohup wget --background ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Homo_sapiens/UCSC/hg38/Homo_sapiens_UCSC_hg38.tar.gz
 
 
-nohup wget --background ftp://igenome:G3nom3s4u@ussd-ftp.illumina.com/Homo_sapiens/UCSC/hg38/Homo_sapiens_UCSC_hg38.tar.gz
+
+##################################################
+#	UCSF
+
+
+https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.gz
+https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.fa.masked.gz
+
+https://ftp.ncbi.nih.gov/refseq/H_sapiens/
+https://ftp.ncbi.nih.gov/refseq/H_sapiens/annotation/GRCh38_latest/refseq_identifiers/
+https://ftp.ncbi.nih.gov/refseq/H_sapiens/mRNA_Prot/
+https://ftp.ncbi.nih.gov/refseq/H_sapiens/RefSeqGene/
+rsync -avz --progress --include=README --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/H_sapiens/mRNA_Prot/ mRNA_Prot/
+rsync -avz --progress --include=README.txt --include="*fna.gz" --include="*gtf.gz" --exclude="*" rsync://ftp.ncbi.nih.gov/refseq/H_sapiens/RefSeqGene/ RefSeqGene/
+ls -1 $PWD/refseq/mRNA_Prot/human.*.rna.fna.gz | paste -sd ,
+ls -1 $PWD/refseq/RefSeqGene/refseqgene.*.genomic.fna.gz | paste -sd ,
+
+
+wget ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz
+wget ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz
+wget ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3
+
+
+zcat hairpin.fa.gz | awk '(/^>/){hsa=0}(/^>hsa/){hsa=1}{if(hsa==1){print}}' | sed -e '/^>/! s/U/T/g' -e 's/miR/mir/g' > human_hairpin.ACTG.fa
+
+zcat mature.fa.gz | awk '(/^>/){hsa=0}(/^>hsa/){hsa=1}{if(hsa==1){print}}' | sed -e '/^>/! s/U/T/g' -e 's/miR/mir/g' > human_mature.ACTG.fa
+
+sed 's/ /-hairpin /' human_hairpin.ACTG.fa > human_mirna.ACTG.fa
+sed 's/ /-mature /'  human_mature.ACTG.fa >> human_mirna.ACTG.fa
+
+
+
+
+wget ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+wget ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz
+zcat Homo_sapiens.GRCh38.cdna.all.fa.gz Homo_sapiens.GRCh38.ncrna.fa.gz | gzip > Homo_sapiens.GRCh38.rna.fa.gz
+
+
+
+
+
+
+
+
+echo "bowtie2-build --threads 8 /data/shared/francislab/refs/fasta/hg38.fa.gz /data/shared/francislab/refs/bowtie2/hg38.alts" | qsub -l nodes=1:ppn=8 -l vmem=8gb
+
+echo "bowtie2-build --threads 8 /data/shared/francislab/refs/fasta/hg38.fa.masked.gz /data/shared/francislab/refs/bowtie2/hg38.alts.masked" | qsub -l nodes=1:ppn=8 -l vmem=8gb
+
+echo "bowtie2-build --threads 8 /data/shared/francislab/refs/refseq/mRNA_Prot/human.1.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.2.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.3.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.4.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.5.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.6.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.7.rna.fna.gz,/data/shared/francislab/refs/refseq/mRNA_Prot/human.8.rna.fna.gz /data/shared/francislab/refs/bowtie2/human.rna" | qsub -l nodes=1:ppn=8 -l vmem=8gb
+
+echo "bowtie2-build --threads 8 /data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.1.genomic.fna.gz,/data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.2.genomic.fna.gz,/data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.3.genomic.fna.gz,/data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.4.genomic.fna.gz,/data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.5.genomic.fna.gz /data/shared/francislab/refs/bowtie2/refseqgene.genomic" | qsub -l nodes=1:ppn=8 -l vmem=8gb
+
+
+
+
+
+kallisto
+
+
+The shortest mature reference is 16bp so should use a kmer size less than that
+
+echo "kallisto index --kmer-size=15 --index /data/shared/francislab/refs/kallisto/mirna.15.idx /data/shared/francislab/refs/fasta/human_mirna.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=15 --index /data/shared/francislab/refs/kallisto/hairpin.15.idx /data/shared/francislab/refs/fasta/human_hairpin.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=15 --index /data/shared/francislab/refs/kallisto/mature.15.idx /data/shared/francislab/refs/fasta/human_mature.ACTG.fa.gz" | qsub
+
+echo "kallisto index --kmer-size=13 --index /data/shared/francislab/refs/kallisto/mirna.13.idx /data/shared/francislab/refs/fasta/human_mirna.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=13 --index /data/shared/francislab/refs/kallisto/hairpin.13.idx /data/shared/francislab/refs/fasta/human_hairpin.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=13 --index /data/shared/francislab/refs/kallisto/mature.13.idx /data/shared/francislab/refs/fasta/human_mature.ACTG.fa.gz" | qsub
+
+echo "kallisto index --kmer-size=11 --index /data/shared/francislab/refs/kallisto/mirna.11.idx /data/shared/francislab/refs/fasta/human_mirna.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=11 --index /data/shared/francislab/refs/kallisto/hairpin.11.idx /data/shared/francislab/refs/fasta/human_hairpin.ACTG.fa.gz" | qsub
+echo "kallisto index --kmer-size=11 --index /data/shared/francislab/refs/kallisto/mature.11.idx /data/shared/francislab/refs/fasta/human_mature.ACTG.fa.gz" | qsub
+
+
+
+
+
+echo "kallisto index --index /data/shared/francislab/refs/kallisto/Homo_sapiens.GRCh38.cdna.all.idx /data/shared/francislab/refs/fasta/Homo_sapiens.GRCh38.cdna.all.fa.gz" | qsub -l vmem=16gb
+echo "kallisto index --index /data/shared/francislab/refs/kallisto/Homo_sapiens.GRCh38.ncrna.idx /data/shared/francislab/refs/fasta/Homo_sapiens.GRCh38.ncrna.fa.gz" | qsub -l vmem=16gb
+echo "kallisto index --index /data/shared/francislab/refs/kallisto/Homo_sapiens.GRCh38.rna.idx /data/shared/francislab/refs/fasta/Homo_sapiens.GRCh38.rna.fa.gz" | qsub -l vmem=16gb
+echo "kallisto index --index /data/shared/francislab/refs/kallisto/human.rna.idx /data/shared/francislab/refs/refseq/mRNA_Prot/human.*.rna.fna.gz" | qsub -l vmem=16gb
+echo "kallisto index --index /data/shared/francislab/refs/kallisto/refseqgene.idx /data/shared/francislab/refs/refseq/RefSeqGene/refseqgene.*.genomic.fna.gz" | qsub -l vmem=32gb
+
+
+
+
+subread
+
+subread-buildindex 
+echo "subread-buildindex -M 16000 -o /data/shared/francislab/refs/subread/hg38.alts /data/shared/francislab/refs/fasta/hg38.fa.gz" | qsub -l vmem=16gb
+echo "subread-buildindex -M 16000 -o /data/shared/francislab/refs/subread/hg38.alts.masked /data/shared/francislab/refs/fasta/hg38.fa.masked.gz" | qsub -l vmem=16gb
+
 
 
