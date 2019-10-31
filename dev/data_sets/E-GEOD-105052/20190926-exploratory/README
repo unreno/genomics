@@ -14,7 +14,8 @@ Avg: 42.4732 	Stddev:	5.46411
 
 
 
-./process.bash
+nohup ./process.bash &
+
 ./merge.py
 
 ./deseq2.R

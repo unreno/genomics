@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+pdf('deseq.pdf')
+
 #setwd(‘temp/’)
 #filenames <- list.files(
 #	pattern=".mature.loc.bam.counts",

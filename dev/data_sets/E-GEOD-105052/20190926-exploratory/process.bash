@@ -12,6 +12,19 @@ for fastq in /raid/data/raw/E-GEOD-105052/fastq/trimmed/*.fastq ; do
 
 	echo $base
 
+	f=${base}.subread.bam
+	if [ -f $f ] && [ ! -w $f ] ; then
+		echo "Write-protected $f exists. Skipping."
+	else
+		echo "Creating $f"
+		#	http://bioinf.wehi.edu.au/subread/
+		#	-t (type 0 for rna, 1 for dna)
+		#	-a /raid/refs/mirbase-hsa.gff3 \
+		subread-align -t 0 -T 40 -i /raid/refs/subread/hg38 -r ${fastq} \
+			-o ${f} > ${f}.subread.out.txt 2> ${f}.subread.err.txt
+		chmod a-w $f
+	fi
+
 	#for ref in viral.masked hairpin ; do
 	for ref in hairpin ; do
 	
@@ -217,5 +230,33 @@ for ref in hairpin mature mirna ; do
 	rm -f ${ref}.header.tsv
 
 done
+
+
+
+f=subread.hairpin.featureCounts.csv
+if [ -f $f ] && [ ! -w $f ] ; then
+	echo "Write-protected $f exists. Skipping."
+else
+	echo "Creating $f"
+	#	hairpin = miRNA_primary_transcript
+	#	mature = miRNA
+	featureCounts -t miRNA_primary_transcript -g Name \
+		-a /raid/refs/mirbase-hsa.gff3 \
+		-o ${f} *.subread.bam
+	chmod a-w $f
+fi
+
+f=subread.mature.featureCounts.csv
+if [ -f $f ] && [ ! -w $f ] ; then
+	echo "Write-protected $f exists. Skipping."
+else
+	echo "Creating $f"
+	#	hairpin = miRNA_primary_transcript
+	#	mature = miRNA
+	featureCounts -t miRNA -g Name \
+		-a /raid/refs/mirbase-hsa.gff3 \
+		-o ${f} *.subread.bam
+	chmod a-w $f
+fi
 
 

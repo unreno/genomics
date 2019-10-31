@@ -6,22 +6,13 @@ set -u	#	Error on usage of unset variables
 set -o pipefail
 
 
+for r1 in /raid/data/raw/Stanford_Project71/fastq-bbmap-laned-given/*R1.fastq ; do
+	r2=${r1/_R1/_R2}
+	echo $r1 $r2
+	base=$( basename $r1 _R1.fastq )
 
-#for r1 in /raid/data/raw/Stanford_Project71/71-*_S*_L001_R1_001.fastq.gz ; do
-#	#	71-9_S9_L001_R1_001.fastq.gz
-#	r2=${r1/_R1/_R2}
-#
-#	base=$(basename $r1 _L001_R1_001.fastq.gz) 
-#	base=${base/71-/}
-#	base=${base/_S*/}
-
-#for r1 in /raid/data/raw/Stanford_Project71/fastq-bbmap-laned-2/*R1.fastq ; do
-#	r2=${r1/_R1/_R2}
-#	echo $r1 $r2
-#	base=$( basename $r1 _R1.fastq )
-
-for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
-	base=$( basename $fastq .fastq )
+#for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
+#	base=$( basename $fastq .fastq )
 
 	echo $base
 
@@ -34,9 +25,7 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 		#	http://bioinf.wehi.edu.au/subread/
 		#	-t (type 0 for rna, 1 for dna)
 		#	-a /raid/refs/mirbase-hsa.gff3 \
-		subread-align -t 0 -T 40 -i /raid/refs/subread/hg38 -r ${fastq} \
-
-	
+		subread-align -t 0 -T 40 -i /raid/refs/subread/hg38 -r ${r1} -R ${r2} \
 			-o ${f} > ${f}.subread.out.txt 2> ${f}.subread.err.txt
 		chmod a-w $f
 	fi
@@ -52,8 +41,8 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			#bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -1 ${r1} -2 ${r2} \
-			bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -U ${fastq} \
+			#bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -U ${fastq} \
+			bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -1 ${r1} -2 ${r2} \
 				--score-min G,1,7 \
 				--no-unal 2> ${f}.bowtie2.err \
 				| samtools view -o ${f} - #> ${f}.samtools.log 2> ${f}.samtools.err
@@ -73,8 +62,8 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			#bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -1 ${r1} -2 ${r2} \
-			bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -U ${fastq} \
+			#bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -U ${fastq} \
+			bowtie2 --xeq --threads 40 --very-sensitive-local -x ${ref} -1 ${r1} -2 ${r2} \
 				--score-min G,1,6 \
 				--no-unal 2> ${f}.bowtie2.err \
 				| samtools view -o ${f} - #> ${f}.samtools.log 2> ${f}.samtools.err
@@ -89,7 +78,8 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 	else
 		echo "Creating $f"
 		#cat $r1 $r2 | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' -e 's/ (.)/\/\1 /'  -e 's/ .*$//' > ${f}
-		cat $fastq | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' > ${f}
+		cat $r1 $r2 | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' > ${f}
+		#cat $fastq | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' > ${f}
 		chmod a-w $f
 	fi
 
@@ -107,7 +97,7 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 				--single-overhang --single -l 146.0 -s 17.6 \
 				--index /raid/refs/kallisto/${ref}.idx \
 				--output-dir ./${f} \
-				${fastq}
+				${r1} ${r2}
 
 			chmod a-w ${f}
 
@@ -123,8 +113,8 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			#bowtie2 --xeq --threads 40 --very-sensitive -x ${ref} -1 ${r1} -2 ${r2} \
-			bowtie2 --xeq --threads 40 --very-sensitive -x ${ref} -U ${fastq} \
+			#bowtie2 --xeq --threads 40 --very-sensitive -x ${ref} -U ${fastq} \
+			bowtie2 --xeq --threads 40 --very-sensitive -x ${ref} -1 ${r1} -2 ${r2} \
 				--no-unal 2> ${f}.bowtie2.err \
 				| samtools view -o ${f} - #> ${f}.samtools.log 2> ${f}.samtools.err
 			chmod a-w $f
@@ -160,52 +150,53 @@ for fastq in /raid/data/raw/Stanford_Project71/fastq-bbmap-given/*.fastq ; do
 
 	done
 
-	f=${base}.pieces
-	if [ -d $f ] ; then	#	&& [ ! -w $f ] ; then
-		echo "Write-protected $f exists. Skipping."
-	else
-		echo "Creating $f"
-		mkdir $f
-		split -d --suffix-length=6 --additional-suffix=.fa --lines=100 ${base}.fa ${f}/
-		#chmod a-w $f
-	fi
 
-	#	mature hg38 nt
-	#for ref in viral.masked hairpin mature ; do
-	for ref in hairpin mature ; do
-
-		# @M04104:246:000000000-D6RBR:1:1101:13542:1883 2:N:0:CTGAAGCT+GTACTGAC
-
+#	f=${base}.pieces
+#	if [ -d $f ] ; then	#	&& [ ! -w $f ] ; then
+#		echo "Write-protected $f exists. Skipping."
+#	else
+#		echo "Creating $f"
+#		mkdir $f
+#		split -d --suffix-length=6 --additional-suffix=.fa --lines=100 ${base}.fa ${f}/
+#		#chmod a-w $f
+#	fi
+#
+#	#	mature hg38 nt
+#	#for ref in viral.masked hairpin mature ; do
+#	for ref in hairpin mature ; do
+#
+#		# @M04104:246:000000000-D6RBR:1:1101:13542:1883 2:N:0:CTGAAGCT+GTACTGAC
+#
+##		f=${base}.${ref}.blastn.tsv.gz
+##		if [ -f $f ] && [ ! -w $f ] ; then
+##			echo "Write-protected $f exists. Skipping."
+##		else
+##			echo "Creating $f"
+##			zcat $r1 $r2 | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' -e 's/ (.)/\/\1 /'  -e 's/ .*$//' | blastn -num_threads 40 -outfmt 6 -db ${ref} | gzip --best > ${f}
+##			chmod a-w $f
+##		fi
+#
+#
 #		f=${base}.${ref}.blastn.tsv.gz
 #		if [ -f $f ] && [ ! -w $f ] ; then
 #			echo "Write-protected $f exists. Skipping."
 #		else
 #			echo "Creating $f"
-#			zcat $r1 $r2 | paste - - - - | cut -f 1,2 | tr '\t' '\n' | sed -E -e 's/^@/>/' -e 's/ (.)/\/\1 /'  -e 's/ .*$//' | blastn -num_threads 40 -outfmt 6 -db ${ref} | gzip --best > ${f}
+#			ls ${base}.pieces/*fa | parallel --no-notice --joblog ${base}.${ref}.parallel.blastn.log -j40 blastn -query {} -outfmt 6 -db ${ref} -out {}.${ref}.blastn.out 2\> {}.${ref}.blastn.err
+#			cat ${base}.pieces/*fa.${ref}.blastn.out | gzip --best > ${f}
 #			chmod a-w $f
 #		fi
-
-
-		f=${base}.${ref}.blastn.tsv.gz
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			ls ${base}.pieces/*fa | parallel --no-notice --joblog ${base}.${ref}.parallel.blastn.log -j40 blastn -query {} -outfmt 6 -db ${ref} -out {}.${ref}.blastn.out 2\> {}.${ref}.blastn.err
-			cat ${base}.pieces/*fa.${ref}.blastn.out | gzip --best > ${f}
-			chmod a-w $f
-		fi
-
-		f=${base}.${ref}.blastn.tsv.gz.counts
-		if [ -f $f ] && [ ! -w $f ] ; then
-			echo "Write-protected $f exists. Skipping."
-		else
-			echo "Creating $f"
-			zcat ${base}.${ref}.blastn.tsv.gz | awk '{print $1,$2}' | sort | uniq | awk '{print $2}' | sort | uniq -c > ${f}
-			chmod a-w $f
-		fi
-
-	done
+#
+#		f=${base}.${ref}.blastn.tsv.gz.counts
+#		if [ -f $f ] && [ ! -w $f ] ; then
+#			echo "Write-protected $f exists. Skipping."
+#		else
+#			echo "Creating $f"
+#			zcat ${base}.${ref}.blastn.tsv.gz | awk '{print $1,$2}' | sort | uniq | awk '{print $2}' | sort | uniq -c > ${f}
+#			chmod a-w $f
+#		fi
+#
+#	done
 
 done 
 

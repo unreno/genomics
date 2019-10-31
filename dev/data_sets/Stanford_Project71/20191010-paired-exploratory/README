@@ -82,9 +82,9 @@ nohup ./process.bash &
 ./merge.py
 
 
-Awaiting Meta Data
 
 ./deseq2.R
+./deseq2.subread.R
 
 ./sleuth.Rscript
 

@@ -1,0 +1,5 @@
+
+
+
+nohup subread-buildindex -F -o hg38 /raid/refs/fasta/hg38.fa > subread.hg38.out 2> subread.hg38.err &
+
