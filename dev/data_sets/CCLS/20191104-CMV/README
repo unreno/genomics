@@ -1,0 +1,51 @@
+
+
+
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+out=$( basename $bam .recaled.bam )
+echo "samtools fasta $bam | gzip > ${out}.fasta.gz"
+done
+
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+out=$( basename $bam .recaled.bam )
+echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
+echo "bowtie2 --threads 5 --very-sensitive -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vs.bam -"
+echo "samtools fasta $bam | blastn -num_threads 5 -db /raid/refs/blast/virii/NC_006273.2 -outfmt 6 -out ${out}.CMV.blastn.tsv"
+done | parallel -j 8 --joblog parallel.cmv.log &
+
+
+
+
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+out=$( basename $bam .recaled.bam )
+echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
+done
+
+
+
+
+
+samtools view 120207.CMV.vsl.bam | cut -f 4 | sort | uniq -c
+
+samtools view -c -f 4 /raid/data/raw/CCLS/bam/120207.recaled.bam > 120207.unmapped.count.txt
+
+
+
+
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+out=$( basename $bam .recaled.bam )
+echo "samtools view --threads 39 -c -f 4 $bam > $out.unmapped.count.txt"
+echo "samtools view --threads 39 -c $bam > $out.count.txt"
+done
+
+
+
+echo "sample,bamcount,nonhuman,CMV" > report.tsv
+for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
+out=$( basename $bam .recaled.bam )
+bamcount=$( cat $out.count.txt )
+nonhuman=$( cat $out.unmapped.count.txt )
+CMV=$( samtools view -c ${out}.unmapped.CMV.masked.vsl.bam )
+echo -e "${out}\t${bamcount}\t${nonhuman}\t${CMV}" >> report.tsv
+done
+

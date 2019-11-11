@@ -114,5 +114,9 @@ cat /raid/refs/fasta/human_mature.ACTG.fa | makeblastdb -dbtype nucl -out mature
 
 blastdbcmd -db mature -entry all
 
+makeblastdb -in /raid/refs/fasta/virii/NC_006273.2.fasta -dbtype nucl -out virii/NC_006273.2 -title NC_006273.2 -parse_seqids
+
+
+
 
 
