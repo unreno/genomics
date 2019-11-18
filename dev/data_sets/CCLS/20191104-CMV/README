@@ -8,9 +8,9 @@ done
 
 for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
 out=$( basename $bam .recaled.bam )
-echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
-echo "bowtie2 --threads 5 --very-sensitive -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vs.bam -"
-echo "samtools fasta $bam | blastn -num_threads 5 -db /raid/refs/blast/virii/NC_006273.2 -outfmt 6 -out ${out}.CMV.blastn.tsv"
+echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virus/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
+echo "bowtie2 --threads 5 --very-sensitive -x /raid/refs/bowtie2/virus/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vs.bam -"
+echo "samtools fasta $bam | blastn -num_threads 5 -db /raid/refs/blast/virus/NC_006273.2 -outfmt 6 -out ${out}.CMV.blastn.tsv"
 done | parallel -j 8 --joblog parallel.cmv.log &
 
 
@@ -18,10 +18,11 @@ done | parallel -j 8 --joblog parallel.cmv.log &
 
 for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
 out=$( basename $bam .recaled.bam )
-echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virii/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
+echo "bowtie2 --threads 5 --very-sensitive-local -x /raid/refs/bowtie2/virus/NC_006273.2 --no-unal -U <( samtools fastq $bam ) | samtools view -o ${out}.CMV.vsl.bam -"
 done
 
 
+for f in *.unmapped.CMV.masked.vsl.bam ; do echo $f ; samtools view -c $f ; done
 
 
 
@@ -48,4 +49,137 @@ nonhuman=$( cat $out.unmapped.count.txt )
 CMV=$( samtools view -c ${out}.unmapped.CMV.masked.vsl.bam )
 echo -e "${out}\t${bamcount}\t${nonhuman}\t${CMV}" >> report.tsv
 done
+
+
+
+
+./trim_single_sided_softclipped_to_fasta.bash 439338.unmapped.CMV.masked.vsl.sorted.bam > 439338.unmapped.CMV.masked.vsl.sorted.fasta
+./trim_single_sided_softclipped_to_fasta.bash 900420.unmapped.CMV.masked.vsl.sorted.bam > 900420.unmapped.CMV.masked.vsl.sorted.fasta
+
+bowtie2 --no-unal -f --threads 40 -x hg38 --very-sensitive -U 439338.unmapped.CMV.masked.vsl.sorted.fasta | samtools view -o 439338.unmapped.CMV.masked.vsl.clipped.hg38.bam -
+
+bowtie2 --no-unal -f --threads 40 -x hg38 --very-sensitive -U 900420.unmapped.CMV.masked.vsl.sorted.fasta | samtools view -o 900420.unmapped.CMV.masked.vsl.clipped.hg38.bam -
+
+
+bowtie2 --no-unal -f --threads 40 -x virus/NC_006273.2 --very-sensitive -U 439338.unmapped.CMV.masked.vsl.sorted.fasta
+
+bowtie2 --no-unal -f --threads 40 -x virus/NC_006273.2 --very-sensitive -U 900420.unmapped.CMV.masked.vsl.sorted.fasta
+
+nohup blastn -db nt -outfmt 6 -query 439338.unmapped.CMV.masked.vsl.sorted.fasta > 439338.unmapped.CMV.masked.vsl.sorted.blastn.nt.tsv &
+nohup blastn -db nt -outfmt 6 -query 900420.unmapped.CMV.masked.vsl.sorted.fasta > 900420.unmapped.CMV.masked.vsl.sorted.blastn.nt.tsv &
+
+
+
+nohup bowtie2 --threads 20 --very-sensitive-local -x /raid/refs/bowtie2/virus/NC_006273.2 --no-unal -U <( samtools fastq /raid/data/raw/CCLS/bam/439338.recaled.bam ) | samtools view -o 439338.CMV.masked.vsl.bam - &
+nohup bowtie2 --threads 20 --very-sensitive-local -x /raid/refs/bowtie2/virus/NC_006273.2 --no-unal -U <( samtools fastq /raid/data/raw/CCLS/bam/900420.recaled.bam ) | samtools view -o 900420.CMV.masked.vsl.bam - &
+
+
+bowtie2 --no-unal --threads 40 -x 20191113/viral.masked --very-sensitive-local -U 439338.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+bowtie2 --no-unal --threads 40 -x viral.masked --very-sensitive-local -U 439338.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+
+bowtie2 --no-unal --threads 40 -x 20191113/viral.masked --very-sensitive-local -U 900420.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+bowtie2 --no-unal --threads 40 -x viral.masked --very-sensitive-local -U 900420.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+
+
+bowtie2 --no-unal --threads 40 -x NA12878 --very-sensitive-local -U 439338.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+bowtie2 --no-unal --threads 40 -x NA12878 --very-sensitive-local -U 900420.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+
+
+CCGAATTCACCATGTCT
+AGACATGGTGAATTCGG
+CCGAATTCACCATGTC
+GACATGGTGAATTCGG
+
+grep -B 1 -A 2 "^GACATGGTGAATTCGG"  900420.unmapped.CMV.masked.vsl.sorted.fastq > tmp.fastq
+grep -B 1 -A 2 "^AGACATGGTGAATTCGG" 439338.unmapped.CMV.masked.vsl.sorted.fastq >> tmp.fastq
+
+bowtie2 --threads 40 --very-sensitive -x virus/NC_006273.2 -U tmp.fastq -S /dev/null
+
+
+bowtie2 --threads 40 --very-sensitive -x virus/NC_006273.2 -U 439338.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+bowtie2 --threads 40 --very-sensitive -x virus/NC_006273.2 -U 900420.unmapped.CMV.masked.vsl.sorted.fastq -S /dev/null
+
+
+cat 439338.unmapped.CMV.masked.vsl.sorted.fastq | paste -d "\t" - - - - | cut -f 2 | sort | uniq > 439338.unmapped.CMV.masked.vsl.sorted.fastq.uniq_reads
+cat 900420.unmapped.CMV.masked.vsl.sorted.fastq | paste -d "\t" - - - - | cut -f 2 | sort | uniq > 900420.unmapped.CMV.masked.vsl.sorted.fastq.uniq_reads
+
+comm -12 *uniq_reads | awk '{print ">"NR;print}' > common_uniq_reads.fa
+bowtie2 -f --threads 40 --very-sensitive -x virus/NC_006273.2 -U common_uniq_reads.fa -S /dev/null
+
+
+
+
+
+
+
+
+
+Get the pairs that had at least one read align to CMV (most are paired, but its easier to just do this)
+
+samtools view ../439338.unmapped.CMV.masked.vsl.bam | awk -F/ '{print $1}' | sort | uniq | awk '{print "^"$0"\t"}' > 439338.list 
+samtools view ../900420.unmapped.CMV.masked.vsl.bam | awk -F/ '{print $1}' | sort | uniq | awk '{print "^"$0"\t"}' > 900420.list 
+
+samtools view -H /raid/data/raw/CCLS/bam/439338.recaled.bam > 439338.select.sam
+samtools view /raid/data/raw/CCLS/bam/439338.recaled.bam | grep -f 439338.list >> 439338.select.sam &
+samtools view -H /raid/data/raw/CCLS/bam/900420.recaled.bam > 900420.select.sam
+samtools view /raid/data/raw/CCLS/bam/900420.recaled.bam | grep -f 900420.list >> 900420.select.sam &
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UP NEXT
+
+
+Most should not have aligned because we started with unmapped.
+However, those that have a position should be noted and compared.
+
+
+samtools sort -o 439338.bam 439338.select.sam
+samtools sort -o 900420.bam 900420.select.sam
+
+samtools fastq -n -0 439338.R0.fastq -1 439338.R1.fastq -2 439338.R2.fastq -s 439338.S.fastq 439338.bam
+samtools fastq -n -0 900420.R0.fastq -1 900420.R1.fastq -2 900420.R2.fastq -s 900420.S.fastq 900420.bam
+
+ls 439339.*.fastq
+ls 900420.*.fastq
+
+bowtie2 -x CMV --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq | samtools view -o 439338.p.CMV.vs.bam
+bowtie2 -x CMV --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq | samtools view -o 439338.u.CMV.vs.bam
+bowtie2 -x CMV.masked --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq | samtools view -o 439338.p.CMV-masked.vs.bam
+bowtie2 -x CMV.masked --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq | samtools view -o 439338.u.CMV-masked.vs.bam
+
+bowtie2 -x CMV --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq | samtools view -o 900420.p.CMV.vs.bam
+bowtie2 -x CMV --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq | samtools view -o 900420.u.CMV.vs.bam
+bowtie2 -x CMV.masked --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq | samtools view -o 900420.p.CMV-masked.vs.bam
+bowtie2 -x CMV.masked --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq | samtools view -o 900420.u.CMV-masked.vs.bam
+
+
+
+VCFs?
+
+
+Share bam files
+Share fasta files for CMV and CMV.masked
+
+
+
+
+
+
+
+
+
+
+
+
 
