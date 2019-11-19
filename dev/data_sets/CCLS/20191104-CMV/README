@@ -143,25 +143,40 @@ UP NEXT
 Most should not have aligned because we started with unmapped.
 However, those that have a position should be noted and compared.
 
-
 samtools sort -o 439338.bam 439338.select.sam
 samtools sort -o 900420.bam 900420.select.sam
+
+samtools view -F 4 439338.bam | awk '{print $3,$4}'
+samtools view -F 4 900420.bam | awk '{print $3,$4}'
 
 samtools fastq -n -0 439338.R0.fastq -1 439338.R1.fastq -2 439338.R2.fastq -s 439338.S.fastq 439338.bam
 samtools fastq -n -0 900420.R0.fastq -1 900420.R1.fastq -2 900420.R2.fastq -s 900420.S.fastq 900420.bam
 
-ls 439339.*.fastq
-ls 900420.*.fastq
+ls -l 439338.*.fastq
+ls -l 900420.*.fastq
 
-bowtie2 -x CMV --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq | samtools view -o 439338.p.CMV.vs.bam
-bowtie2 -x CMV --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq | samtools view -o 439338.u.CMV.vs.bam
-bowtie2 -x CMV.masked --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq | samtools view -o 439338.p.CMV-masked.vs.bam
-bowtie2 -x CMV.masked --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq | samtools view -o 439338.u.CMV-masked.vs.bam
+No CIGAR strings in the 900420.S.fastq
 
-bowtie2 -x CMV --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq | samtools view -o 900420.p.CMV.vs.bam
-bowtie2 -x CMV --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq | samtools view -o 900420.u.CMV.vs.bam
-bowtie2 -x CMV.masked --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq | samtools view -o 900420.p.CMV-masked.vs.bam
-bowtie2 -x CMV.masked --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq | samtools view -o 900420.u.CMV-masked.vs.bam
+
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq 2> 439338.p.CMV.vs.err.txt | samtools view -o 439338.p.CMV.vs.bam 
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq 2> 439338.u.CMV.vs.err.txt | samtools view -o 439338.u.CMV.vs.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive -1 439338.R1.fastq -2 439338.R2.fastq 2> 439338.p.CMV-masked.vs.err.txt | samtools view -o 439338.p.CMV-masked.vs.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive -U 439338.R1.fastq,439338.R2.fastq 2> 439338.u.CMV-masked.vs.err.txt | samtools view -o 439338.u.CMV-masked.vs.bam 
+
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq 2> 900420.p.CMV.vs.err.txt | samtools view -o 900420.p.CMV.vs.bam 
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq 2> 900420.u.CMV.vs.err.txt | samtools view -o 900420.u.CMV.vs.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive -1 900420.R1.fastq -2 900420.R2.fastq 2> 900420.p.CMV-masked.vs.err.txt | samtools view -o 900420.p.CMV-masked.vs.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive -U 900420.R1.fastq,900420.R2.fastq 2> 900420.u.CMV-masked.vs.err.txt | samtools view -o 900420.u.CMV-masked.vs.bam 
+
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive-local -1 439338.R1.fastq -2 439338.R2.fastq 2> 439338.p.CMV.vsl.err.txt | samtools view -o 439338.p.CMV.vsl.bam 
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive-local -U 439338.R1.fastq,439338.R2.fastq 2> 439338.u.CMV.vsl.err.txt | samtools view -o 439338.u.CMV.vsl.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive-local -1 439338.R1.fastq -2 439338.R2.fastq 2> 439338.p.CMV-masked.vsl.err.txt | samtools view -o 439338.p.CMV-masked.vsl.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive-local -U 439338.R1.fastq,439338.R2.fastq 2> 439338.u.CMV-masked.vsl.err.txt | samtools view -o 439338.u.CMV-masked.vsl.bam 
+
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive-local -1 900420.R1.fastq -2 900420.R2.fastq 2> 900420.p.CMV.vsl.err.txt | samtools view -o 900420.p.CMV.vsl.bam 
+bowtie2 -x viral/NC_006273.2 --threads 40 --very-sensitive-local -U 900420.R1.fastq,900420.R2.fastq 2> 900420.u.CMV.vsl.err.txt | samtools view -o 900420.u.CMV.vsl.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive-local -1 900420.R1.fastq -2 900420.R2.fastq 2> 900420.p.CMV-masked.vsl.err.txt | samtools view -o 900420.p.CMV-masked.vsl.bam 
+bowtie2 -x viral/NC_006273.2.masked --threads 40 --very-sensitive-local -U 900420.R1.fastq,900420.R2.fastq 2> 900420.u.CMV-masked.vsl.err.txt | samtools view -o 900420.u.CMV-masked.vsl.bam 
 
 
 

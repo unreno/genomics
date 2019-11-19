@@ -3,8 +3,12 @@
 
 for bam in /raid/data/raw/CCLS/bam/*.recaled.bam ; do
 out=$( basename $bam .recaled.bam )
-echo "~/.github/zd1/telseq/bin/ubuntu/telseq ${bam} -o ${out}.telseq"
+echo "~/.github/zd1/telseq/bin/ubuntu/telseq ${bam} -o ${out}.telseq.csv"
 done | parallel -j 4 --joblog parallel.telseq.log &
+
+
+rename 's/telseq/telseq.csv/' *telseq
+
 
 
 
