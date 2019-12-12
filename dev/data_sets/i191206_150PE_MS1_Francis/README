@@ -1,0 +1,64 @@
+
+
+lftp -e 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true' gslanalyzer.qb3.berkeley.edu:990
+
+lftp -c 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true; open -e "mirror -c; quit" gslanalyzer.qb3.berkeley.edu:990'
+
+
+
+#	mkdir working
+#	cd working
+#	for f in ../Sample*_001.fastq.gz ; do
+#	#	Sample36_S36_L001_R2_001.fastq.gz
+#	l=$( basename $f _001.fastq.gz )
+#	#	Sample36_S36_L001_R2
+#	l=${l/_L001_/_}
+#	#	Sample36_S36_R2
+#	l=${l#Sample*_}
+#	#	S36_R2
+#	if [ ${#l} -eq 5 ] ; then
+#	l=${l/S/S0}
+#	fi
+#	ln -s ${f} ${l}.fastq.gz
+#	done
+#	
+#	for r1 in S*R1.fastq.gz ; do
+#	r2=${r1/R1/R2}
+#	or1=${r1/.fastq/.umi.fastq}
+#	or2=${r2/.fastq/.umi.fastq}
+#	umi_tools extract -I ${r1} --bc-pattern=NNNNNNNNN \
+#	  --read2-in=${r2} --stdout=${or1} \
+#	  --read2-out=${or2} > ${or1}.out 2> ${or1}.err
+#	done
+#	
+#	for r1 in S*R1.umi.fastq.gz ; do
+#	r2=${r1/R1/R2}
+#	base=$( basename $r1 _R1.umi.fastq.gz )
+#	for ref in hg38 NA12878 SVAs_and_HERVs_KWHE ; do
+#	bowtie2 --threads 40 -x ${ref} -1 ${r1} -2 ${r2} --very-sensitive-local 2> ${base}.${ref}.err | samtools view -o ${base}.${ref}.bam -
+#	done; done
+#	
+#	for bam in *bam ; do
+#	base=$( basename $bam .bam )
+#	umi_tools dedup -I $bam --paired -S ${base}.deduplicated.bam
+#	done
+
+
+
+
+
+
+
+Count raw bases
+
+QC
+
+Re-Demultiplex with just i7? Not i5?
+
+UMI fastq files with aryeelab/umi
+
+Same as previous HKLE-Seq
+
+
+
+
