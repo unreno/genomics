@@ -1,5 +1,13 @@
 
 
+.netrc does not work so . Scratch that.
+
+Add "machine gslanalyzer.qb3.berkeley.edu login ########## password ##########" to ~/.netrc
+
+Then DO NOT USE the "ftp://" prefix or "-u username,password" in command 
+
+
+
 lftp -e 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true' gslanalyzer.qb3.berkeley.edu:990
 
 lftp -c 'set ssl:verify-certificate no set ftp:ssl-protect-data true set ftp:ssl-force true; open -e "mirror -c; quit" gslanalyzer.qb3.berkeley.edu:990'
@@ -58,7 +66,4 @@ Re-Demultiplex with just i7? Not i5?
 UMI fastq files with aryeelab/umi
 
 Same as previous HKLE-Seq
-
-
-
 
