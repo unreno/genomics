@@ -202,3 +202,11 @@ awk '(!/^>/){print length($0)}' human_mirna.ACTG.singleline.fa | sort -n
 
 
 
+
+
+RepeatMasker limits sequence names to 50chars.
+Need to trim NA12878 assembly.
+awk '(/^>/){print substr($0,1,51);next}{print}' na12878_MaSuRCA_3.2.8_nanopore_wgs_consortium_37x_GIAB_100x.fa > na12878_MaSuRCA_3.2.8_nanopore_wgs_consortium_37x_GIAB_100x.trimmed.fa
+This is odd as it was running on my laptop without complaint. Just slow.
+
+

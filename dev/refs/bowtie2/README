@@ -23,3 +23,8 @@ bowtie2-build ../fasta/human_hairpin.ACTG.fa hairpin
 bowtie2-build ../fasta/human_mature.ACTG.fa mature
 bowtie2-build ../fasta/human_mirna.ACTG.fa mirna
 
+bowtie2-build --threads 40 ../fasta/na12878_MaSuRCA_3.2.8_nanopore_wgs_consortium_37x_GIAB_100x.scaffolds.fa NA12878
+
+bowtie2-build --threads 40 ../fasta/na12878_MaSuRCA_3.2.8_nanopore_wgs_consortium_37x_GIAB_100x.scaffolds.fa.masked NA12878.masked
+
+bowtie2-build --threads 40 ../refseq/viral/viral.fa viral

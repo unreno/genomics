@@ -1,0 +1,5 @@
+
+
+nohup kraken2-build --standard --threads 40 --db standard > kraken2-build.out.txt 2> kraken2-build.err.txt &
+
+
