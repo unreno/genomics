@@ -49,3 +49,22 @@ CMV=$( samtools view -c ${out}.unmapped.CMV.masked.vsl.bam )
 echo -e "${out}\t${bamcount}\t${nonhuman}\t${CMV}" >> report.tsv
 done
 
+
+
+
+Using end-to-end, most of these reads align.
+
+bowtie2 --threads 8 --very-sensitive -x /data/shared/francislab/refs/bowtie2/NC_006273.2 -U 439338.unmapped.CMV.masked.vsl.sorted.fastq | samtools view -o 439338.realign.CMV.vs.bam -
+bowtie2 --threads 8 --very-sensitive -x /data/shared/francislab/refs/bowtie2/NC_006273.2 -U 900420.unmapped.CMV.masked.vsl.sorted.fastq | samtools view -o 900420.realign.CMV.vs.bam -
+
+79.50% overall alignment rate
+72.68% overall alignment rate
+
+bowtie2 --score-min L,-0.6,-1 --threads 8 --very-sensitive -x /data/shared/francislab/refs/bowtie2/NC_006273.2 -U 439338.unmapped.CMV.masked.vsl.sorted.fastq | samtools view -o 439338.realign.CMV.vs.bam -
+bowtie2 --score-min L,-0.6,-1 --threads 8 --very-sensitive -x /data/shared/francislab/refs/bowtie2/NC_006273.2 -U 900420.unmapped.CMV.masked.vsl.sorted.fastq | samtools view -o 900420.realign.CMV.vs.bam -
+
+85.09% overall alignment rate
+77.84% overall alignment rate
+
+
+
