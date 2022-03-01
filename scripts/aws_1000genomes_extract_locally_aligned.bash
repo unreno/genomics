@@ -151,7 +151,7 @@ set -x
 		response=$( $command )
 		echo "$response"
 		volume_id=$( echo "$response" | jq '.VolumeId' | tr -d '"' )
-		$echo $volume_id
+		echo $volume_id
 		#	vol-1234567890abcdef0
 
 
